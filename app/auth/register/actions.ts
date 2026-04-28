@@ -19,9 +19,27 @@ export async function register(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const role = String(formData.get("role") ?? "user") as UserRole;
+  const shelterName = String(formData.get("shelter_name") ?? "").trim();
+  const shelterLocation = String(formData.get("shelter_location") ?? "").trim();
+  const shelterMission = String(formData.get("shelter_mission") ?? "").trim();
+  const contactRole = String(formData.get("contact_role") ?? "").trim();
+  const contactPhone = String(formData.get("contact_phone") ?? "").trim();
 
   if (!fullName || !email || !password || !allowedRoles.includes(role)) {
     redirect(`${redirectBasePath}?error=${encodeURIComponent(dictionary.auth.invalidData)}`);
+  }
+
+  const userMetadata: Record<string, string> = {
+    full_name: fullName,
+    role,
+  };
+
+  if (role === "canil") {
+    if (shelterName) userMetadata.shelter_name = shelterName;
+    if (shelterLocation) userMetadata.shelter_location = shelterLocation;
+    if (shelterMission) userMetadata.shelter_mission = shelterMission;
+    if (contactRole) userMetadata.contact_role = contactRole;
+    if (contactPhone) userMetadata.contact_phone = contactPhone;
   }
 
   const supabase = await createServerSupabaseClient();
@@ -29,10 +47,7 @@ export async function register(formData: FormData) {
     email,
     password,
     options: {
-      data: {
-        full_name: fullName,
-        role,
-      },
+      data: userMetadata,
     },
   });
 

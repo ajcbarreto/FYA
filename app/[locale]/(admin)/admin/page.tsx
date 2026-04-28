@@ -28,7 +28,7 @@ export default async function AdminPage({ params, searchParams }: AdminPageProps
       <p className="mt-2 text-sm text-muted-foreground">{dictionary.admin.subtitle}</p>
 
       {success && (
-        <p className="mt-4 rounded-md border border-green-600/40 bg-green-100 px-3 py-2 text-sm text-green-700">
+        <p className="mt-4 rounded-md border border-secondary/35 bg-secondary/15 px-3 py-2 text-sm text-secondary">
           {success}
         </p>
       )}

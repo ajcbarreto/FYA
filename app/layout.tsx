@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "FYA (Found Your Animal)",
   description: "FYA - Found Your Animal, plataforma de adocao de animais",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

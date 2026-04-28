@@ -107,6 +107,20 @@ type Dictionary = {
       urgent: string;
     };
   };
+  petDetails: {
+    backToCatalog: string;
+    healthStatus: string;
+    personality: string;
+    storyTitle: string;
+    medicalSummaryTitle: string;
+    contactCardTitle: string;
+    contactCardSubtitle: string;
+    applyCta: string;
+    saveCta: string;
+    adoptionHintTitle: string;
+    adoptionHintDescription: string;
+    similarPetsTitle: string;
+  };
   admin: {
     title: string;
     subtitle: string;
@@ -122,6 +136,38 @@ type Dictionary = {
     success: string;
     unauthorized: string;
     genericError: string;
+  };
+  canilProfile: {
+    title: string;
+    subtitle: string;
+    shelterRole: string;
+    verifiedLabel: string;
+    verifiedValue: string;
+    unverifiedValue: string;
+    emailLabel: string;
+    phoneLabel: string;
+    locationLabel: string;
+    joinedLabel: string;
+    notProvided: string;
+    stats: {
+      activePets: string;
+      completedAdoptions: string;
+      pendingRequests: string;
+      responseTime: string;
+      comingSoon: string;
+    };
+    aboutTitle: string;
+    aboutDescription: string;
+    tagsTitle: string;
+    editProfile: string;
+    managePets: string;
+    quickActionsTitle: string;
+    postNewPet: string;
+    viewMessages: string;
+    exportReport: string;
+    profileProgressTitle: string;
+    profileProgressDescription: string;
+    openProfileCta: string;
   };
 };
 
@@ -236,6 +282,20 @@ const dictionaries: Record<Locale, Dictionary> = {
         urgent: "Urgente",
       },
     },
+    petDetails: {
+      backToCatalog: "Voltar ao catalogo",
+      healthStatus: "Estado de saude",
+      personality: "Personalidade",
+      storyTitle: "Historia",
+      medicalSummaryTitle: "Resumo medico",
+      contactCardTitle: "Contacto do canil",
+      contactCardSubtitle: "Responderemos em ate 24 horas com os proximos passos da adocao.",
+      applyCta: "Candidatar para adotar",
+      saveCta: "Guardar pet",
+      adoptionHintTitle: "Dica para adocao",
+      adoptionHintDescription: "Partilha a tua rotina e experiencia com animais para acelerar a avaliacao.",
+      similarPetsTitle: "Conhece mais amigos",
+    },
     admin: {
       title: "Painel de administracao",
       subtitle: "Configura os dados globais da plataforma.",
@@ -251,6 +311,39 @@ const dictionaries: Record<Locale, Dictionary> = {
       success: "Configuracao atualizada com sucesso.",
       unauthorized: "Nao autorizado para esta operacao.",
       genericError: "Nao foi possivel guardar. Tenta novamente.",
+    },
+    canilProfile: {
+      title: "Perfil do Abrigo",
+      subtitle: "Gere a identidade publica do teu abrigo na FYA (Found Your Animal).",
+      shelterRole: "Abrigo",
+      verifiedLabel: "Verificacao",
+      verifiedValue: "Verificado",
+      unverifiedValue: "Pendente",
+      emailLabel: "Email",
+      phoneLabel: "Telefone",
+      locationLabel: "Localizacao",
+      joinedLabel: "Membro desde",
+      notProvided: "Nao definido",
+      stats: {
+        activePets: "Pets ativos",
+        completedAdoptions: "Adocoes concluidas",
+        pendingRequests: "Pedidos pendentes",
+        responseTime: "Tempo de resposta",
+        comingSoon: "Em breve",
+      },
+      aboutTitle: "Sobre o abrigo",
+      aboutDescription:
+        "Mantem este perfil atualizado para aumentar a confianca dos adotantes e melhorar a taxa de resposta.",
+      tagsTitle: "Especialidades e comodidades",
+      editProfile: "Editar perfil",
+      managePets: "Gerir animais",
+      quickActionsTitle: "Acoes rapidas",
+      postNewPet: "Publicar novo pet",
+      viewMessages: "Ver mensagens",
+      exportReport: "Exportar relatorio",
+      profileProgressTitle: "Progresso do perfil",
+      profileProgressDescription: "Perfil base concluido. Completa telefone e localizacao para maior destaque.",
+      openProfileCta: "Abrir perfil do abrigo",
     },
   },
   en: {
@@ -363,6 +456,20 @@ const dictionaries: Record<Locale, Dictionary> = {
         urgent: "Urgent",
       },
     },
+    petDetails: {
+      backToCatalog: "Back to catalog",
+      healthStatus: "Health status",
+      personality: "Personality",
+      storyTitle: "Story",
+      medicalSummaryTitle: "Medical summary",
+      contactCardTitle: "Shelter contact",
+      contactCardSubtitle: "We usually reply within 24 hours with the next adoption steps.",
+      applyCta: "Apply to adopt",
+      saveCta: "Save pet",
+      adoptionHintTitle: "Adoption tip",
+      adoptionHintDescription: "Share your routine and pet experience to speed up the review.",
+      similarPetsTitle: "Meet more friends",
+    },
     admin: {
       title: "Admin panel",
       subtitle: "Configure global platform data.",
@@ -378,6 +485,39 @@ const dictionaries: Record<Locale, Dictionary> = {
       success: "Configuration updated successfully.",
       unauthorized: "Not authorized for this operation.",
       genericError: "Could not save. Please try again.",
+    },
+    canilProfile: {
+      title: "Shelter Profile",
+      subtitle: "Manage your shelter public identity on FYA (Found Your Animal).",
+      shelterRole: "Shelter",
+      verifiedLabel: "Verification",
+      verifiedValue: "Verified",
+      unverifiedValue: "Pending",
+      emailLabel: "Email",
+      phoneLabel: "Phone",
+      locationLabel: "Location",
+      joinedLabel: "Member since",
+      notProvided: "Not provided",
+      stats: {
+        activePets: "Active pets",
+        completedAdoptions: "Completed adoptions",
+        pendingRequests: "Pending requests",
+        responseTime: "Response time",
+        comingSoon: "Coming soon",
+      },
+      aboutTitle: "About the shelter",
+      aboutDescription:
+        "Keep this profile updated to increase adopter trust and improve your response rate.",
+      tagsTitle: "Specializations and amenities",
+      editProfile: "Edit profile",
+      managePets: "Manage pets",
+      quickActionsTitle: "Quick actions",
+      postNewPet: "Post new pet",
+      viewMessages: "View messages",
+      exportReport: "Export report",
+      profileProgressTitle: "Profile progress",
+      profileProgressDescription: "Base profile is complete. Add phone and location for better visibility.",
+      openProfileCta: "Open shelter profile",
     },
   },
 };

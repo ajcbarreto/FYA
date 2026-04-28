@@ -13,12 +13,21 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
   const nextPath = pathname.replace(/^\/(pt|en)(?=\/|$)/, "") || "/";
 
   return (
-    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-      <Link href={`/pt${nextPath}`} className={locale === "pt" ? "text-foreground font-medium" : ""}>
+    <div className="inline-flex items-center rounded-full bg-muted/80 p-1 text-xs font-semibold">
+      <Link
+        href={`/pt${nextPath}`}
+        className={`rounded-full px-2.5 py-1 transition-colors ${
+          locale === "pt" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-primary"
+        }`}
+      >
         PT
       </Link>
-      <span>/</span>
-      <Link href={`/en${nextPath}`} className={locale === "en" ? "text-foreground font-medium" : ""}>
+      <Link
+        href={`/en${nextPath}`}
+        className={`rounded-full px-2.5 py-1 transition-colors ${
+          locale === "en" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-primary"
+        }`}
+      >
         EN
       </Link>
     </div>
