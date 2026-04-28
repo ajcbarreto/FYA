@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CheckCircle2, FileUp, HeartHandshake, LayoutDashboard, Visibility } from "lucide-react";
+import { CheckCircle2, Eye, FileUp, HeartHandshake, LayoutDashboard } from "lucide-react";
 import { register } from "@/app/auth/register/actions";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
@@ -88,7 +88,7 @@ export default async function ShelterRegistrationPage({
             <div className="space-y-6">
               <div className="flex gap-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
-                  <Visibility className="h-5 w-5" />
+                  <Eye className="h-5 w-5" />
                 </div>
                 <div>
                   <h4 className="font-bold">{content.benefit1Title}</h4>

@@ -1,6 +1,18 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Heart, MapPin, ShieldCheck, Stethoscope } from "lucide-react";
+import {
+  ArrowLeft,
+  ChevronRight,
+  Heart,
+  House,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
+  Stethoscope,
+  Syringe,
+  Scissors,
+  Activity,
+} from "lucide-react";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
@@ -26,147 +38,268 @@ export default async function PetDetailsPage({ params }: PetDetailsPageProps) {
   }
 
   const relatedPets = await getRelatedPets(supabase, pet.id, locale);
-  const healthStatus = [locale === "pt" ? "Vacinado" : "Vaccinated", pet.status];
+  const healthStatus = [locale === "pt" ? "Vacinacao em dia" : "Vaccinations up to date", pet.status];
   const personality = pet.traits;
-  const medicalSummary = [
-    { label: locale === "pt" ? "Estado" : "Status", value: pet.status },
-    { label: locale === "pt" ? "Origem" : "Shelter", value: pet.shelterName },
-    { label: locale === "pt" ? "Localizacao" : "Location", value: pet.location },
+  const galleryImages = [
+    pet.imageUrl,
+    `${pet.imageUrl}&sat=-20`,
+    `${pet.imageUrl}&sat=20`,
+    `${pet.imageUrl}&blur=1`,
   ];
+  const subtitle =
+    locale === "pt" ? `A alma especial do ${pet.shelterName}` : `The golden soul of ${pet.shelterName}`;
+  const weight =
+    pet.traits.join(" ").toLowerCase().includes("pequeno") || pet.traits.join(" ").toLowerCase().includes("small")
+      ? locale === "pt"
+        ? "8-12 kg"
+        : "18-26 lbs"
+      : pet.traits.join(" ").toLowerCase().includes("grande") || pet.traits.join(" ").toLowerCase().includes("large")
+        ? locale === "pt"
+          ? "24-32 kg"
+          : "53-70 lbs"
+        : locale === "pt"
+          ? "14-22 kg"
+          : "30-48 lbs";
+  const adoptionFee = locale === "pt" ? "Taxa de adocao: 180€" : "Adoption fee: $250";
+  const adoptionHint =
+    locale === "pt"
+      ? "Inclui microchip, vacinas iniciais e acompanhamento inicial do abrigo."
+      : "Includes microchip, initial vaccines, and early shelter follow-up.";
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-8 md:py-10">
-      <Link
-        href={`/${locale}/pets`}
-        className="inline-flex w-fit items-center gap-2 rounded-full border border-border/60 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        {dictionary.petDetails.backToCatalog}
-      </Link>
+    <main className="mx-auto w-full max-w-7xl flex-1 px-6 pb-20 pt-8 lg:px-8">
+      <nav className="mb-8 flex items-center gap-2 text-sm text-muted-foreground">
+        <Link href={`/${locale}/pets`} className="inline-flex items-center gap-1 font-medium hover:text-primary">
+          <ArrowLeft className="h-4 w-4" />
+          {dictionary.petDetails.backToCatalog}
+        </Link>
+        <span>/</span>
+        <span>{pet.species}</span>
+        <span>/</span>
+        <span className="font-bold text-primary">{pet.name}</span>
+      </nav>
 
-      <section className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
-        <article className="overflow-hidden rounded-3xl bg-card shadow-sm ring-1 ring-border/40">
-          <div className="relative flex min-h-80 items-end justify-between p-6">
-            <img src={pet.imageUrl} alt={pet.name} className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-            <button
-              type="button"
-              className="relative z-10 ml-auto inline-flex h-11 w-11 items-center justify-center rounded-full bg-background/85 text-muted-foreground backdrop-blur-sm transition-colors hover:text-foreground"
-              aria-label={`Favorite ${pet.name}`}
-            >
-              <Heart className="h-5 w-5" />
-            </button>
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+        <section className="space-y-6 lg:col-span-8">
+          <article className="relative">
+            <div className="aspect-[16/10] overflow-hidden rounded-3xl shadow-xl">
+              <img src={pet.imageUrl} alt={pet.name} className="h-full w-full object-cover" />
+            </div>
+            <div className="absolute -bottom-4 left-6 inline-flex items-center gap-2 rounded-full bg-secondary px-5 py-2 text-sm font-bold text-secondary-foreground shadow-lg">
+              <Heart className="h-4 w-4 fill-current" />
+              {locale === "pt" ? "Escolha popular" : "Popular choice"}
+            </div>
+          </article>
+
+          <div className="grid grid-cols-4 gap-4">
+            {galleryImages.map((image, index) => (
+              <div key={image} className="relative aspect-square overflow-hidden rounded-2xl">
+                <img src={image} alt={`${pet.name} ${index + 1}`} className="h-full w-full object-cover" />
+                {index === 3 && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-sm font-bold text-white">
+                    +2
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
-          <div className="space-y-6 p-6 md:p-8">
-            <header className="space-y-3">
-              <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">{pet.name}</h1>
-              <p className="text-base text-muted-foreground">
-                {pet.age} • {pet.species} • {pet.sex}
-              </p>
-              <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin className="h-4 w-4" />
-                {pet.location}
-              </p>
-              <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                <ShieldCheck className="h-4 w-4" />
-                {pet.shelterName}
-              </p>
-            </header>
-
+          <div className="space-y-8 pt-6">
             <div className="space-y-3">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                {dictionary.petDetails.healthStatus}
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {healthStatus.map((item) => (
-                  <span
-                    key={item}
-                    className="inline-flex items-center gap-1 rounded-full bg-secondary/15 px-3 py-1 text-xs font-medium text-secondary"
-                  >
-                    <ShieldCheck className="h-3.5 w-3.5" />
-                    {item}
-                  </span>
-                ))}
-              </div>
+              <h1 className="text-5xl font-extrabold tracking-tight">{pet.name}</h1>
+              <p className="text-xl italic text-secondary">{subtitle}</p>
             </div>
 
-            <div className="space-y-3">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                {dictionary.petDetails.personality}
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {personality.map((item) => (
-                  <span key={item} className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                    {item}
-                  </span>
-                ))}
-              </div>
+            <div className="flex flex-wrap gap-3">
+              {personality.map((item) => (
+                <span
+                  key={item}
+                  className="inline-flex items-center gap-2 rounded-full bg-secondary/15 px-4 py-2 text-sm font-bold text-secondary"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  {item}
+                </span>
+              ))}
             </div>
 
-            <section className="space-y-3">
-              <h2 className="text-xl font-semibold">{dictionary.petDetails.storyTitle}</h2>
-              <p className="leading-relaxed text-muted-foreground">
+            <section className="space-y-4">
+              <h2 className="text-2xl font-bold">{locale === "pt" ? `${pet.name} e a sua historia` : `${pet.name}'s story`}</h2>
+              <p className="text-base leading-relaxed text-muted-foreground">
                 {pet.description || (locale === "pt" ? "Sem descricao disponivel para este animal." : "No description available for this pet.")}
               </p>
             </section>
 
-            <section className="space-y-3">
-              <h2 className="text-xl font-semibold">{dictionary.petDetails.medicalSummaryTitle}</h2>
-              <div className="grid gap-3 sm:grid-cols-3">
-                {medicalSummary.map((entry) => (
-                  <div key={entry.label} className="rounded-2xl bg-muted/70 p-4">
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{entry.label}</p>
-                    <p className="mt-2 text-sm font-medium">{entry.value}</p>
+            <section className="rounded-3xl bg-muted/55 p-8">
+              <h3 className="mb-6 text-xl font-bold">{locale === "pt" ? "Saude e cuidados" : "Health & grooming"}</h3>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div className="flex items-start gap-3">
+                  <Syringe className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-bold">{locale === "pt" ? "Vacinacao" : "Vaccinations"}</p>
+                    <p className="text-sm text-muted-foreground">{healthStatus[0]}</p>
                   </div>
-                ))}
+                </div>
+                <div className="flex items-start gap-3">
+                  <Scissors className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-bold">{locale === "pt" ? "Cuidados de pelo" : "Grooming needs"}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {locale === "pt" ? "Escovagem regular recomendada." : "Regular brushing recommended."}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <ShieldCheck className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-bold">{locale === "pt" ? "Estado atual" : "Current status"}</p>
+                    <p className="text-sm text-muted-foreground">{pet.status}</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Activity className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-bold">{locale === "pt" ? "Condicoes medicas" : "Medical conditions"}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {locale === "pt" ? "Sem condicoes criticas registadas." : "No critical conditions registered."}
+                    </p>
+                  </div>
+                </div>
               </div>
             </section>
           </div>
-        </article>
+        </section>
 
-        <aside className="h-fit space-y-5 rounded-3xl bg-muted/55 p-6">
-          <h2 className="text-xl font-semibold">{dictionary.petDetails.contactCardTitle}</h2>
-          <p className="text-sm text-muted-foreground">{pet.shelterName}</p>
-          <p className="text-sm text-muted-foreground">{dictionary.petDetails.contactCardSubtitle}</p>
+        <aside className="space-y-6 lg:col-span-4">
+          <article className="space-y-8 rounded-[2.5rem] border border-border/35 bg-card p-8 shadow-sm">
+            <h3 className="border-b border-border/35 pb-4 text-xl font-bold">
+              {locale === "pt" ? "Estatisticas principais" : "Key statistics"}
+            </h3>
+            <div className="grid grid-cols-2 gap-y-6">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  {locale === "pt" ? "Raca" : "Breed"}
+                </p>
+                <p className="font-semibold">{pet.species}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  {locale === "pt" ? "Idade" : "Age"}
+                </p>
+                <p className="font-semibold">{pet.age}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  {locale === "pt" ? "Genero" : "Gender"}
+                </p>
+                <p className="font-semibold">{pet.sex}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  {locale === "pt" ? "Peso" : "Weight"}
+                </p>
+                <p className="font-semibold">{weight}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  {locale === "pt" ? "Localizacao" : "Location"}
+                </p>
+                <p className="font-semibold">{pet.location}</p>
+              </div>
+            </div>
 
-          <button
-            type="button"
-            className="w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            {dictionary.petDetails.applyCta}
-          </button>
-          <button
-            type="button"
-            className="w-full rounded-full border border-border/70 bg-background px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
-          >
-            {dictionary.petDetails.saveCta}
-          </button>
+            <div className="space-y-3 pt-2">
+              <button
+                type="button"
+                className="w-full rounded-full bg-primary px-5 py-4 text-lg font-bold text-primary-foreground shadow-xl shadow-primary/25 transition-transform hover:scale-[1.01]"
+              >
+                {dictionary.petDetails.applyCta}
+              </button>
+              <button
+                type="button"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary px-5 py-3.5 text-base font-bold text-primary transition-colors hover:bg-primary/5"
+              >
+                <Heart className="h-4 w-4" />
+                {dictionary.petDetails.saveCta}
+              </button>
+            </div>
+          </article>
 
-          <div className="rounded-2xl bg-background/70 p-4">
-            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              <Stethoscope className="h-3.5 w-3.5" />
-              {dictionary.petDetails.adoptionHintTitle}
+          <article className="space-y-5 rounded-[2.5rem] bg-secondary p-8 text-secondary-foreground">
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 overflow-hidden rounded-full bg-white shadow-inner" />
+              <div>
+                <h4 className="font-bold">{pet.shelterName}</h4>
+                <p className="text-sm opacity-85">{locale === "pt" ? "Abrigo certificado" : "Certified shelter"}</p>
+              </div>
+            </div>
+            <div className="space-y-3 text-sm">
+              <p className="inline-flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                {pet.location}
+              </p>
+              <p className="inline-flex items-center gap-2">
+                <House className="h-4 w-4" />
+                {locale === "pt" ? "Visitas: Seg-Sab, 10h - 16h" : "Visits: Mon-Sat, 10am - 4pm"}
+              </p>
+            </div>
+            <div className="h-36 rounded-3xl bg-white/12" />
+            <Link href={`/${locale}/canil/perfil`} className="block text-center text-sm font-bold underline underline-offset-4">
+              {locale === "pt" ? "Ver perfil do abrigo" : "View shelter profile"}
+            </Link>
+          </article>
+
+          <article className="rounded-3xl border border-border/30 bg-muted/45 p-6">
+            <p className="inline-flex items-center gap-2 font-bold text-primary">
+              <Stethoscope className="h-4 w-4" />
+              {adoptionFee}
             </p>
-            <p className="mt-2 text-sm text-muted-foreground">{dictionary.petDetails.adoptionHintDescription}</p>
-          </div>
+            <p className="mt-2 text-xs text-muted-foreground">{adoptionHint}</p>
+          </article>
         </aside>
-      </section>
+      </div>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">{dictionary.petDetails.similarPetsTitle}</h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <section className="mt-24 space-y-10">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="text-3xl font-black">{dictionary.petDetails.similarPetsTitle}</h2>
+            <p className="mt-2 text-muted-foreground">
+              {locale === "pt"
+                ? `Mais amigos do ${pet.shelterName}`
+                : `More friends from ${pet.shelterName}`}
+            </p>
+          </div>
+          <Link href={`/${locale}/pets`} className="inline-flex items-center gap-1 text-sm font-bold text-secondary transition-all hover:gap-2">
+            {locale === "pt" ? "Ver todos os pets" : "View all pets"}
+            <ChevronRight className="h-4 w-4" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {relatedPets.map((relatedPet) => (
             <Link
               key={relatedPet.id}
               href={`/${locale}/pets/${relatedPet.id}`}
-              className="overflow-hidden rounded-3xl bg-card shadow-sm ring-1 ring-border/40 transition-transform hover:-translate-y-1"
+              className="group overflow-hidden rounded-[2rem] bg-card shadow-sm ring-1 ring-border/35 transition-all hover:-translate-y-1.5 hover:shadow-xl"
             >
-              <div className="flex aspect-[4/3] items-center justify-center overflow-hidden">
-                <img src={relatedPet.imageUrl} alt={relatedPet.name} className="h-full w-full object-cover" />
+              <div className="relative aspect-square overflow-hidden">
+                <img src={relatedPet.imageUrl} alt={relatedPet.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                {relatedPet.badge && (
+                  <span
+                    className={`absolute right-4 top-4 rounded-full px-3 py-1 text-[10px] font-bold uppercase ${
+                      relatedPet.badge === "new" ? "bg-primary/10 text-primary" : "bg-secondary/15 text-secondary"
+                    }`}
+                  >
+                    {relatedPet.badge === "new"
+                      ? locale === "pt"
+                        ? "Jovem"
+                        : "Young"
+                      : locale === "pt"
+                        ? "Adulto"
+                        : "Adult"}
+                  </span>
+                )}
               </div>
-              <div className="space-y-2 p-4">
-                <h3 className="text-lg font-semibold">{relatedPet.name}</h3>
+              <div className="space-y-2 p-5">
+                <h3 className="text-xl font-bold">{relatedPet.name}</h3>
                 <p className="text-sm text-muted-foreground">
                   {relatedPet.age} • {relatedPet.species}
                 </p>
