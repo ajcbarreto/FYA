@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { Navbar } from "@/components/navbar";
+import { NavbarSkeleton } from "@/components/navbar-skeleton";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 
 type LocaleLayoutProps = {
@@ -16,7 +18,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
   return (
     <>
-      <Navbar locale={locale as Locale} />
+      <Suspense fallback={<NavbarSkeleton locale={locale as Locale} />}>
+        <Navbar locale={locale as Locale} />
+      </Suspense>
       {children}
     </>
   );

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowRight, Heart, MapPin, PawPrint, Search, Send, Users, ShieldCheck } from "lucide-react";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -113,10 +114,13 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
         <div className="relative">
           <div className="absolute inset-0 -z-10 rotate-12 rounded-[57%_43%_61%_39%/45%_41%_59%_55%] bg-primary/10" />
           <div className="relative aspect-square overflow-hidden rounded-2xl shadow-2xl">
-            <img
+            <Image
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIgI4hK1OJrZt7EYogXqM0gNrsB9cteCk_tD7p7wfZ-_nWeAzyA80QW_vA-zbLGagTGGsyz5jIz0fP7Kdd8bCMlVQU-UeSZQqSO7-MLh4xqDtGATWAyVAzgJyQLSO2NcFE4SKC7v1tb9A5NY95NCjTY0-QBBoXwXZmjgG3ijmqAVvxQjZa9m8_RYbDtkHa03tjMxLSiXk9GnlzF1l3AkDmWbWjgiSmcJRFs_EP7tID8f-uVlTbZJqMpDRkbJ6Lej6seyDKHiGFnw8"
               alt={locale === "pt" ? "Cao e gato juntos" : "Dog and cat together"}
-              className="h-full w-full object-cover"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
             />
           </div>
           <div className="absolute -bottom-6 -left-6 flex items-center gap-4 rounded-xl bg-card p-5 shadow-xl">
@@ -150,7 +154,13 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
                 className="group overflow-hidden rounded-xl bg-card transition-all hover:-translate-y-1.5 hover:shadow-lg"
               >
                 <div className="relative h-64">
-                  <img src={pet.imageUrl} alt={pet.name} className="h-full w-full object-cover" />
+                  <Image
+                    src={pet.imageUrl}
+                    alt={pet.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    className="object-cover"
+                  />
                   <span className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-[10px] font-black uppercase tracking-wider text-primary-foreground">
                     {dictionary.petCatalog.tags.urgent}
                   </span>

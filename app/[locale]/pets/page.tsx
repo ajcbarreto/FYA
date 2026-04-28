@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowRight,
   ChevronLeft,
@@ -32,8 +33,10 @@ export default async function PetCatalogPage({ params }: PetCatalogPageProps) {
   const dictionary = getDictionary(locale);
   const filters = dictionary.petCatalog.sections;
   const supabase = await createServerSupabaseClient();
-  const filterConfig = await getPetCatalogFiltersConfig(supabase);
-  const pets = await getCatalogPets(supabase, locale);
+  const [filterConfig, pets] = await Promise.all([
+    getPetCatalogFiltersConfig(supabase),
+    getCatalogPets(supabase, locale),
+  ]);
   const sectionRows = [
     { icon: Timer, label: filters.ageRange, values: filterConfig.ageRanges },
     { icon: StretchHorizontal, label: filters.size, values: filterConfig.sizes },
@@ -150,10 +153,12 @@ export default async function PetCatalogPage({ params }: PetCatalogPageProps) {
               className="group overflow-hidden rounded-2xl border border-border/40 bg-card transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/5"
             >
               <div className="relative aspect-[4/5] overflow-hidden">
-                <img
+                <Image
                   src={pet.imageUrl}
                   alt={pet.name}
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <button
                   type="button"

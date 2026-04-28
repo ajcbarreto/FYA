@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
@@ -31,13 +32,14 @@ export default async function PetDetailsPage({ params }: PetDetailsPageProps) {
 
   const dictionary = getDictionary(locale);
   const supabase = await createServerSupabaseClient();
-  const pet = await getPetById(supabase, petId, locale);
+  const [pet, relatedPets] = await Promise.all([
+    getPetById(supabase, petId, locale),
+    getRelatedPets(supabase, petId, locale),
+  ]);
 
   if (!pet) {
     notFound();
   }
-
-  const relatedPets = await getRelatedPets(supabase, pet.id, locale);
   const healthStatus = [locale === "pt" ? "Vacinacao em dia" : "Vaccinations up to date", pet.status];
   const personality = pet.traits;
   const galleryImages = [
@@ -83,7 +85,14 @@ export default async function PetDetailsPage({ params }: PetDetailsPageProps) {
         <section className="space-y-6 lg:col-span-8">
           <article className="relative">
             <div className="aspect-[16/10] overflow-hidden rounded-3xl shadow-xl">
-              <img src={pet.imageUrl} alt={pet.name} className="h-full w-full object-cover" />
+              <Image
+                src={pet.imageUrl}
+                alt={pet.name}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 66vw"
+                className="object-cover"
+              />
             </div>
             <div className="absolute -bottom-4 left-6 inline-flex items-center gap-2 rounded-full bg-secondary px-5 py-2 text-sm font-bold text-secondary-foreground shadow-lg">
               <Heart className="h-4 w-4 fill-current" />
@@ -94,7 +103,13 @@ export default async function PetDetailsPage({ params }: PetDetailsPageProps) {
           <div className="grid grid-cols-4 gap-4">
             {galleryImages.map((image, index) => (
               <div key={image} className="relative aspect-square overflow-hidden rounded-2xl">
-                <img src={image} alt={`${pet.name} ${index + 1}`} className="h-full w-full object-cover" />
+                <Image
+                  src={image}
+                  alt={`${pet.name} ${index + 1}`}
+                  fill
+                  sizes="(max-width: 1024px) 25vw, 16vw"
+                  className="object-cover"
+                />
                 {index === 3 && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-sm font-bold text-white">
                     +2
@@ -281,7 +296,13 @@ export default async function PetDetailsPage({ params }: PetDetailsPageProps) {
               className="group overflow-hidden rounded-[2rem] bg-card shadow-sm ring-1 ring-border/35 transition-all hover:-translate-y-1.5 hover:shadow-xl"
             >
               <div className="relative aspect-square overflow-hidden">
-                <img src={relatedPet.imageUrl} alt={relatedPet.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                <Image
+                  src={relatedPet.imageUrl}
+                  alt={relatedPet.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                />
                 {relatedPet.badge && (
                   <span
                     className={`absolute right-4 top-4 rounded-full px-3 py-1 text-[10px] font-bold uppercase ${
