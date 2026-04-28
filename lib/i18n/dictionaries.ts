@@ -3,6 +3,7 @@ import type { Locale } from "@/lib/i18n/config";
 type Dictionary = {
   nav: {
     home: string;
+    pets: string;
     login: string;
     register: string;
     userDashboard: string;
@@ -59,12 +60,44 @@ type Dictionary = {
     goToRegister: string;
     goToLogin: string;
   };
+  petCatalog: {
+    title: string;
+    subtitle: string;
+    resultCount: string;
+    gridView: string;
+    listView: string;
+    filtersTitle: string;
+    filtersSubtitle: string;
+    clearFilters: string;
+    sections: {
+      species: string;
+      ageRange: string;
+      size: string;
+      gender: string;
+      compatibility: string;
+    };
+    speciesOptions: {
+      dog: string;
+      cat: string;
+      other: string;
+    };
+    searchPlaceholder: string;
+    pagination: {
+      previous: string;
+      next: string;
+    };
+    tags: {
+      newArrival: string;
+      urgent: string;
+    };
+  };
 };
 
 const dictionaries: Record<Locale, Dictionary> = {
   pt: {
     nav: {
       home: "Home",
+      pets: "Catalogo de Pets",
       login: "Entrar",
       register: "Registar",
       userDashboard: "Dashboard Adotante",
@@ -122,10 +155,42 @@ const dictionaries: Record<Locale, Dictionary> = {
       goToRegister: "Criar conta",
       goToLogin: "Entrar",
     },
+    petCatalog: {
+      title: "Pets disponiveis para adocao",
+      subtitle: "Explora animais de varios canis e encontra o teu proximo melhor amigo.",
+      resultCount: "A mostrar 1.240 animais em procura de uma familia.",
+      gridView: "Grelha",
+      listView: "Lista",
+      filtersTitle: "Filtrar resultados",
+      filtersSubtitle: "Encontra o match ideal",
+      clearFilters: "Limpar filtros",
+      sections: {
+        species: "Especie",
+        ageRange: "Faixa etaria",
+        size: "Porte",
+        gender: "Genero",
+        compatibility: "Compatibilidade",
+      },
+      speciesOptions: {
+        dog: "Cao",
+        cat: "Gato",
+        other: "Outro",
+      },
+      searchPlaceholder: "Pesquisa por raca ou nome...",
+      pagination: {
+        previous: "Pagina anterior",
+        next: "Proxima pagina",
+      },
+      tags: {
+        newArrival: "Novo",
+        urgent: "Urgente",
+      },
+    },
   },
   en: {
     nav: {
       home: "Home",
+      pets: "Pet Catalog",
       login: "Login",
       register: "Register",
       userDashboard: "Adopter Dashboard",
@@ -182,6 +247,37 @@ const dictionaries: Record<Locale, Dictionary> = {
       hasAccount: "Already have an account?",
       goToRegister: "Create account",
       goToLogin: "Sign in",
+    },
+    petCatalog: {
+      title: "Available pets for adoption",
+      subtitle: "Explore animals from trusted shelters and find your next best friend.",
+      resultCount: "Showing 1,240 pets currently looking for a family.",
+      gridView: "Grid",
+      listView: "List",
+      filtersTitle: "Filter results",
+      filtersSubtitle: "Find your perfect match",
+      clearFilters: "Clear filters",
+      sections: {
+        species: "Species",
+        ageRange: "Age range",
+        size: "Size",
+        gender: "Gender",
+        compatibility: "Compatibility",
+      },
+      speciesOptions: {
+        dog: "Dog",
+        cat: "Cat",
+        other: "Other",
+      },
+      searchPlaceholder: "Search by breed or name...",
+      pagination: {
+        previous: "Previous page",
+        next: "Next page",
+      },
+      tags: {
+        newArrival: "New arrival",
+        urgent: "Urgent",
+      },
     },
   },
 };

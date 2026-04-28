@@ -34,7 +34,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const { supabase, response } = createMiddlewareSupabaseClient(request);
+  let supabase: ReturnType<typeof createMiddlewareSupabaseClient>["supabase"];
+  let response: ReturnType<typeof createMiddlewareSupabaseClient>["response"];
+
+  try {
+    ({ supabase, response } = createMiddlewareSupabaseClient(request));
+  } catch {
+    const loginUrl = new URL(`/${locale}/auth/login`, request.url);
+    loginUrl.searchParams.set("next", pathnameWithoutLocale);
+    return NextResponse.redirect(loginUrl);
+  }
 
   const {
     data: { user },

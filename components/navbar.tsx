@@ -43,6 +43,9 @@ export async function Navbar({ locale }: NavbarProps) {
           <Link href={`/${locale}`} className="text-sm text-muted-foreground hover:text-foreground">
             {dictionary.nav.home}
           </Link>
+          <Link href={`/${locale}/pets`} className="text-sm text-muted-foreground hover:text-foreground">
+            {dictionary.nav.pets}
+          </Link>
 
           {!user && (
             <>

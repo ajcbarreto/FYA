@@ -1,8 +1,10 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
-import { supabasePublishableKey, supabaseUrl } from "./config";
+import { assertSupabaseEnv, supabasePublishableKey, supabaseUrl } from "./config";
 
 export function createMiddlewareSupabaseClient(request: NextRequest) {
+  assertSupabaseEnv();
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,

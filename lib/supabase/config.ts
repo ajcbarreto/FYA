@@ -1,14 +1,22 @@
-function requireEnv(name: "NEXT_PUBLIC_SUPABASE_URL" | "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY") {
-  const value = process.env[name];
+type SupabaseEnvName = "NEXT_PUBLIC_SUPABASE_URL" | "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY";
 
-  if (!value) {
-    throw new Error(`Missing Supabase environment variable: ${name}`);
-  }
-
-  return value;
+function readEnv(name: SupabaseEnvName) {
+  return process.env[name] ?? "";
 }
 
-const supabaseUrl = requireEnv("NEXT_PUBLIC_SUPABASE_URL");
-const supabasePublishableKey = requireEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
+const supabaseUrl = readEnv("NEXT_PUBLIC_SUPABASE_URL");
+const supabasePublishableKey = readEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
 
-export { supabaseUrl, supabasePublishableKey };
+const hasSupabaseEnv = Boolean(supabaseUrl && supabasePublishableKey);
+
+function assertSupabaseEnv() {
+  if (hasSupabaseEnv) {
+    return;
+  }
+
+  throw new Error(
+    "Missing Supabase environment variables: NEXT_PUBLIC_SUPABASE_URL and/or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+  );
+}
+
+export { supabaseUrl, supabasePublishableKey, hasSupabaseEnv, assertSupabaseEnv };
