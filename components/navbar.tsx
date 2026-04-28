@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { logout } from "@/app/auth/register/actions";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import type { UserRole } from "@/lib/supabase/types";
-import { Button } from "@/components/ui/button";
+import { AccountDropdown } from "@/components/account-dropdown";
 
 type NavbarProps = {
   locale: Locale;
@@ -19,16 +18,50 @@ export async function Navbar({ locale }: NavbarProps) {
   } = await supabase.auth.getUser();
 
   let role: UserRole | null = null;
+  let fullName: string | null = null;
+  let email: string | null = null;
 
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role,full_name,email")
       .eq("id", user.id)
       .single();
 
     role = (profile?.role as UserRole | undefined) ?? null;
+    fullName = profile?.full_name ?? null;
+    email = profile?.email ?? user.email ?? null;
   }
+
+  const roleDashboardHref =
+    role === "admin" ? `/${locale}/admin` : role === "canil" ? `/${locale}/canil` : `/${locale}/user`;
+  const roleDashboardLabel =
+    role === "admin"
+      ? dictionary.nav.admin
+      : role === "canil"
+        ? dictionary.nav.canilDashboard
+        : dictionary.nav.userDashboard;
+  const roleSettingsHref = role === "canil" ? `/${locale}/canil/configuracoes` : `/${locale}/user/configuracoes`;
+  const roleSettingsLabel = role === "canil" ? dictionary.nav.canilSettings : dictionary.nav.userSettings;
+  const userDisplayName =
+    fullName?.trim() ||
+    (email?.includes("@") ? email.split("@")[0] : null) ||
+    (locale === "pt" ? "Conta" : "Account");
+  const userInitial = userDisplayName.charAt(0).toUpperCase();
+  const menuCopy =
+    locale === "pt"
+      ? {
+          openMenu: "Abrir menu da conta",
+          panel: "Meu painel",
+          settings: "Configuracoes",
+          logout: "Terminar sessao",
+        }
+      : {
+          openMenu: "Open account menu",
+          panel: "My dashboard",
+          settings: "Settings",
+          logout: "Sign out",
+        };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
@@ -99,12 +132,17 @@ export async function Navbar({ locale }: NavbarProps) {
             )}
 
             {user && (
-              <form action={logout}>
-                <input type="hidden" name="locale" value={locale} />
-                <Button type="submit" size="sm" className="rounded-full px-5">
-                  {dictionary.nav.logout}
-                </Button>
-              </form>
+              <AccountDropdown
+                locale={locale}
+                displayName={userDisplayName}
+                email={email}
+                initial={userInitial}
+                dashboardHref={roleDashboardHref}
+                dashboardLabel={roleDashboardLabel}
+                settingsHref={roleSettingsHref}
+                settingsLabel={roleSettingsLabel}
+                menuCopy={menuCopy}
+              />
             )}
           </div>
         </div>

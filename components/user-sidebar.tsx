@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType } from "react";
-import { Home, FileText, MessageCircle, Search } from "lucide-react";
+import { Home, FileText, MessageCircle, Search, Settings } from "lucide-react";
 import type { Locale } from "@/lib/i18n/config";
 
 type UserSidebarProps = {
@@ -27,6 +27,7 @@ export function UserSidebar({ locale }: UserSidebarProps) {
             catalog: "Catalogo de Pets",
             requests: "Meus Pedidos",
             messages: "Mensagens",
+            settings: "Configuracoes",
           },
         }
       : {
@@ -36,6 +37,7 @@ export function UserSidebar({ locale }: UserSidebarProps) {
             catalog: "Pet Catalog",
             requests: "My Requests",
             messages: "Messages",
+            settings: "Settings",
           },
         };
 
@@ -44,6 +46,7 @@ export function UserSidebar({ locale }: UserSidebarProps) {
     { href: `/${locale}/pets`, label: copy.links.catalog, icon: Search },
     { href: `/${locale}/user/pedidos`, label: copy.links.requests, icon: FileText },
     { href: `/${locale}/user/mensagens`, label: copy.links.messages, icon: MessageCircle },
+    { href: `/${locale}/user/configuracoes`, label: copy.links.settings, icon: Settings },
   ];
 
   return (
