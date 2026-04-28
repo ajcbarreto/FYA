@@ -1,0 +1,14 @@
+---
+description: Locale routing and translation conventions for app pages
+globs: app/**/*.tsx
+alwaysApply: false
+---
+
+# Locale and Routing Rules
+
+- All user-facing pages must live under `app/[locale]/...`.
+- Supported locales are `pt` and `en` only; validate locale before rendering.
+- Internal links in page UI and nav must be locale-prefixed (e.g. `/${locale}/auth/register`).
+- Do not hardcode mixed-language text in shared pages; read copy from dictionaries.
+- Keep default redirect behavior from `/` to `/${defaultLocale}` via middleware.
+- If adding a new page, provide translation keys in `lib/i18n/dictionaries.ts`.

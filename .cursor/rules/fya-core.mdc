@@ -1,0 +1,15 @@
+---
+description: Core standards for FYA architecture and delivery
+alwaysApply: true
+---
+
+# FYA Core Standards
+
+- Keep the app name and messaging as `FYA (Found Your Animal)`.
+- Stack baseline is fixed: Next.js App Router + TypeScript + Tailwind + shadcn.
+- Auth must use `@supabase/ssr` utilities from `lib/supabase/*` (no legacy auth-helpers).
+- Roles are `admin`, `user`, `canil` and authorization must depend on `profiles.role`.
+- Route protection must remain enforced in `middleware.ts`.
+- New features must preserve PT/EN compatibility and locale-aware navigation (`/pt`, `/en`).
+- Prefer Server Components by default; use Client Components only when necessary.
+- Keep changes small, testable, and aligned with existing file structure.

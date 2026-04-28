@@ -1,0 +1,14 @@
+---
+description: Supabase SSR and RBAC guardrails for auth-sensitive code
+globs: "{middleware.ts,lib/supabase/**/*.ts,app/**/auth/**/*.ts}"
+alwaysApply: false
+---
+
+# Auth and RBAC Guardrails
+
+- Keep cookie-based Supabase SSR clients centralized in `lib/supabase/`.
+- Middleware must protect role-based routes and avoid bypass paths.
+- Any auth redirect must preserve locale and intended destination when possible.
+- Profile role lookups must read from `public.profiles` by `auth.uid()`.
+- Never grant admin behavior unless role check explicitly confirms `admin`.
+- Keep user roles constrained to known values (`admin`, `user`, `canil`).
