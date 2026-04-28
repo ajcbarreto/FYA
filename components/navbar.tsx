@@ -52,9 +52,14 @@ export async function Navbar({ locale }: NavbarProps) {
           )}
 
           {role === "canil" && (
-            <Link href={`/${locale}/canil`} className="text-muted-foreground transition-colors hover:text-primary">
-              {dictionary.nav.canilDashboard}
-            </Link>
+            <>
+              <Link href={`/${locale}/canil`} className="text-muted-foreground transition-colors hover:text-primary">
+                {dictionary.nav.canilDashboard}
+              </Link>
+              <Link href={`/${locale}/canil/configuracoes`} className="text-muted-foreground transition-colors hover:text-primary">
+                {dictionary.nav.canilSettings}
+              </Link>
+            </>
           )}
 
           {role === "admin" && (
