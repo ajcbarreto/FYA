@@ -59,9 +59,28 @@ export async function proxy(request: NextRequest) {
     .from("profiles")
     .select("role")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
-  const role = profile?.role as UserRole | undefined;
+  let role = profile?.role as UserRole | undefined;
+
+  if (!role) {
+    const metadataRole = user.user_metadata?.role;
+    if (metadataRole === "admin" || metadataRole === "user" || metadataRole === "canil") {
+      role = metadataRole;
+    } else {
+      const { data: ownedShelter } = await supabase
+        .from("canis")
+        .select("id")
+        .eq("owner_profile_id", user.id)
+        .limit(1)
+        .maybeSingle();
+
+      if (ownedShelter) {
+        role = "canil";
+      }
+    }
+  }
+
   const authorized = role === requiredRole || (role === "admin" && requiredRole !== "admin");
 
   if (!authorized) {

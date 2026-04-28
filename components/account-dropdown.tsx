@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Settings, LayoutDashboard, LogOut } from "lucide-react"
+import { Settings, LayoutDashboard, LogOut, ChevronDown } from "lucide-react"
 import { logout } from "@/app/auth/register/actions"
 import { Button } from "@/components/ui/button"
 import {
@@ -48,7 +48,7 @@ export function AccountDropdown({
           variant="outline"
           size="sm"
           aria-label={menuCopy.openMenu}
-          className="h-10 rounded-full px-2"
+          className="h-11 rounded-full border-border/50 bg-card/70 px-2 shadow-sm backdrop-blur-sm"
         >
           <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-black text-primary-foreground">
             {initial}
@@ -56,35 +56,32 @@ export function AccountDropdown({
           <span className="hidden max-w-[130px] truncate pr-1 font-semibold sm:inline">
             {displayName}
           </span>
+          <ChevronDown className="mr-1 h-4 w-4 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-60 rounded-2xl">
+      <DropdownMenuContent align="end" className="w-64 rounded-2xl border-border/40 p-2 shadow-2xl">
         <DropdownMenuLabel>
           <p className="truncate text-sm font-bold">{displayName}</p>
           {email ? <p className="truncate text-xs text-muted-foreground">{email}</p> : null}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href={dashboardHref} className="cursor-pointer">
+          <Link href={dashboardHref} className="cursor-pointer rounded-xl">
             <LayoutDashboard className="h-4 w-4" />
-            <span>
-              {menuCopy.panel}: {dashboardLabel}
-            </span>
+            <span>{dashboardLabel}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href={settingsHref} className="cursor-pointer">
+          <Link href={settingsHref} className="cursor-pointer rounded-xl">
             <Settings className="h-4 w-4" />
-            <span>
-              {menuCopy.settings}: {settingsLabel}
-            </span>
+            <span>{settingsLabel}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <form action={logout}>
           <input type="hidden" name="locale" value={locale} />
           <DropdownMenuItem asChild variant="destructive">
-            <button type="submit" className="w-full cursor-pointer">
+            <button type="submit" className="w-full cursor-pointer rounded-xl">
               <LogOut className="h-4 w-4" />
               <span>{menuCopy.logout}</span>
             </button>

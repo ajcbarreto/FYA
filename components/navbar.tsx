@@ -26,11 +26,29 @@ export async function Navbar({ locale }: NavbarProps) {
       .from("profiles")
       .select("role,full_name,email")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     role = (profile?.role as UserRole | undefined) ?? null;
     fullName = profile?.full_name ?? null;
     email = profile?.email ?? user.email ?? null;
+
+    // Fallback resilience: if profile role is missing for any reason, infer from owned shelter.
+    if (!role) {
+      const metadataRole = user.user_metadata?.role;
+      if (metadataRole === "admin" || metadataRole === "user" || metadataRole === "canil") {
+        role = metadataRole;
+      } else {
+        const { data: ownedShelter } = await supabase
+          .from("canis")
+          .select("id")
+          .eq("owner_profile_id", user.id)
+          .limit(1)
+          .maybeSingle();
+        if (ownedShelter) {
+          role = "canil";
+        }
+      }
+    }
   }
 
   const roleDashboardHref =
