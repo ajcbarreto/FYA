@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowRight, Lock, Mail, PawPrint } from "lucide-react";
 import { login } from "@/app/auth/login/actions";
@@ -45,10 +46,12 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
     <main className="mx-auto flex w-full max-w-6xl flex-1 items-center justify-center px-4 py-10 md:px-8 md:py-12">
       <section className="flex min-h-[700px] w-full flex-col overflow-hidden rounded-2xl bg-muted/35 shadow-[0_20px_40px_rgba(56,56,51,0.06)] md:flex-row">
         <div className="relative hidden w-1/2 p-12 md:flex md:flex-col md:justify-between">
-          <img
+          <Image
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqoyq7uuDX8byZraMUtO0HvBbcv1cBciDJKIAGd_OJmJmh3oS-FWYWS-RoFfuXBQ7XfLtqOqqgcciPqEMzbp1-ygVwagCWtZYjJ1kn6UhP6ZwE4Zpst-gOQxVZAb8DGq2wZ8-Yekyn-l3Oi_TojuZYuX6JkthIO6bjOdbyCy-9Oyo8puEQ9AImEvZtgN4-xyWeVWHK1-sZ0edrBOSpaOkPG1QXpeTljsqV1-k2153B9MciUJH7VGl2I8SjE5ymIZUMA3E17dLbHWQ"
             alt={locale === "pt" ? "Cao feliz" : "Happy golden retriever"}
-            className="absolute inset-0 h-full w-full object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-primary/15 mix-blend-multiply" />
           <div className="absolute inset-0 bg-gradient-to-t from-primary/45 to-transparent" />

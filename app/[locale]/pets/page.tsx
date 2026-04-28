@@ -3,8 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   ArrowRight,
-  ChevronLeft,
-  ChevronRight,
   Heart,
   PawPrint,
   Search,
@@ -17,14 +15,23 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getPetCatalogFiltersConfig } from "@/lib/pet-catalog/filter-config";
-import { getCatalogPets } from "@/lib/pet-catalog/db-pets";
+import { getCatalogPets, getCatalogPetsCount } from "@/lib/pet-catalog/db-pets";
 
 type PetCatalogPageProps = {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ q?: string; species?: string; sex?: string; size?: string; status?: string; page?: string }>;
 };
 
-export default async function PetCatalogPage({ params }: PetCatalogPageProps) {
+export default async function PetCatalogPage({ params, searchParams }: PetCatalogPageProps) {
   const { locale } = await params;
+  const { q, species, sex, size, status, page } = await searchParams;
+  const query = (q ?? "").trim();
+  const selectedSpecies = (species ?? "").trim().toLowerCase();
+  const selectedSex = (sex ?? "").trim().toLowerCase();
+  const selectedSize = (size ?? "").trim().toLowerCase();
+  const selectedStatus = (status ?? "").trim().toLowerCase();
+  const currentPage = Math.max(1, Number.parseInt(page ?? "1", 10) || 1);
+  const pageSize = 12;
 
   if (!isLocale(locale)) {
     notFound();
@@ -33,10 +40,67 @@ export default async function PetCatalogPage({ params }: PetCatalogPageProps) {
   const dictionary = getDictionary(locale);
   const filters = dictionary.petCatalog.sections;
   const supabase = await createServerSupabaseClient();
-  const [filterConfig, pets] = await Promise.all([
+  const [filterConfig, pets, totalPets] = await Promise.all([
     getPetCatalogFiltersConfig(supabase),
-    getCatalogPets(supabase, locale),
+    getCatalogPets(supabase, locale, {
+      search: query,
+      species: selectedSpecies || undefined,
+      sex: selectedSex || undefined,
+      size: selectedSize || undefined,
+      status: selectedStatus || undefined,
+      limit: pageSize,
+      page: currentPage,
+    }),
+    getCatalogPetsCount(supabase, {
+      search: query,
+      species: selectedSpecies || undefined,
+      sex: selectedSex || undefined,
+      size: selectedSize || undefined,
+      status: selectedStatus || undefined,
+    }),
   ]);
+  const totalPages = Math.max(1, Math.ceil(totalPets / pageSize));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const paginationBaseParams = new URLSearchParams();
+  if (query) paginationBaseParams.set("q", query);
+  if (selectedSpecies) paginationBaseParams.set("species", selectedSpecies);
+  if (selectedSex) paginationBaseParams.set("sex", selectedSex);
+  if (selectedSize) paginationBaseParams.set("size", selectedSize);
+  if (selectedStatus) paginationBaseParams.set("status", selectedStatus);
+  const buildPageHref = (targetPage: number) => {
+    const params = new URLSearchParams(paginationBaseParams.toString());
+    if (targetPage > 1) {
+      params.set("page", String(targetPage));
+    }
+    const serialized = params.toString();
+    return serialized ? `/${locale}/pets?${serialized}` : `/${locale}/pets`;
+  };
+  const visiblePages = Array.from(
+    new Set([1, safeCurrentPage - 1, safeCurrentPage, safeCurrentPage + 1, totalPages].filter((value) => value >= 1 && value <= totalPages)),
+  ).sort((a, b) => a - b);
+  const speciesOptions = [
+    { value: "", label: locale === "pt" ? "Todas as especies" : "All species" },
+    { value: "cao", label: locale === "pt" ? "Caes" : "Dogs" },
+    { value: "gato", label: locale === "pt" ? "Gatos" : "Cats" },
+  ];
+  const sexOptions = [
+    { value: "", label: locale === "pt" ? "Qualquer genero" : "Any gender" },
+    { value: "macho", label: locale === "pt" ? "Macho" : "Male" },
+    { value: "femea", label: locale === "pt" ? "Femea" : "Female" },
+  ];
+  const sizeOptions = [
+    { value: "", label: locale === "pt" ? "Qualquer porte" : "Any size" },
+    { value: "pequeno", label: locale === "pt" ? "Pequeno" : "Small" },
+    { value: "medio", label: locale === "pt" ? "Medio" : "Medium" },
+    { value: "grande", label: locale === "pt" ? "Grande" : "Large" },
+  ];
+  const statusOptions = [
+    { value: "", label: locale === "pt" ? "Qualquer estado" : "Any status" },
+    { value: "disponivel", label: locale === "pt" ? "Disponivel" : "Available" },
+    { value: "reservado", label: locale === "pt" ? "Reservado" : "Reserved" },
+    { value: "em_tratamento", label: locale === "pt" ? "Em tratamento" : "In treatment" },
+    { value: "adotado", label: locale === "pt" ? "Adotado" : "Adopted" },
+  ];
   const sectionRows = [
     { icon: Timer, label: filters.ageRange, values: filterConfig.ageRanges },
     { icon: StretchHorizontal, label: filters.size, values: filterConfig.sizes },
@@ -82,16 +146,11 @@ export default async function PetCatalogPage({ params }: PetCatalogPageProps) {
             <span className="text-sm">{filters.species}</span>
           </div>
           <div className="space-y-2 pl-10">
-          {filterConfig.species.map((option, index) => (
-            <label key={option} className="group flex items-center gap-2 text-sm text-muted-foreground">
-              <input
-                type="checkbox"
-                defaultChecked={index === 0}
-                className="h-4 w-4 rounded-full border-border text-primary focus:ring-primary"
-              />
-              {option}
-            </label>
-          ))}
+            {filterConfig.species.map((option) => (
+              <p key={option} className="text-sm text-muted-foreground">
+                {option}
+              </p>
+            ))}
           </div>
         </section>
 
@@ -109,12 +168,12 @@ export default async function PetCatalogPage({ params }: PetCatalogPageProps) {
           </section>
         ))}
 
-        <button
-          type="button"
-          className="mt-auto rounded-full px-4 py-3 text-sm font-bold text-secondary transition-colors hover:bg-secondary/10"
+        <Link
+          href={`/${locale}/pets`}
+          className="mt-auto inline-flex items-center justify-center rounded-full px-4 py-3 text-sm font-bold text-secondary transition-colors hover:bg-secondary/10"
         >
           {dictionary.petCatalog.clearFilters}
-        </button>
+        </Link>
       </aside>
 
       <section className="min-w-0 flex-1">
@@ -122,28 +181,88 @@ export default async function PetCatalogPage({ params }: PetCatalogPageProps) {
           <div className="space-y-2">
             <h1 className="text-4xl font-extrabold tracking-tight">{dictionary.petCatalog.title}</h1>
             <p className="max-w-2xl text-sm text-muted-foreground md:text-base">
-              {pets.length > 0 ? `${pets.length} ${locale === "pt" ? "animais encontrados." : "pets found."}` : dictionary.petCatalog.resultCount}
+              {totalPets > 0 ? `${totalPets} ${locale === "pt" ? "animais encontrados." : "pets found."}` : dictionary.petCatalog.resultCount}
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-            <div className="relative w-full md:max-w-md">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="search"
-                placeholder={dictionary.petCatalog.searchPlaceholder}
-                className="h-11 w-full rounded-full bg-muted px-11 pr-4 text-sm outline-none ring-0 transition-all focus:ring-2 focus:ring-primary/40"
-              />
+          <form method="get" className="flex flex-col gap-3 md:gap-4">
+            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div className="relative w-full md:max-w-md">
+                <label htmlFor="catalog-search" className="sr-only">
+                  {dictionary.petCatalog.searchPlaceholder}
+                </label>
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  id="catalog-search"
+                  name="q"
+                  type="search"
+                  placeholder={dictionary.petCatalog.searchPlaceholder}
+                  defaultValue={query}
+                  className="h-11 w-full rounded-full bg-muted px-11 pr-4 text-sm outline-none ring-0 transition-all focus:ring-2 focus:ring-primary/40"
+                />
+              </div>
+              <div className="inline-flex w-fit items-center rounded-full bg-muted p-1.5">
+                <button type="button" className="rounded-full bg-card px-6 py-1.5 text-sm font-bold text-primary shadow-sm">
+                  {dictionary.petCatalog.gridView}
+                </button>
+                <button type="button" className="rounded-full px-6 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-card/70">
+                  {dictionary.petCatalog.listView}
+                </button>
+              </div>
             </div>
-            <div className="inline-flex w-fit items-center rounded-full bg-muted p-1.5">
-              <button type="button" className="rounded-full bg-card px-6 py-1.5 text-sm font-bold text-primary shadow-sm">
-                {dictionary.petCatalog.gridView}
-              </button>
-              <button type="button" className="rounded-full px-6 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-card/70">
-                {dictionary.petCatalog.listView}
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-5">
+              <select
+                name="species"
+                defaultValue={selectedSpecies}
+                className="h-11 rounded-full bg-muted px-4 text-sm outline-none ring-0 transition-all focus:ring-2 focus:ring-primary/40"
+              >
+                {speciesOptions.map((option) => (
+                  <option key={option.value || "all"} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <select
+                name="sex"
+                defaultValue={selectedSex}
+                className="h-11 rounded-full bg-muted px-4 text-sm outline-none ring-0 transition-all focus:ring-2 focus:ring-primary/40"
+              >
+                {sexOptions.map((option) => (
+                  <option key={option.value || "all"} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <select
+                name="size"
+                defaultValue={selectedSize}
+                className="h-11 rounded-full bg-muted px-4 text-sm outline-none ring-0 transition-all focus:ring-2 focus:ring-primary/40"
+              >
+                {sizeOptions.map((option) => (
+                  <option key={option.value || "all"} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <select
+                name="status"
+                defaultValue={selectedStatus}
+                className="h-11 rounded-full bg-muted px-4 text-sm outline-none ring-0 transition-all focus:ring-2 focus:ring-primary/40"
+              >
+                {statusOptions.map((option) => (
+                  <option key={option.value || "all"} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="submit"
+                className="h-11 rounded-full bg-primary px-5 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+              >
+                {locale === "pt" ? "Aplicar filtros" : "Apply filters"}
               </button>
             </div>
-          </div>
+          </form>
         </header>
 
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -200,36 +319,50 @@ export default async function PetCatalogPage({ params }: PetCatalogPageProps) {
         </div>
         {pets.length === 0 && (
           <div className="rounded-2xl border border-border/40 bg-card p-8 text-center text-muted-foreground">
-            {locale === "pt" ? "Sem animais encontrados na base de dados." : "No pets were found in the database."}
+            {query
+              ? locale === "pt"
+                ? "Nao encontrámos resultados para essa pesquisa."
+                : "We could not find results for that search."
+              : locale === "pt"
+                ? "Sem animais encontrados na base de dados."
+                : "No pets were found in the database."}
           </div>
         )}
-
-        <nav className="mt-16 flex items-center justify-center gap-2" aria-label="Pagination">
-          <button
-            type="button"
-            aria-label={dictionary.petCatalog.pagination.previous}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-primary/5"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button type="button" className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20">
-            1
-          </button>
-          <button type="button" className="flex h-12 w-12 items-center justify-center rounded-full text-sm font-bold text-muted-foreground transition-colors hover:bg-muted">
-            2
-          </button>
-          <button type="button" className="flex h-12 w-12 items-center justify-center rounded-full text-sm font-bold text-muted-foreground transition-colors hover:bg-muted">
-            3
-          </button>
-          <span className="flex h-12 w-12 items-center justify-center text-sm text-muted-foreground">...</span>
-          <button
-            type="button"
-            aria-label={dictionary.petCatalog.pagination.next}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-primary/5"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        </nav>
+        {totalPages > 1 && (
+          <nav className="mt-10 flex items-center justify-center gap-2" aria-label="Pagination">
+            <Link
+              href={buildPageHref(Math.max(1, safeCurrentPage - 1))}
+              aria-disabled={safeCurrentPage <= 1}
+              className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                safeCurrentPage <= 1 ? "pointer-events-none bg-muted text-muted-foreground/50" : "bg-muted text-muted-foreground hover:text-primary"
+              }`}
+            >
+              {dictionary.petCatalog.pagination.previous}
+            </Link>
+            {visiblePages.map((pageNumber) => (
+              <Link
+                key={pageNumber}
+                href={buildPageHref(pageNumber)}
+                className={`rounded-full px-4 py-2 text-sm font-bold ${
+                  pageNumber === safeCurrentPage ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-primary"
+                }`}
+              >
+                {pageNumber}
+              </Link>
+            ))}
+            <Link
+              href={buildPageHref(Math.min(totalPages, safeCurrentPage + 1))}
+              aria-disabled={safeCurrentPage >= totalPages}
+              className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                safeCurrentPage >= totalPages
+                  ? "pointer-events-none bg-muted text-muted-foreground/50"
+                  : "bg-muted text-muted-foreground hover:text-primary"
+              }`}
+            >
+              {dictionary.petCatalog.pagination.next}
+            </Link>
+          </nav>
+        )}
 
         <footer className="mt-24 w-full border-t border-border/30 bg-muted/45">
           <div className="grid grid-cols-1 gap-10 px-8 py-16 md:grid-cols-4">

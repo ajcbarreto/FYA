@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowRight, Lock, Mail, PawPrint, User } from "lucide-react";
 import { register } from "@/app/auth/register/actions";
@@ -55,17 +56,21 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
         <div className="hidden lg:flex lg:flex-col lg:gap-10">
           <div className="relative w-fit">
             <div className="h-72 w-72 overflow-hidden rounded-full bg-secondary/20">
-              <img
+              <Image
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWCZKJyZVDZ0dI5a0Biove2dBDNpabZ4NSMqwafAfeCf9CcyQ6ZxDzP6gJI7byxRwbFc67KU_Tts1FECIP4wPVI5tO0Dic1t1FiWeW60JafvL0nQJbENUVvPDgrWO4R034SZTDAFZ4naVmmdkHzHExw-HjvsUOP4FVyz52Ehzjb6289EJrWGhxXHLSHbCQ4_c_aiklLZrnAFSZOtWOrkSlzDvKMCceiMq9JouGzka6aERf8bHeGTBqVNYnqew7CTcARGYnTJchl7Y"
                 alt={locale === "pt" ? "Cao sorridente" : "Smiling dog"}
-                className="h-full w-full object-cover"
+                fill
+                sizes="288px"
+                className="object-cover"
               />
             </div>
             <div className="absolute -bottom-6 -right-8 h-48 w-48 overflow-hidden rounded-full border-8 border-background bg-accent/20">
-              <img
+              <Image
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFutvC_LkhP2mmaQjWonEh_ong68fgPK1qYZHCdhxexb3hi7Ymm6BFV-354zz-BHNPO6omH0gEY9HCPlFducmGdQDSjaC7AaaVV2Io2Gq5e_BTz393TiLXwYzhw2W57Sj_bIbTjHkOTcARH9SEppiFgFyak9TEiv5p6wymyrszd0dQryHvfl2Fvq44uIl35uYEReZRjN9xdGvjB4LESi0GbGx5fJGkAALGaldpttCHCcMAycy9rr8drj1SHv6LtoOTvo7W_7Pus4M"
                 alt={locale === "pt" ? "Gatinho" : "Kitten"}
-                className="h-full w-full object-cover"
+                fill
+                sizes="192px"
+                className="object-cover"
               />
             </div>
           </div>

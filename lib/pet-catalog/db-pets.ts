@@ -29,6 +29,16 @@ export type AnimalRow = {
   canis: { nome: string; localizacao: string } | { nome: string; localizacao: string }[] | null;
 };
 
+type CatalogPetsQueryOptions = {
+  search?: string;
+  limit?: number;
+  page?: number;
+  species?: string;
+  sex?: string;
+  size?: string;
+  status?: string;
+};
+
 function toTitleCase(value: string) {
   return value
     .replaceAll("_", " ")
@@ -173,11 +183,37 @@ export function toCatalogItem(animal: AnimalRow, locale: string): PetCatalogItem
   };
 }
 
-export async function getCatalogPets(supabase: SupabaseClient, locale: string) {
-  const { data, error } = await supabase
+export async function getCatalogPets(supabase: SupabaseClient, locale: string, options: CatalogPetsQueryOptions = {}) {
+  let query = supabase
     .from("animais")
     .select("id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,canis(nome,localizacao)")
     .order("created_at", { ascending: false });
+
+  const normalizedSearch = options.search?.trim();
+  if (normalizedSearch) {
+    const escaped = normalizedSearch.replaceAll("%", "\\%").replaceAll("_", "\\_");
+    query = query.or(`nome.ilike.%${escaped}%,raca.ilike.%${escaped}%,descricao.ilike.%${escaped}%`);
+  }
+  if (options.species) {
+    query = query.eq("especie", options.species);
+  }
+  if (options.sex) {
+    query = query.eq("sexo", options.sex);
+  }
+  if (options.size) {
+    query = query.eq("porte", options.size);
+  }
+  if (options.status) {
+    query = query.eq("status", options.status);
+  }
+  if (options.limit && options.limit > 0) {
+    const page = Math.max(1, options.page ?? 1);
+    const from = (page - 1) * options.limit;
+    const to = from + options.limit - 1;
+    query = query.range(from, to);
+  }
+
+  const { data, error } = await query;
 
   if (error || !data) {
     if (error) {
@@ -187,6 +223,38 @@ export async function getCatalogPets(supabase: SupabaseClient, locale: string) {
   }
 
   return (data as AnimalRow[]).map((animal) => toCatalogItem(animal, locale));
+}
+
+export async function getCatalogPetsCount(
+  supabase: SupabaseClient,
+  options: Pick<CatalogPetsQueryOptions, "search" | "species" | "sex" | "size" | "status"> = {},
+) {
+  let query = supabase.from("animais").select("id", { count: "exact", head: true });
+  const normalizedSearch = options.search?.trim();
+  if (normalizedSearch) {
+    const escaped = normalizedSearch.replaceAll("%", "\\%").replaceAll("_", "\\_");
+    query = query.or(`nome.ilike.%${escaped}%,raca.ilike.%${escaped}%,descricao.ilike.%${escaped}%`);
+  }
+  if (options.species) {
+    query = query.eq("especie", options.species);
+  }
+  if (options.sex) {
+    query = query.eq("sexo", options.sex);
+  }
+  if (options.size) {
+    query = query.eq("porte", options.size);
+  }
+  if (options.status) {
+    query = query.eq("status", options.status);
+  }
+
+  const { count, error } = await query;
+  if (error) {
+    console.error("[getCatalogPetsCount] Supabase error:", error.message);
+    return 0;
+  }
+
+  return count ?? 0;
 }
 
 export async function getPetById(supabase: SupabaseClient, petId: string, locale: string) {

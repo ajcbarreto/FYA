@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CheckCircle2, Eye, FileUp, HeartHandshake, LayoutDashboard } from "lucide-react";
 import { register } from "@/app/auth/register/actions";
@@ -117,10 +118,12 @@ export default async function ShelterRegistrationPage({
           </div>
 
           <div className="relative h-64 overflow-hidden rounded-3xl shadow-xl">
-            <img
+            <Image
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuoGWPNxgccv2PjP-EljrPZXeo21I3n6e1XE9YzPCzxMv50Zyf-2ceJmBnCbeumIC62eCf6b-57Jj_Spc6469NsNooVsVaJTuA0KJvhU3QvTq-ZgrRFVNQ2rCYucMZdjjXdt5TQTB4WPeWFpY7cMwfBO6hX84Ycx3qGsl1GiQEvZUGeEsCyX4YR-eRHXQ263xrXVvNV1qVa-QA-Y_Iqxx6kcBRsf8fCtCytfTwTCC2CRPD-WYXRXZyv_SsU5czIcNJFIUpY3hVSWU"
               alt={locale === "pt" ? "Caes felizes num abrigo" : "Happy shelter dogs"}
-              className="h-full w-full object-cover"
+              fill
+              sizes="(max-width: 1024px) 100vw, 33vw"
+              className="object-cover"
             />
             <div className="absolute inset-0 flex items-end bg-gradient-to-t from-primary/60 to-transparent p-6">
               <p className="font-medium italic text-white">{content.imageQuote}</p>

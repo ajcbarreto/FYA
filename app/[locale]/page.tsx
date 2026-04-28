@@ -5,7 +5,7 @@ import { ArrowRight, Heart, MapPin, PawPrint, Search, Send, Users, ShieldCheck }
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getCatalogPets } from "@/lib/pet-catalog/db-pets";
+import { getCatalogPets, getCatalogPetsCount } from "@/lib/pet-catalog/db-pets";
 
 type LocalizedHomePageProps = {
   params: Promise<{ locale: string }>;
@@ -20,7 +20,10 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
 
   const dictionary = getDictionary(locale);
   const supabase = await createServerSupabaseClient();
-  const catalogPets = await getCatalogPets(supabase, locale);
+  const [urgentPets, totalPets] = await Promise.all([
+    getCatalogPets(supabase, locale, { limit: 4 }),
+    getCatalogPetsCount(supabase),
+  ]);
   const content =
     locale === "pt"
       ? {
@@ -28,7 +31,7 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
           urgentTitle: "Pets urgentes",
           urgentSubtitle: "Estes amigos estao ha mais tempo a espera de um lar.",
           seeAll: "Ver todos",
-          todayFound: `${catalogPets.length} pets encontrados`,
+          todayFound: `${totalPets} pets encontrados`,
           nearYou: "Na tua area hoje",
           howSubtitle:
             "Tres passos simples para encontrares o teu novo membro da familia com seguranca e acompanhamento.",
@@ -53,7 +56,7 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
           urgentTitle: "Urgent pets",
           urgentSubtitle: "These friends have been waiting the longest for a home.",
           seeAll: "See all",
-          todayFound: `${catalogPets.length} pets found`,
+          todayFound: `${totalPets} pets found`,
           nearYou: "In your area today",
           howSubtitle:
             "Three simple steps to bring your new family member home with confidence and guidance.",
@@ -73,8 +76,6 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
           browseCatalog: "Browse catalog",
           learnMore: "Learn more",
         };
-
-  const urgentPets = catalogPets.slice(0, 4);
 
   const steps = [
     { icon: Search, title: dictionary.home.steps.searchTitle, description: dictionary.home.steps.searchDescription },

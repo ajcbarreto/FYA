@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { Heart, MapPin, Phone, Globe, ShieldCheck, ArrowDown } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
@@ -124,11 +125,23 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
     <main className="w-full flex-1 pb-20 pt-8">
       <section className="mx-auto mb-16 w-full max-w-7xl px-6 lg:px-8">
         <div className="group relative h-[420px] w-full overflow-hidden rounded-3xl">
-          <img src={shelterImage} alt={locale === "pt" ? "Interior de abrigo moderno" : "Modern shelter interior"} className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+          <Image
+            src={shelterImage}
+            alt={locale === "pt" ? "Interior de abrigo moderno" : "Modern shelter interior"}
+            fill
+            sizes="(max-width: 1024px) 100vw, 1280px"
+            className="object-cover transition-transform duration-1000 group-hover:scale-110"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
           <div className="absolute bottom-10 left-10 flex items-end gap-6">
             <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border-4 border-background bg-white p-2 shadow-2xl">
-              <img src={profileLogo} alt={locale === "pt" ? "Logo do abrigo" : "Shelter logo"} className="h-full w-full rounded-full object-cover" />
+              <Image
+                src={profileLogo}
+                alt={locale === "pt" ? "Logo do abrigo" : "Shelter logo"}
+                width={112}
+                height={112}
+                className="h-full w-full rounded-full object-cover"
+              />
             </div>
             <div className="pb-2 text-white">
               <h1 className="text-5xl font-black tracking-tight">{shelterName}</h1>
@@ -247,10 +260,12 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
                 className="group overflow-hidden rounded-3xl border border-border/20 bg-background shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl"
               >
                 <div className="relative h-72 overflow-hidden">
-                  <img
-                    src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${pet.id}`}
+                  <Image
+                    src={pet.imageUrl}
                     alt={pet.name}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 25vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   {pet.badge && (
                     <span
