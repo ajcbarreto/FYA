@@ -1,81 +1,15 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { Heart } from "lucide-react";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
+import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { getPetCatalogFiltersConfig } from "@/lib/pet-catalog/filter-config";
+import { mockPets } from "@/lib/pet-catalog/mock-pets";
 
 type PetCatalogPageProps = {
   params: Promise<{ locale: string }>;
 };
-
-type PetCard = {
-  name: string;
-  age: string;
-  species: string;
-  sex: string;
-  traits: [string, string];
-  badge?: "new" | "urgent";
-  emoji: string;
-  accent: string;
-};
-
-const petCards: PetCard[] = [
-  {
-    name: "Cooper",
-    age: "2 Months",
-    species: "Golden Retriever",
-    sex: "Male",
-    traits: ["Energetic", "Kid Friendly"],
-    badge: "new",
-    emoji: "🐶",
-    accent: "from-amber-100 via-orange-100 to-rose-100",
-  },
-  {
-    name: "Luna",
-    age: "3 Years",
-    species: "Russian Blue",
-    sex: "Female",
-    traits: ["Calm", "Indoor Only"],
-    emoji: "🐱",
-    accent: "from-slate-100 via-zinc-100 to-blue-100",
-  },
-  {
-    name: "Benson",
-    age: "5 Years",
-    species: "French Bulldog",
-    sex: "Male",
-    traits: ["Apartment Life", "Well Trained"],
-    badge: "urgent",
-    emoji: "🐕",
-    accent: "from-orange-100 via-red-100 to-rose-100",
-  },
-  {
-    name: "Marshmallow",
-    age: "1 Year",
-    species: "Persian",
-    sex: "Female",
-    traits: ["Sweet", "Cuddly"],
-    emoji: "🐈",
-    accent: "from-zinc-100 via-stone-100 to-neutral-100",
-  },
-  {
-    name: "Duke",
-    age: "7 Years",
-    species: "Labrador Mix",
-    sex: "Male",
-    traits: ["Loyal", "Senior Friendly"],
-    emoji: "🐕‍🦺",
-    accent: "from-emerald-100 via-teal-100 to-cyan-100",
-  },
-  {
-    name: "Mittens",
-    age: "4 Months",
-    species: "Domestic Shorthair",
-    sex: "Female",
-    traits: ["Playful", "Social"],
-    emoji: "🐾",
-    accent: "from-sky-100 via-indigo-100 to-purple-100",
-  },
-];
 
 export default async function PetCatalogPage({ params }: PetCatalogPageProps) {
   const { locale } = await params;
@@ -86,7 +20,8 @@ export default async function PetCatalogPage({ params }: PetCatalogPageProps) {
 
   const dictionary = getDictionary(locale);
   const filters = dictionary.petCatalog.sections;
-  const species = dictionary.petCatalog.speciesOptions;
+  const supabase = await createServerSupabaseClient();
+  const filterConfig = await getPetCatalogFiltersConfig(supabase);
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 gap-6 px-4 py-8 md:gap-8 md:py-10">
@@ -98,25 +33,39 @@ export default async function PetCatalogPage({ params }: PetCatalogPageProps) {
 
         <section className="space-y-2">
           <p className="text-sm font-medium">{filters.species}</p>
-          <label className="flex items-center gap-2 text-sm text-muted-foreground">
-            <input type="checkbox" defaultChecked className="h-4 w-4 rounded border-input" />
-            {species.dog}
-          </label>
-          <label className="flex items-center gap-2 text-sm text-muted-foreground">
-            <input type="checkbox" className="h-4 w-4 rounded border-input" />
-            {species.cat}
-          </label>
-          <label className="flex items-center gap-2 text-sm text-muted-foreground">
-            <input type="checkbox" className="h-4 w-4 rounded border-input" />
-            {species.other}
-          </label>
+          {filterConfig.species.map((option, index) => (
+            <label key={option} className="flex items-center gap-2 text-sm text-muted-foreground">
+              <input type="checkbox" defaultChecked={index === 0} className="h-4 w-4 rounded border-input" />
+              {option}
+            </label>
+          ))}
         </section>
 
-        <section className="space-y-3 text-sm text-muted-foreground">
-          <p>{filters.ageRange}</p>
-          <p>{filters.size}</p>
-          <p>{filters.gender}</p>
-          <p>{filters.compatibility}</p>
+        <section className="space-y-4 text-sm text-muted-foreground">
+          <div className="space-y-2">
+            <p className="font-medium text-foreground">{filters.ageRange}</p>
+            {filterConfig.ageRanges.map((option) => (
+              <p key={option}>{option}</p>
+            ))}
+          </div>
+          <div className="space-y-2">
+            <p className="font-medium text-foreground">{filters.size}</p>
+            {filterConfig.sizes.map((option) => (
+              <p key={option}>{option}</p>
+            ))}
+          </div>
+          <div className="space-y-2">
+            <p className="font-medium text-foreground">{filters.gender}</p>
+            {filterConfig.genders.map((option) => (
+              <p key={option}>{option}</p>
+            ))}
+          </div>
+          <div className="space-y-2">
+            <p className="font-medium text-foreground">{filters.compatibility}</p>
+            {filterConfig.compatibilities.map((option) => (
+              <p key={option}>{option}</p>
+            ))}
+          </div>
         </section>
 
         <button
@@ -153,10 +102,10 @@ export default async function PetCatalogPage({ params }: PetCatalogPageProps) {
         </header>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {petCards.map((pet) => (
+          {mockPets.map((pet) => (
             <article
-              key={pet.name}
-              className="overflow-hidden rounded-3xl bg-card shadow-sm ring-1 ring-border/40 transition-transform hover:-translate-y-1"
+              key={pet.id}
+              className="overflow-hidden rounded-3xl bg-card shadow-sm ring-1 ring-border/40 transition-transform hover:-translate-y-1 focus-within:ring-primary/40"
             >
               <div className={`relative flex aspect-[4/5] items-start justify-between bg-gradient-to-br p-4 ${pet.accent}`}>
                 <span className="text-6xl" aria-hidden>
@@ -181,7 +130,7 @@ export default async function PetCatalogPage({ params }: PetCatalogPageProps) {
                 )}
               </div>
 
-              <div className="space-y-4 p-5">
+              <Link href={`/${locale}/pets/${pet.id}`} className="block space-y-4 p-5" aria-label={`Open ${pet.name} details`}>
                 <div className="flex items-start justify-between gap-3">
                   <h2 className="text-xl font-semibold">{pet.name}</h2>
                   <p className="text-sm font-medium text-primary">{pet.age}</p>
@@ -196,7 +145,7 @@ export default async function PetCatalogPage({ params }: PetCatalogPageProps) {
                     </span>
                   ))}
                 </div>
-              </div>
+              </Link>
             </article>
           ))}
         </div>

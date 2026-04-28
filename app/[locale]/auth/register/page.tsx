@@ -93,6 +93,11 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
             <option value="user">{dictionary.auth.adopter}</option>
             <option value="canil">{dictionary.auth.canil}</option>
           </select>
+          <p className="text-xs text-muted-foreground">
+            <Link href={`/${locale}/auth/shelter-registration`} className="hover:underline">
+              {dictionary.auth.shelterRegistrationLink}
+            </Link>
+          </p>
         </div>
 
         <Button type="submit" className="w-full">

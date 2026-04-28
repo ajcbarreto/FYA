@@ -59,6 +59,22 @@ type Dictionary = {
     hasAccount: string;
     goToRegister: string;
     goToLogin: string;
+    shelterRegistrationTitle: string;
+    shelterRegistrationSubtitle: string;
+    shelterIdentitySection: string;
+    shelterName: string;
+    shelterLocation: string;
+    shelterMission: string;
+    contactPersonSection: string;
+    contactRole: string;
+    contactPhone: string;
+    verificationSection: string;
+    registrationCertificateLabel: string;
+    registrationCertificateHint: string;
+    shelterDeclaration: string;
+    saveDraft: string;
+    finalizeRegistration: string;
+    shelterRegistrationLink: string;
   };
   petCatalog: {
     title: string;
@@ -90,6 +106,22 @@ type Dictionary = {
       newArrival: string;
       urgent: string;
     };
+  };
+  admin: {
+    title: string;
+    subtitle: string;
+    filterConfigTitle: string;
+    filterConfigDescription: string;
+    species: string;
+    ageRanges: string;
+    sizes: string;
+    genders: string;
+    compatibilities: string;
+    hint: string;
+    save: string;
+    success: string;
+    unauthorized: string;
+    genericError: string;
   };
 };
 
@@ -154,6 +186,24 @@ const dictionaries: Record<Locale, Dictionary> = {
       hasAccount: "Ja tens conta?",
       goToRegister: "Criar conta",
       goToLogin: "Entrar",
+      shelterRegistrationTitle: "Registo de Canis - Joyful Sanctuary",
+      shelterRegistrationSubtitle:
+        "Torne-se um parceiro da FYA completando o registo do abrigo e os dados de verificacao.",
+      shelterIdentitySection: "Identidade do Abrigo",
+      shelterName: "Nome do Abrigo / Canil",
+      shelterLocation: "Localizacao (Cidade/Distrito)",
+      shelterMission: "Declaracao de Missao",
+      contactPersonSection: "Pessoa de Contacto",
+      contactRole: "Cargo / Funcao",
+      contactPhone: "Telefone",
+      verificationSection: "Verificacao",
+      registrationCertificateLabel: "Carregue o Certificado de Registro da Entidade",
+      registrationCertificateHint: "PDF, JPG ou PNG (Max 5MB)",
+      shelterDeclaration:
+        "Confirmo que as informacoes fornecidas sao verdadeiras e que tenho autoridade para representar este abrigo na plataforma FYA (Found Your Animal).",
+      saveDraft: "Guardar Rascunho",
+      finalizeRegistration: "Finalizar Registo",
+      shelterRegistrationLink: "Registar canil com formulario completo",
     },
     petCatalog: {
       title: "Pets disponiveis para adocao",
@@ -185,6 +235,22 @@ const dictionaries: Record<Locale, Dictionary> = {
         newArrival: "Novo",
         urgent: "Urgente",
       },
+    },
+    admin: {
+      title: "Painel de administracao",
+      subtitle: "Configura os dados globais da plataforma.",
+      filterConfigTitle: "Configuracao dos filtros do catalogo",
+      filterConfigDescription: "Define quais opcoes aparecem no filtro da pagina de pets.",
+      species: "Especies",
+      ageRanges: "Faixas etarias",
+      sizes: "Portes",
+      genders: "Generos",
+      compatibilities: "Compatibilidades",
+      hint: "Separar opcoes com virgulas (ex: Cao, Gato, Outro).",
+      save: "Guardar configuracao",
+      success: "Configuracao atualizada com sucesso.",
+      unauthorized: "Nao autorizado para esta operacao.",
+      genericError: "Nao foi possivel guardar. Tenta novamente.",
     },
   },
   en: {
@@ -247,6 +313,24 @@ const dictionaries: Record<Locale, Dictionary> = {
       hasAccount: "Already have an account?",
       goToRegister: "Create account",
       goToLogin: "Sign in",
+      shelterRegistrationTitle: "Shelter Registration - Become a Partner",
+      shelterRegistrationSubtitle:
+        "Become an FYA partner by completing your shelter profile and verification information.",
+      shelterIdentitySection: "Shelter Identity",
+      shelterName: "Shelter Name",
+      shelterLocation: "Location (City/Region)",
+      shelterMission: "Mission Statement",
+      contactPersonSection: "Contact Person",
+      contactRole: "Role / Position",
+      contactPhone: "Phone",
+      verificationSection: "Verification",
+      registrationCertificateLabel: "Upload Organization Registration Certificate",
+      registrationCertificateHint: "PDF, JPG, or PNG (Max 5MB)",
+      shelterDeclaration:
+        "I confirm that the provided information is accurate and that I am authorized to represent this shelter on FYA (Found Your Animal).",
+      saveDraft: "Save Draft",
+      finalizeRegistration: "Complete Registration",
+      shelterRegistrationLink: "Register shelter with full form",
     },
     petCatalog: {
       title: "Available pets for adoption",
@@ -278,6 +362,22 @@ const dictionaries: Record<Locale, Dictionary> = {
         newArrival: "New arrival",
         urgent: "Urgent",
       },
+    },
+    admin: {
+      title: "Admin panel",
+      subtitle: "Configure global platform data.",
+      filterConfigTitle: "Pet catalog filter configuration",
+      filterConfigDescription: "Define which options appear in the pet catalog filters.",
+      species: "Species",
+      ageRanges: "Age ranges",
+      sizes: "Sizes",
+      genders: "Genders",
+      compatibilities: "Compatibilities",
+      hint: "Separate options with commas (e.g. Dog, Cat, Other).",
+      save: "Save configuration",
+      success: "Configuration updated successfully.",
+      unauthorized: "Not authorized for this operation.",
+      genericError: "Could not save. Please try again.",
     },
   },
 };

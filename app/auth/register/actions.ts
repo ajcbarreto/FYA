@@ -12,15 +12,16 @@ export async function register(formData: FormData) {
   const localeValue = String(formData.get("locale") ?? defaultLocale);
   const locale: Locale = isLocale(localeValue) ? localeValue : defaultLocale;
   const dictionary = getDictionary(locale);
+  const source = String(formData.get("source") ?? "register");
+  const redirectBasePath =
+    source === "shelter_registration" ? `/${locale}/auth/shelter-registration` : `/${locale}/auth/register`;
   const fullName = String(formData.get("full_name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const role = String(formData.get("role") ?? "user") as UserRole;
 
   if (!fullName || !email || !password || !allowedRoles.includes(role)) {
-    redirect(
-      `/${locale}/auth/register?error=${encodeURIComponent(dictionary.auth.invalidData)}`,
-    );
+    redirect(`${redirectBasePath}?error=${encodeURIComponent(dictionary.auth.invalidData)}`);
   }
 
   const supabase = await createServerSupabaseClient();
@@ -36,12 +37,10 @@ export async function register(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/${locale}/auth/register?error=${encodeURIComponent(error.message)}`);
+    redirect(`${redirectBasePath}?error=${encodeURIComponent(error.message)}`);
   }
 
-  redirect(
-    `/${locale}/auth/register?success=${encodeURIComponent(dictionary.auth.accountCreated)}`,
-  );
+  redirect(`${redirectBasePath}?success=${encodeURIComponent(dictionary.auth.accountCreated)}`);
 }
 
 export async function logout(formData: FormData) {

@@ -10,5 +10,5 @@ alwaysApply: false
 - Supported locales are `pt` and `en` only; validate locale before rendering.
 - Internal links in page UI and nav must be locale-prefixed (e.g. `/${locale}/auth/register`).
 - Do not hardcode mixed-language text in shared pages; read copy from dictionaries.
-- Keep default redirect behavior from `/` to `/${defaultLocale}` via middleware.
+- Keep default redirect behavior from `/` to `/${defaultLocale}` via proxy.
 - If adding a new page, provide translation keys in `lib/i18n/dictionaries.ts`.

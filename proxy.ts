@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { defaultLocale, isLocale } from "./lib/i18n/config";
-import { createMiddlewareSupabaseClient } from "./lib/supabase/middleware-client";
+import { createProxySupabaseClient } from "./lib/supabase/proxy-client";
 import type { UserRole } from "./lib/supabase/types";
 
 const protectedRoleByPrefix: Record<string, UserRole> = {
@@ -15,7 +15,7 @@ function getRequiredRole(pathname: string) {
   )?.[1];
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const segments = pathname.split("/").filter(Boolean);
   const maybeLocale = segments[0];
@@ -34,11 +34,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  let supabase: ReturnType<typeof createMiddlewareSupabaseClient>["supabase"];
-  let response: ReturnType<typeof createMiddlewareSupabaseClient>["response"];
+  let supabase: ReturnType<typeof createProxySupabaseClient>["supabase"];
+  let response: ReturnType<typeof createProxySupabaseClient>["response"];
 
   try {
-    ({ supabase, response } = createMiddlewareSupabaseClient(request));
+    ({ supabase, response } = createProxySupabaseClient(request));
   } catch {
     const loginUrl = new URL(`/${locale}/auth/login`, request.url);
     loginUrl.searchParams.set("next", pathnameWithoutLocale);
@@ -72,5 +72,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],
 };

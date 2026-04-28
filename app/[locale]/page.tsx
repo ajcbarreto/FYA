@@ -62,7 +62,7 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <Button asChild size="lg" className="rounded-full px-7">
-            <Link href={`/${locale}/auth/register`}>{dictionary.home.primaryCta}</Link>
+            <Link href={`/${locale}/auth/shelter-registration`}>{dictionary.home.primaryCta}</Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="rounded-full border-border/70 bg-background/80 px-7">
             <Link href={`/${locale}/user`}>{dictionary.home.secondaryCta}</Link>
