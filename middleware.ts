@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { defaultLocale, isLocale } from "@/lib/i18n/config";
-import { createMiddlewareSupabaseClient } from "@/lib/supabase/middleware-client";
-import type { UserRole } from "@/lib/supabase/types";
+import { defaultLocale, isLocale } from "./lib/i18n/config";
+import { createMiddlewareSupabaseClient } from "./lib/supabase/middleware-client";
+import type { UserRole } from "./lib/supabase/types";
 
 const protectedRoleByPrefix: Record<string, UserRole> = {
   "/user": "user",
