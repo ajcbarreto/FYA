@@ -46,9 +46,17 @@ export async function Navbar({ locale }: NavbarProps) {
           </Link>
 
           {role === "user" && (
-            <Link href={`/${locale}/user`} className="text-muted-foreground transition-colors hover:text-primary">
-              {dictionary.nav.userDashboard}
-            </Link>
+            <>
+              <Link href={`/${locale}/user`} className="text-muted-foreground transition-colors hover:text-primary">
+                {dictionary.nav.userDashboard}
+              </Link>
+              <Link href={`/${locale}/user/pedidos`} className="text-muted-foreground transition-colors hover:text-primary">
+                {dictionary.nav.userRequests}
+              </Link>
+              <Link href={`/${locale}/user/mensagens`} className="text-muted-foreground transition-colors hover:text-primary">
+                {dictionary.nav.userMessages}
+              </Link>
+            </>
           )}
 
           {role === "canil" && (

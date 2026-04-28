@@ -204,3 +204,168 @@ set
   porte = excluded.porte,
   status = excluded.status,
   descricao = excluded.descricao;
+
+-- 5) Pedidos de adocao de exemplo
+with applicant as (
+  select id
+  from public.profiles
+  where lower(email) = lower('user@fya.local')
+  limit 1
+)
+insert into public.pedidos_adocao (
+  id,
+  animal_id,
+  canil_id,
+  applicant_profile_id,
+  status,
+  mensagem_inicial,
+  observacoes_canil
+)
+select
+  'cccccccc-cccc-cccc-cccc-ccccccccccc1'::uuid,
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbb001'::uuid,
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1'::uuid,
+  a.id,
+  'pendente',
+  'Tenho experiencia com caes de porte medio e horario flexivel para adaptacao.',
+  null
+from applicant a
+on conflict (id) do update
+set
+  status = excluded.status,
+  mensagem_inicial = excluded.mensagem_inicial,
+  observacoes_canil = excluded.observacoes_canil;
+
+with applicant as (
+  select id
+  from public.profiles
+  where lower(email) = lower('user@fya.local')
+  limit 1
+)
+insert into public.pedidos_adocao (
+  id,
+  animal_id,
+  canil_id,
+  applicant_profile_id,
+  status,
+  mensagem_inicial,
+  observacoes_canil,
+  reviewed_at
+)
+select
+  'cccccccc-cccc-cccc-cccc-ccccccccccc2'::uuid,
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbb002'::uuid,
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1'::uuid,
+  a.id,
+  'entrevista',
+  'A Luna parece perfeita para apartamento e rotina calma.',
+  'Marcar visita para sabado as 11h.',
+  now()
+from applicant a
+on conflict (id) do update
+set
+  status = excluded.status,
+  mensagem_inicial = excluded.mensagem_inicial,
+  observacoes_canil = excluded.observacoes_canil,
+  reviewed_at = excluded.reviewed_at;
+
+-- 6) Conversas e mensagens de exemplo
+with applicant as (
+  select id
+  from public.profiles
+  where lower(email) = lower('user@fya.local')
+  limit 1
+)
+insert into public.conversas_adocao (
+  id,
+  canil_id,
+  applicant_profile_id,
+  animal_id,
+  pedido_id
+)
+select
+  'dddddddd-dddd-dddd-dddd-ddddddddddd1'::uuid,
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1'::uuid,
+  a.id,
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbb001'::uuid,
+  'cccccccc-cccc-cccc-cccc-ccccccccccc1'::uuid
+from applicant a
+on conflict (id) do update
+set
+  pedido_id = excluded.pedido_id,
+  animal_id = excluded.animal_id;
+
+with applicant as (
+  select id
+  from public.profiles
+  where lower(email) = lower('user@fya.local')
+  limit 1
+)
+insert into public.conversas_adocao (
+  id,
+  canil_id,
+  applicant_profile_id,
+  animal_id,
+  pedido_id
+)
+select
+  'dddddddd-dddd-dddd-dddd-ddddddddddd2'::uuid,
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1'::uuid,
+  a.id,
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbb002'::uuid,
+  'cccccccc-cccc-cccc-cccc-ccccccccccc2'::uuid
+from applicant a
+on conflict (id) do update
+set
+  pedido_id = excluded.pedido_id,
+  animal_id = excluded.animal_id;
+
+with sender_user as (
+  select id
+  from public.profiles
+  where lower(email) = lower('user@fya.local')
+  limit 1
+), sender_canil as (
+  select id
+  from public.profiles
+  where lower(email) = lower('canil@fya.local')
+  limit 1
+)
+insert into public.mensagens_adocao (id, conversa_id, sender_profile_id, conteudo)
+select
+  'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'::uuid,
+  'dddddddd-dddd-dddd-dddd-ddddddddddd1'::uuid,
+  su.id,
+  'Ola! Queria saber se o Bobby ainda aceita visitas este fim de semana.'
+from sender_user su
+on conflict (id) do nothing;
+
+with sender_canil as (
+  select id
+  from public.profiles
+  where lower(email) = lower('canil@fya.local')
+  limit 1
+)
+insert into public.mensagens_adocao (id, conversa_id, sender_profile_id, conteudo)
+select
+  'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'::uuid,
+  'dddddddd-dddd-dddd-dddd-ddddddddddd1'::uuid,
+  sc.id,
+  'Sim, temos disponibilidade no sabado. Posso confirmar as 10h?'
+from sender_canil sc
+on conflict (id) do nothing;
+
+with sender_user as (
+  select id
+  from public.profiles
+  where lower(email) = lower('user@fya.local')
+  limit 1
+)
+insert into public.mensagens_adocao (id, conversa_id, sender_profile_id, conteudo)
+select
+  'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee3'::uuid,
+  'dddddddd-dddd-dddd-dddd-ddddddddddd2'::uuid,
+  su.id,
+  'A Luna convive bem com criancas pequenas?'
+from sender_user su
+on conflict (id) do nothing;

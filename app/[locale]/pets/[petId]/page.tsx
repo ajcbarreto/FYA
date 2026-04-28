@@ -18,13 +18,16 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getPetById, getRelatedPets } from "@/lib/pet-catalog/db-pets";
+import { submitAdoptionRequest } from "@/app/adoption/actions";
 
 type PetDetailsPageProps = {
   params: Promise<{ locale: string; petId: string }>;
+  searchParams: Promise<{ success?: string; error?: string }>;
 };
 
-export default async function PetDetailsPage({ params }: PetDetailsPageProps) {
+export default async function PetDetailsPage({ params, searchParams }: PetDetailsPageProps) {
   const { locale, petId } = await params;
+  const { success, error } = await searchParams;
 
   if (!isLocale(locale)) {
     notFound();
@@ -67,6 +70,29 @@ export default async function PetDetailsPage({ params }: PetDetailsPageProps) {
     locale === "pt"
       ? "Inclui microchip, vacinas iniciais e acompanhamento inicial do abrigo."
       : "Includes microchip, initial vaccines, and early shelter follow-up.";
+  const feedbackMap =
+    locale === "pt"
+      ? {
+          request_created: "Candidatura enviada com sucesso.",
+          only_users_can_apply: "Apenas adotantes podem candidatar-se.",
+          pet_not_found: "Nao encontramos este animal.",
+          request_failed: "Nao foi possivel enviar a candidatura.",
+          conversation_failed: "A candidatura foi criada, mas nao foi possivel iniciar conversa.",
+          invalid_pet: "Animal invalido.",
+        }
+      : {
+          request_created: "Application submitted successfully.",
+          only_users_can_apply: "Only adopters can submit applications.",
+          pet_not_found: "Pet not found.",
+          request_failed: "Could not submit the application.",
+          conversation_failed: "Application created, but conversation could not be started.",
+          invalid_pet: "Invalid pet.",
+        };
+  const feedback =
+    (success && feedbackMap[success as keyof typeof feedbackMap]) ||
+    (error && feedbackMap[error as keyof typeof feedbackMap]) ||
+    null;
+  const feedbackIsError = Boolean(error);
 
   return (
     <main className="mx-auto w-full max-w-7xl flex-1 px-6 pb-20 pt-8 lg:px-8">
@@ -185,6 +211,17 @@ export default async function PetDetailsPage({ params }: PetDetailsPageProps) {
         </section>
 
         <aside className="space-y-6 lg:col-span-4">
+          {feedback && (
+            <p
+              className={`rounded-2xl px-4 py-3 text-sm ${
+                feedbackIsError
+                  ? "border border-destructive/40 bg-destructive/10 text-destructive"
+                  : "border border-secondary/30 bg-secondary/10 text-secondary"
+              }`}
+            >
+              {feedback}
+            </p>
+          )}
           <article className="space-y-8 rounded-[2.5rem] border border-border/35 bg-card p-8 shadow-sm">
             <h3 className="border-b border-border/35 pb-4 text-xl font-bold">
               {locale === "pt" ? "Estatisticas principais" : "Key statistics"}
@@ -222,9 +259,17 @@ export default async function PetDetailsPage({ params }: PetDetailsPageProps) {
               </div>
             </div>
 
-            <div className="space-y-3 pt-2">
+            <form action={submitAdoptionRequest} className="space-y-3 pt-2">
+              <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="petId" value={pet.id} />
+              <textarea
+                name="message"
+                rows={3}
+                placeholder={locale === "pt" ? "Escreve uma mensagem inicial para o canil..." : "Write an initial message to the shelter..."}
+                className="w-full rounded-2xl border border-border/30 bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+              />
               <button
-                type="button"
+                type="submit"
                 className="w-full rounded-full bg-primary px-5 py-4 text-lg font-bold text-primary-foreground shadow-xl shadow-primary/25 transition-transform hover:scale-[1.01]"
               >
                 {dictionary.petDetails.applyCta}
@@ -236,7 +281,7 @@ export default async function PetDetailsPage({ params }: PetDetailsPageProps) {
                 <Heart className="h-4 w-4" />
                 {dictionary.petDetails.saveCta}
               </button>
-            </div>
+            </form>
           </article>
 
           <article className="space-y-5 rounded-[2.5rem] bg-secondary p-8 text-secondary-foreground">

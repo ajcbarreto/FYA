@@ -7,6 +7,8 @@ type Dictionary = {
     login: string;
     register: string;
     userDashboard: string;
+    userRequests: string;
+    userMessages: string;
     canilDashboard: string;
     canilSettings: string;
     admin: string;
@@ -180,6 +182,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       login: "Entrar",
       register: "Registar",
       userDashboard: "Dashboard Adotante",
+      userRequests: "Meus Pedidos",
+      userMessages: "Mensagens",
       canilDashboard: "Dashboard Canil",
       canilSettings: "Configuracoes do Canil",
       admin: "Admin",
@@ -355,6 +359,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       login: "Login",
       register: "Register",
       userDashboard: "Adopter Dashboard",
+      userRequests: "My Requests",
+      userMessages: "Messages",
       canilDashboard: "Shelter Dashboard",
       canilSettings: "Shelter Settings",
       admin: "Admin",

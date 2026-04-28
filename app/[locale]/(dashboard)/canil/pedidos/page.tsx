@@ -2,17 +2,17 @@ import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
+import { getAdoptionRequestsForCanil, getRowAnimal, localizeRequestStatus, mapRequestApplicantName } from "@/lib/adoption/db";
+import { updateRequestStatus } from "@/app/adoption/actions";
 
 type CanilRequestsPageProps = {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ success?: string; error?: string }>;
 };
 
-type MockRequestStatus = "pending" | "interview" | "approved";
-
-const requestNames = ["Sarah Mitchell", "James Wilson", "Emily Chen", "Michael Scott", "Ana Souza", "Ricardo Silva"];
-
-export default async function CanilRequestsPage({ params }: CanilRequestsPageProps) {
+export default async function CanilRequestsPage({ params, searchParams }: CanilRequestsPageProps) {
   const { locale } = await params;
+  const { success, error } = await searchParams;
 
   if (!isLocale(locale)) {
     notFound();
@@ -27,7 +27,12 @@ export default async function CanilRequestsPage({ params }: CanilRequestsPagePro
     redirect(`/${locale}/auth/login?next=/canil/pedidos`);
   }
 
-  const { animals } = await getShelterForUser(supabase, user.id);
+  const { shelter } = await getShelterForUser(supabase, user.id);
+  if (!shelter) {
+    redirect(`/${locale}/canil?error=no_shelter`);
+  }
+
+  const requests = await getAdoptionRequestsForCanil(supabase, shelter.id);
   const copy =
     locale === "pt"
       ? {
@@ -39,14 +44,24 @@ export default async function CanilRequestsPage({ params }: CanilRequestsPagePro
             status: "Estado",
             actions: "Acoes",
           },
-          empty: "Sem pedidos no momento. Quando chegares novos pedidos, eles vao aparecer aqui.",
-          action: "Rever candidatura",
+          empty: "Sem pedidos no momento. Quando chegarem novos pedidos, eles vao aparecer aqui.",
+          action: "Atualizar pedido",
           statuses: {
-            pending: "Pendente",
-            interview: "Entrevista agendada",
-            approved: "Aprovado",
+            pendente: "Pendente",
+            entrevista: "Entrevista",
+            aprovado: "Aprovado",
+            rejeitado: "Rejeitado",
           },
-          hint: "Nota: enquanto o modulo completo de candidaturas nao e ligado ao backend, esta lista e gerada automaticamente a partir dos animais do canil.",
+          hint: "Atualiza o estado e adiciona notas para manter o adotante informado.",
+          notePlaceholder: "Observacoes para o adotante (opcional)",
+          save: "Guardar",
+          success: "Pedido atualizado com sucesso.",
+          errors: {
+            invalid_request: "Pedido invalido.",
+            save_failed: "Nao foi possivel guardar alteracoes.",
+            unauthorized: "Nao autorizado.",
+            no_shelter: "Nao foi encontrado canil associado.",
+          },
         }
       : {
           title: "Adoption Requests",
@@ -58,35 +73,31 @@ export default async function CanilRequestsPage({ params }: CanilRequestsPagePro
             actions: "Actions",
           },
           empty: "No requests right now. New requests will show up here.",
-          action: "Review application",
+          action: "Update request",
           statuses: {
-            pending: "Pending",
-            interview: "Interview scheduled",
-            approved: "Approved",
+            pendente: "Pending",
+            entrevista: "Interview",
+            aprovado: "Approved",
+            rejeitado: "Rejected",
           },
-          hint: "Note: until the full applications module is connected to backend data, this list is generated from shelter pets.",
+          hint: "Update statuses and notes to keep adopters informed.",
+          notePlaceholder: "Notes for adopter (optional)",
+          save: "Save",
+          success: "Request updated successfully.",
+          errors: {
+            invalid_request: "Invalid request.",
+            save_failed: "Could not save changes.",
+            unauthorized: "Not authorized.",
+            no_shelter: "No linked shelter found.",
+          },
         };
 
-  const requests = animals.slice(0, 6).map((animal, index) => {
-    const statusCycle: MockRequestStatus[] = ["pending", "interview", "approved"];
-    const status = statusCycle[index % statusCycle.length];
-
-    return {
-      id: `${animal.id}-${index}`,
-      applicant: requestNames[index % requestNames.length],
-      petName: animal.nome,
-      submittedAt: new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short", year: "numeric" }).format(
-        new Date(animal.created_at),
-      ),
-      status,
-    };
-  });
-
-  const statusClass: Record<MockRequestStatus, string> = {
-    pending: "bg-muted text-muted-foreground",
-    interview: "bg-accent/30 text-accent-foreground",
-    approved: "bg-secondary/20 text-secondary",
-  };
+  const feedback =
+    success === "updated"
+      ? copy.success
+      : error && copy.errors[error as keyof typeof copy.errors]
+        ? copy.errors[error as keyof typeof copy.errors]
+        : null;
 
   return (
     <main className="space-y-6">
@@ -94,6 +105,15 @@ export default async function CanilRequestsPage({ params }: CanilRequestsPagePro
         <h1 className="text-3xl font-black tracking-tight">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
+      {feedback && (
+        <p
+          className={`rounded-2xl px-4 py-3 text-sm ${
+            success ? "border border-secondary/30 bg-secondary/10 text-secondary" : "border border-destructive/40 bg-destructive/10 text-destructive"
+          }`}
+        >
+          {feedback}
+        </p>
+      )}
 
       <section className="overflow-hidden rounded-3xl border border-border/20 bg-card">
         {requests.length === 0 ? (
@@ -113,21 +133,43 @@ export default async function CanilRequestsPage({ params }: CanilRequestsPagePro
                 {requests.map((request) => (
                   <tr key={request.id} className="border-t border-border/15">
                     <td className="px-6 py-4">
-                      <p className="font-semibold">{request.applicant}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {locale === "pt" ? "Interesse em" : "Interested in"} {request.petName}
-                      </p>
+                      <p className="font-semibold">{mapRequestApplicantName(request, locale)}</p>
+                      <p className="text-xs text-muted-foreground">{getRowAnimal(request)?.nome ?? "-"}</p>
                     </td>
-                    <td className="px-6 py-4 text-sm">{request.submittedAt}</td>
+                    <td className="px-6 py-4 text-sm">
+                      {new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short", year: "numeric" }).format(
+                        new Date(request.created_at),
+                      )}
+                    </td>
                     <td className="px-6 py-4">
-                      <span className={`rounded-full px-3 py-1 text-xs font-bold ${statusClass[request.status]}`}>
-                        {copy.statuses[request.status]}
+                      <span className="rounded-full bg-muted px-3 py-1 text-xs font-bold text-muted-foreground">
+                        {localizeRequestStatus(request.status, locale)}
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <button type="button" className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">
-                        {copy.action}
-                      </button>
+                      <form action={updateRequestStatus} className="space-y-2">
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="requestId" value={request.id} />
+                        <select
+                          name="status"
+                          defaultValue={request.status}
+                          className="h-9 rounded-full border border-border/30 bg-background px-3 text-xs outline-none focus:ring-2 focus:ring-primary/20"
+                        >
+                          <option value="pendente">{copy.statuses.pendente}</option>
+                          <option value="entrevista">{copy.statuses.entrevista}</option>
+                          <option value="aprovado">{copy.statuses.aprovado}</option>
+                          <option value="rejeitado">{copy.statuses.rejeitado}</option>
+                        </select>
+                        <input
+                          name="notes"
+                          defaultValue={request.observacoes_canil ?? ""}
+                          placeholder={copy.notePlaceholder}
+                          className="h-9 w-full rounded-full border border-border/30 bg-background px-3 text-xs outline-none focus:ring-2 focus:ring-primary/20"
+                        />
+                        <button type="submit" className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">
+                          {copy.save}
+                        </button>
+                      </form>
                     </td>
                   </tr>
                 ))}

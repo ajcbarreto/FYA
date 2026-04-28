@@ -1,16 +1,15 @@
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getShelterForUser } from "@/lib/canil/shelter-data";
-import { getConversationsForCanil, getMessagesByConversationId, mapConversationListItem } from "@/lib/adoption/db";
+import { getConversationsForUser, getMessagesByConversationId, mapConversationListItem } from "@/lib/adoption/db";
 import { sendAdoptionMessage } from "@/app/adoption/actions";
 
-type CanilMessagesPageProps = {
+type UserMessagesPageProps = {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{ conversation?: string; success?: string; error?: string }>;
 };
 
-export default async function CanilMessagesPage({ params, searchParams }: CanilMessagesPageProps) {
+export default async function UserMessagesPage({ params, searchParams }: UserMessagesPageProps) {
   const { locale } = await params;
   const { conversation: selectedConversationId, success, error } = await searchParams;
 
@@ -24,15 +23,10 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/${locale}/auth/login?next=/canil/mensagens`);
+    redirect(`/${locale}/auth/login?next=/user/mensagens`);
   }
 
-  const { shelter } = await getShelterForUser(supabase, user.id);
-  if (!shelter) {
-    redirect(`/${locale}/canil?error=no_shelter`);
-  }
-
-  const conversationRows = await getConversationsForCanil(supabase, shelter.id);
+  const conversationRows = await getConversationsForUser(supabase, user.id);
   const conversations = conversationRows.map((row) => mapConversationListItem(row, locale));
   const activeConversation = selectedConversationId
     ? conversations.find((conversation) => conversation.id === selectedConversationId) ?? conversations[0] ?? null
@@ -42,14 +36,12 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
   const copy =
     locale === "pt"
       ? {
-          title: "Mensagens",
-          searchPlaceholder: "Procurar conversas...",
-          noConversations: "Sem conversas no momento.",
+          title: "Mensagens com Canis",
+          searchPlaceholder: "Pesquisar conversa...",
+          noConversations: "Sem conversas ainda.",
           inputPlaceholder: "Escreve a tua mensagem...",
           send: "Enviar",
-          adopterInfo: "Sobre o adotante",
-          profileVerified: "Perfil verificado",
-          reminder: "Lembrete",
+          withShelter: "Conversa com",
           success: "Mensagem enviada.",
           errors: {
             invalid_message: "Mensagem invalida.",
@@ -57,14 +49,12 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
           },
         }
       : {
-          title: "Messages",
-          searchPlaceholder: "Search conversations...",
+          title: "Messages with Shelters",
+          searchPlaceholder: "Search conversation...",
           noConversations: "No conversations yet.",
           inputPlaceholder: "Write your message...",
           send: "Send",
-          adopterInfo: "About the adopter",
-          profileVerified: "Verified profile",
-          reminder: "Reminder",
+          withShelter: "Chat with",
           success: "Message sent.",
           errors: {
             invalid_message: "Invalid message.",
@@ -110,13 +100,13 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
               conversations.map((conversation) => (
                 <a
                   key={conversation.id}
-                  href={`/${locale}/canil/mensagens?conversation=${conversation.id}`}
-                  className={`w-full rounded-2xl px-4 py-3 text-left ${
+                  href={`/${locale}/user/mensagens?conversation=${conversation.id}`}
+                  className={`block w-full rounded-2xl px-4 py-3 text-left ${
                     activeConversation?.id === conversation.id ? "bg-muted" : "hover:bg-muted/60"
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <p className="font-semibold">{conversation.applicantName}</p>
+                    <p className="font-semibold">{conversation.canilName}</p>
                     <span className="text-xs text-muted-foreground">
                       {new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(
                         new Date(conversation.updatedAt),
@@ -124,23 +114,22 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
                     </span>
                   </div>
                   <p className="mt-0.5 text-xs text-primary">{conversation.animalName}</p>
-                  <p className="mt-1 truncate text-sm text-muted-foreground">{conversation.canilName}</p>
+                  <p className="mt-1 truncate text-sm text-muted-foreground">{conversation.applicantName}</p>
                 </a>
               ))
             )}
           </div>
         </article>
 
-        <article className="rounded-3xl border border-border/20 bg-card p-6 xl:col-span-5">
+        <article className="rounded-3xl border border-border/20 bg-card p-6 xl:col-span-8">
           {activeConversation ? (
             <>
               <div className="border-b border-border/20 pb-4">
                 <p className="text-lg font-bold">{activeConversation.animalName}</p>
                 <p className="text-sm text-muted-foreground">
-                  {locale === "pt" ? "Conversa com" : "Chat with"} {activeConversation.applicantName}
+                  {copy.withShelter} {activeConversation.canilName}
                 </p>
               </div>
-
               <div className="space-y-4 py-6">
                 {messages.length === 0 ? (
                   <p className="text-sm text-muted-foreground">{copy.noConversations}</p>
@@ -163,44 +152,24 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
                   })
                 )}
               </div>
-
-              <div className="pt-4">
-                <form action={sendAdoptionMessage} className="flex items-center gap-2 rounded-full bg-muted px-3 py-2">
-                  <input type="hidden" name="locale" value={locale} />
-                  <input type="hidden" name="audience" value="canil" />
-                  <input type="hidden" name="conversationId" value={activeConversation.id} />
-                  <input
-                    type="text"
-                    name="message"
-                    placeholder={copy.inputPlaceholder}
-                    className="h-9 flex-1 bg-transparent px-2 text-sm outline-none"
-                  />
-                  <button type="submit" className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">
-                    {copy.send}
-                  </button>
-                </form>
-              </div>
+              <form action={sendAdoptionMessage} className="flex items-center gap-2 rounded-full bg-muted px-3 py-2">
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="audience" value="user" />
+                <input type="hidden" name="conversationId" value={activeConversation.id} />
+                <input
+                  type="text"
+                  name="message"
+                  placeholder={copy.inputPlaceholder}
+                  className="h-9 flex-1 bg-transparent px-2 text-sm outline-none"
+                />
+                <button type="submit" className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">
+                  {copy.send}
+                </button>
+              </form>
             </>
           ) : (
             <p className="text-sm text-muted-foreground">{copy.noConversations}</p>
           )}
-        </article>
-
-        <article className="rounded-3xl border border-border/20 bg-card p-6 xl:col-span-3">
-          <h2 className="text-lg font-bold">{activeConversation?.applicantName ?? "-"}</h2>
-          <p className="mt-4 text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">{copy.adopterInfo}</p>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li className="rounded-xl bg-muted px-3 py-2">{copy.profileVerified}</li>
-            <li className="rounded-xl bg-muted px-3 py-2">{locale === "pt" ? "Casa com quintal" : "House with backyard"}</li>
-            <li className="rounded-xl bg-muted px-3 py-2">{locale === "pt" ? "Resposta media: < 2h" : "Average response: < 2h"}</li>
-          </ul>
-
-          <p className="mt-6 text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">{copy.reminder}</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {locale === "pt"
-              ? "Confirmar compatibilidade com outros animais durante a visita presencial."
-              : "Confirm compatibility with other pets during the in-person visit."}
-          </p>
         </article>
       </section>
     </main>
