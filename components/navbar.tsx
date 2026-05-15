@@ -49,7 +49,12 @@ export async function Navbar({ locale }: NavbarProps) {
       : role === "canil"
         ? dictionary.nav.canilDashboard
         : dictionary.nav.userDashboard;
-  const roleSettingsHref = role === "canil" ? `/${locale}/canil/configuracoes` : `/${locale}/user/configuracoes`;
+  const roleSettingsHref =
+    role === "admin"
+      ? `/${locale}/admin/configuracoes`
+      : role === "canil"
+        ? `/${locale}/canil/configuracoes`
+        : `/${locale}/user/configuracoes`;
   const roleSettingsLabel = role === "canil" ? dictionary.nav.canilSettings : dictionary.nav.userSettings;
   const userDisplayName =
     fullName?.trim() ||

@@ -6,6 +6,7 @@ import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 import { ANIMAL_PHOTOS_BUCKET, buildPhotoStoragePath } from "@/lib/canil/animal-photos";
+import { getPlatformSettings } from "@/lib/admin/platform-settings";
 
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 const ALLOWED_SPECIES = ["cao", "gato", "outro"];
@@ -95,6 +96,11 @@ export async function createAnimal(formData: FormData) {
   const { shelter } = await getShelterForUser(supabase, user.id);
   if (!shelter) {
     redirect(`/${locale}/canil/animais?error=no_shelter`);
+  }
+
+  const platform = await getPlatformSettings(supabase);
+  if (platform.requireVerificationToPublish && !shelter.verificado) {
+    redirect(`/${locale}/canil/animais/novo?error=needs_verification`);
   }
 
   const { data: created, error } = await supabase

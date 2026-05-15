@@ -45,6 +45,7 @@ export default async function NewAnimalPage({ params, searchParams }: NewAnimalP
           errors: {
             invalid_data: "Preenche pelo menos nome, especie e estado.",
             save_failed: "Nao foi possivel criar o animal.",
+            needs_verification: "O teu canil precisa de ser verificado pelo admin antes de publicar animais.",
           },
         }
       : {
@@ -55,6 +56,7 @@ export default async function NewAnimalPage({ params, searchParams }: NewAnimalP
           errors: {
             invalid_data: "Provide at least name, species and status.",
             save_failed: "Could not create the pet.",
+            needs_verification: "Your shelter must be verified by an admin before publishing animals.",
           },
         };
 
