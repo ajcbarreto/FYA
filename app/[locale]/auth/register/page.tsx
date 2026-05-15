@@ -121,7 +121,7 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
                   id="full_name"
                   name="full_name"
                   required
-                  className="h-13 w-full rounded-full bg-background px-12 pr-4 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-primary/30"
+                  className="h-13 w-full rounded-xl bg-background px-12 pr-4 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-primary/30"
                 />
               </div>
             </div>
@@ -137,7 +137,7 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
                   name="email"
                   type="email"
                   required
-                  className="h-13 w-full rounded-full bg-background px-12 pr-4 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-primary/30"
+                  className="h-13 w-full rounded-xl bg-background px-12 pr-4 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-primary/30"
                 />
               </div>
             </div>
@@ -154,7 +154,7 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
                   type="password"
                   minLength={6}
                   required
-                  className="h-13 w-full rounded-full bg-background px-12 pr-4 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-primary/30"
+                  className="h-13 w-full rounded-xl bg-background px-12 pr-4 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-primary/30"
                 />
               </div>
             </div>
@@ -167,7 +167,7 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
                 id="role"
                 name="role"
                 defaultValue="user"
-                className="h-13 w-full rounded-full bg-background px-4 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-primary/30"
+                className="h-13 w-full rounded-xl bg-background px-4 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-primary/30"
               >
                 <option value="user">{dictionary.auth.adopter}</option>
                 <option value="canil">{dictionary.auth.canil}</option>
@@ -186,7 +186,7 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
 
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-br from-primary to-accent px-6 py-4 text-base font-bold text-primary-foreground shadow-lg transition-all hover:opacity-95 hover:shadow-xl"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-lg transition-all hover:opacity-95 hover:shadow-xl"
             >
               {dictionary.auth.submit}
               <ArrowRight className="h-4 w-4" />
@@ -199,10 +199,10 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <button type="button" className="rounded-full border border-border bg-background px-4 py-3 text-sm font-medium hover:bg-muted">
+              <button type="button" className="rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium hover:bg-muted">
                 Google
               </button>
-              <button type="button" className="rounded-full border border-border bg-background px-4 py-3 text-sm font-medium hover:bg-muted">
+              <button type="button" className="rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium hover:bg-muted">
                 Facebook
               </button>
             </div>

@@ -152,7 +152,7 @@ export default async function ShelterRegistrationPage({
                   id="shelter_name"
                   name="shelter_name"
                   required
-                  className="h-13 w-full rounded-full bg-muted px-6 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-primary/35"
+                  className="h-13 w-full rounded-xl bg-muted px-6 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-primary/35"
                 />
               </div>
               <div className="space-y-2">
@@ -163,7 +163,7 @@ export default async function ShelterRegistrationPage({
                   id="shelter_location"
                   name="shelter_location"
                   required
-                  className="h-13 w-full rounded-full bg-muted px-6 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-primary/35"
+                  className="h-13 w-full rounded-xl bg-muted px-6 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-primary/35"
                 />
               </div>
               <div className="space-y-2 md:col-span-2">
@@ -197,7 +197,7 @@ export default async function ShelterRegistrationPage({
                   id="full_name"
                   name="full_name"
                   required
-                  className="h-13 w-full rounded-full bg-muted px-6 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-secondary/35"
+                  className="h-13 w-full rounded-xl bg-muted px-6 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-secondary/35"
                 />
               </div>
               <div className="space-y-2">
@@ -208,7 +208,7 @@ export default async function ShelterRegistrationPage({
                   id="contact_role"
                   name="contact_role"
                   required
-                  className="h-13 w-full rounded-full bg-muted px-6 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-secondary/35"
+                  className="h-13 w-full rounded-xl bg-muted px-6 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-secondary/35"
                 />
               </div>
               <div className="space-y-2">
@@ -220,7 +220,7 @@ export default async function ShelterRegistrationPage({
                   name="email"
                   type="email"
                   required
-                  className="h-13 w-full rounded-full bg-muted px-6 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-secondary/35"
+                  className="h-13 w-full rounded-xl bg-muted px-6 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-secondary/35"
                 />
               </div>
               <div className="space-y-2">
@@ -232,7 +232,7 @@ export default async function ShelterRegistrationPage({
                   name="contact_phone"
                   type="tel"
                   required
-                  className="h-13 w-full rounded-full bg-muted px-6 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-secondary/35"
+                  className="h-13 w-full rounded-xl bg-muted px-6 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-secondary/35"
                 />
               </div>
               <div className="space-y-2 md:col-span-2">
@@ -245,7 +245,7 @@ export default async function ShelterRegistrationPage({
                   type="password"
                   minLength={6}
                   required
-                  className="h-13 w-full rounded-full bg-muted px-6 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-secondary/35"
+                  className="h-13 w-full rounded-xl bg-muted px-6 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-secondary/35"
                 />
               </div>
             </div>
@@ -287,13 +287,13 @@ export default async function ShelterRegistrationPage({
           <div className="flex flex-col items-center justify-end gap-4 md:flex-row">
             <button
               type="button"
-              className="w-full rounded-full px-8 py-4 font-bold text-muted-foreground transition-colors hover:bg-muted md:w-auto"
+              className="w-full rounded-xl px-8 py-4 font-bold text-muted-foreground transition-colors hover:bg-muted md:w-auto"
             >
               {dictionary.auth.saveDraft}
             </button>
             <button
               type="submit"
-              className="w-full rounded-full bg-gradient-to-br from-primary to-accent px-12 py-4 font-bold text-primary-foreground shadow-xl transition-all hover:scale-[1.02] md:w-auto"
+              className="w-full rounded-xl bg-primary px-12 py-4 font-bold text-primary-foreground shadow-xl transition-all hover:scale-[1.02] md:w-auto"
             >
               {dictionary.auth.finalizeRegistration}
             </button>

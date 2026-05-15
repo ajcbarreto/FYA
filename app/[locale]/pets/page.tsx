@@ -123,7 +123,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
         };
 
   const selectClass =
-    "h-10 min-w-[140px] flex-1 rounded-full border border-border/40 bg-background px-3 text-sm outline-none transition-all focus:ring-2 focus:ring-primary/30";
+    "h-10 min-w-[140px] flex-1 rounded-lg border border-border/40 bg-background px-3 text-sm outline-none transition-all focus:ring-2 focus:ring-primary/30";
 
   const footerCopy =
     locale === "pt"
@@ -162,7 +162,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
           </div>
           <Link
             href={`/${locale}/match`}
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-primary to-accent px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-md shadow-primary/20 transition-all hover:brightness-105"
+            className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
             <Sparkles className="h-4 w-4" />
             {locale === "pt" ? "Encontrar o meu match" : "Find my match"}
@@ -184,7 +184,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
               type="search"
               placeholder={dictionary.petCatalog.searchPlaceholder}
               defaultValue={query}
-              className="h-11 w-full rounded-full border border-border/40 bg-background px-11 pr-4 text-sm outline-none transition-all focus:ring-2 focus:ring-primary/30"
+              className="h-11 w-full rounded-lg border border-border/40 bg-background px-11 pr-4 text-sm outline-none transition-all focus:ring-2 focus:ring-primary/30"
             />
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -222,7 +222,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
             </select>
             <button
               type="submit"
-              className="h-10 shrink-0 rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+              className="h-10 shrink-0 rounded-lg bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
             >
               {copy.apply}
             </button>
@@ -261,7 +261,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
           {pets.map((pet) => (
             <article
               key={pet.id}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-border/40 bg-card transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5"
+              className="group flex flex-col overflow-hidden rounded-2xl border border-border/40 bg-card transition-all hover:-translate-y-1 hover:shadow-lg"
             >
               <div className="relative aspect-square overflow-hidden">
                 <Image
@@ -321,7 +321,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
           <Link
             href={buildPageHref(Math.max(1, safeCurrentPage - 1))}
             aria-disabled={safeCurrentPage <= 1}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${
+            className={`rounded-lg px-4 py-2 text-sm font-semibold ${
               safeCurrentPage <= 1 ? "pointer-events-none bg-muted text-muted-foreground/50" : "bg-muted text-muted-foreground hover:text-primary"
             }`}
           >
@@ -331,7 +331,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
             <Link
               key={pageNumber}
               href={buildPageHref(pageNumber)}
-              className={`rounded-full px-4 py-2 text-sm font-bold ${
+              className={`rounded-lg px-4 py-2 text-sm font-bold ${
                 pageNumber === safeCurrentPage ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-primary"
               }`}
             >
@@ -341,7 +341,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
           <Link
             href={buildPageHref(Math.min(totalPages, safeCurrentPage + 1))}
             aria-disabled={safeCurrentPage >= totalPages}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${
+            className={`rounded-lg px-4 py-2 text-sm font-semibold ${
               safeCurrentPage >= totalPages
                 ? "pointer-events-none bg-muted text-muted-foreground/50"
                 : "bg-muted text-muted-foreground hover:text-primary"
@@ -355,7 +355,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
       <footer className="mt-24 w-full border-t border-border/30 bg-muted/45">
         <div className="grid grid-cols-1 gap-10 px-8 py-16 md:grid-cols-3">
           <div className="space-y-4">
-            <div className="text-2xl font-black text-primary">FYA</div>
+            <div className="text-2xl font-bold text-primary">FYA</div>
             <p className="text-sm text-muted-foreground">{footerCopy.tagline}</p>
           </div>
           <div>

@@ -48,7 +48,7 @@ export default async function ResetPasswordPage({ params, searchParams }: ResetP
 
   const feedback = error && copy.errors[error as keyof typeof copy.errors] ? copy.errors[error as keyof typeof copy.errors] : null;
   const inputClass =
-    "h-12 w-full rounded-full bg-muted px-11 text-sm outline-none focus:ring-2 focus:ring-primary/30";
+    "h-12 w-full rounded-xl bg-muted px-11 text-sm outline-none focus:ring-2 focus:ring-primary/30";
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16">
@@ -86,7 +86,7 @@ export default async function ResetPasswordPage({ params, searchParams }: ResetP
           </div>
           <button
             type="submit"
-            className="w-full rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
+            className="w-full rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
           >
             {copy.submit}
           </button>

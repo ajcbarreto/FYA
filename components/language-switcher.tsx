@@ -13,11 +13,11 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
   const nextPath = pathname.replace(/^\/(pt|en)(?=\/|$)/, "") || "/";
 
   return (
-    <div className="inline-flex h-10 items-center rounded-full border border-border/60 bg-muted/60 p-1 text-xs font-bold">
+    <div className="inline-flex h-10 items-center rounded-lg border border-border/60 bg-muted/60 p-1 text-xs font-bold">
       <Link
         href={`/pt${nextPath}`}
         aria-current={locale === "pt" ? "true" : undefined}
-        className={`rounded-full px-3 py-1.5 transition-colors ${
+        className={`rounded-md px-3 py-1.5 transition-colors ${
           locale === "pt"
             ? "bg-background text-primary shadow-sm"
             : "text-muted-foreground hover:text-primary"
@@ -28,7 +28,7 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
       <Link
         href={`/en${nextPath}`}
         aria-current={locale === "en" ? "true" : undefined}
-        className={`rounded-full px-3 py-1.5 transition-colors ${
+        className={`rounded-md px-3 py-1.5 transition-colors ${
           locale === "en"
             ? "bg-background text-primary shadow-sm"
             : "text-muted-foreground hover:text-primary"

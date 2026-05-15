@@ -49,7 +49,7 @@ export function MobileMenu({ links, closeLabel, openLabel }: MobileMenuProps) {
           />
           <div className="absolute right-0 top-0 flex h-full w-72 max-w-[85vw] flex-col gap-1 overflow-y-auto bg-background p-5 shadow-2xl">
             <div className="mb-4 flex items-center justify-between">
-              <span className="text-xl font-black text-primary">FYA</span>
+              <span className="text-xl font-bold text-primary">FYA</span>
               <button
                 type="button"
                 aria-label={closeLabel}

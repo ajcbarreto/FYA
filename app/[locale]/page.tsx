@@ -96,16 +96,16 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
             <span className="text-secondary">{locale === "pt" ? "para toda a familia" : "for every family"}</span>
           </h1>
           <p className="max-w-xl text-lg leading-relaxed text-muted-foreground">{dictionary.home.subtitle}</p>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-3">
             <Link
               href={`/${locale}/pets`}
-              className="rounded-full bg-primary px-8 py-4 text-sm font-bold text-primary-foreground shadow-xl transition-all hover:brightness-110"
+              className="rounded-xl bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
             >
               {content.browseCatalog}
             </Link>
             <Link
               href={`/${locale}/auth/shelter-registration`}
-              className="rounded-full bg-muted px-8 py-4 text-sm font-bold text-primary transition-all hover:bg-muted/80"
+              className="rounded-xl border border-border/60 bg-card px-7 py-3.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
             >
               {dictionary.home.primaryCta}
             </Link>
@@ -162,7 +162,7 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                     className="object-cover"
                   />
-                  <span className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-[10px] font-black uppercase tracking-wider text-primary-foreground">
+                  <span className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
                     {dictionary.petCatalog.tags.urgent}
                   </span>
                 </div>
@@ -181,7 +181,7 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
                   </div>
                   <Link
                     href={`/${locale}/pets/${pet.id}`}
-                    className="inline-flex w-full items-center justify-center rounded-full bg-muted px-4 py-3 text-sm font-bold text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground"
+                    className="inline-flex w-full items-center justify-center rounded-xl bg-muted px-4 py-2.5 text-sm font-semibold text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground"
                   >
                     {locale === "pt" ? `Conhecer ${pet.name}` : `Meet ${pet.name}`}
                   </Link>
@@ -212,22 +212,21 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
       </section>
 
       <section className="px-6 pb-20 lg:px-8">
-        <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center overflow-hidden rounded-2xl bg-secondary p-12 text-center md:p-20">
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary to-primary opacity-80" />
+        <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center overflow-hidden rounded-3xl bg-secondary p-12 text-center md:p-20">
           <div className="absolute right-0 top-0 h-56 w-56 -translate-y-1/2 translate-x-1/2 rounded-[57%_43%_61%_39%/45%_41%_59%_55%] bg-white/10" />
           <div className="relative z-10">
-            <h2 className="text-4xl font-extrabold text-white md:text-5xl">{dictionary.home.finalCtaTitle}</h2>
-            <p className="mx-auto mt-6 max-w-xl text-lg text-white/80">{dictionary.home.finalCtaDescription}</p>
-            <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+            <h2 className="text-4xl font-bold text-white md:text-5xl">{dictionary.home.finalCtaTitle}</h2>
+            <p className="mx-auto mt-5 max-w-xl text-lg text-white/80">{dictionary.home.finalCtaDescription}</p>
+            <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
               <Link
                 href={`/${locale}/pets`}
-                className="rounded-full bg-white px-10 py-4 text-sm font-black text-primary shadow-2xl transition-all hover:bg-background"
+                className="rounded-xl bg-white px-8 py-3.5 text-sm font-semibold text-secondary transition-colors hover:bg-white/90"
               >
                 {content.browseCatalog}
               </Link>
               <Link
                 href={`/${locale}/auth/register`}
-                className="rounded-full border-2 border-white/30 bg-transparent px-10 py-4 text-sm font-bold text-white transition-colors hover:bg-white/10"
+                className="rounded-xl border border-white/40 px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
               >
                 {content.learnMore}
               </Link>
@@ -239,7 +238,7 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
       <footer className="mt-20 w-full border-t border-border/40 bg-muted/45">
         <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-6 py-12 text-sm leading-relaxed md:grid-cols-4 lg:px-8">
           <div className="space-y-4">
-            <span className="text-xl font-black text-primary">FYA</span>
+            <span className="text-xl font-bold text-primary">FYA</span>
             <p className="max-w-xs text-muted-foreground">{content.footerTagline}</p>
           </div>
           <div>
@@ -263,7 +262,7 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
             <p className="mb-4 text-muted-foreground">{content.sheltersDescription}</p>
             <Link
               href={`/${locale}/canis`}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
             >
               {content.sheltersCta}
               <ArrowRight className="h-3 w-3" />

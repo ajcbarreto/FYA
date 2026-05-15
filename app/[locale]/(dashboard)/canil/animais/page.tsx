@@ -104,7 +104,7 @@ export default async function CanilPetsPage({ params, searchParams }: CanilPetsP
     <main className="space-y-6">
       <header className="flex flex-col gap-4 rounded-3xl border border-border/20 bg-card p-8 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-black tracking-tight">{copy.title}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
           <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
         </div>
         <Link
@@ -121,15 +121,15 @@ export default async function CanilPetsPage({ params, searchParams }: CanilPetsP
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <article className="rounded-2xl border border-border/20 bg-card p-5">
           <p className="text-sm text-muted-foreground">{copy.statusOptions.disponivel}</p>
-          <p className="mt-1 text-3xl font-black text-secondary">{summary.available}</p>
+          <p className="mt-1 text-3xl font-bold text-secondary">{summary.available}</p>
         </article>
         <article className="rounded-2xl border border-border/20 bg-card p-5">
           <p className="text-sm text-muted-foreground">{copy.statusOptions.reservado}</p>
-          <p className="mt-1 text-3xl font-black text-primary">{summary.pending}</p>
+          <p className="mt-1 text-3xl font-bold text-primary">{summary.pending}</p>
         </article>
         <article className="rounded-2xl border border-border/20 bg-card p-5">
           <p className="text-sm text-muted-foreground">{copy.statusOptions.adotado}</p>
-          <p className="mt-1 text-3xl font-black">{summary.adopted}</p>
+          <p className="mt-1 text-3xl font-bold">{summary.adopted}</p>
         </article>
       </section>
 

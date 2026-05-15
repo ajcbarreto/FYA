@@ -27,7 +27,7 @@ export default async function UserSettingsPage({ params }: UserSettingsPageProps
   return (
     <main className="space-y-6">
       <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-black tracking-tight">{locale === "pt" ? "Configuracoes da Conta" : "Account Settings"}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{locale === "pt" ? "Configuracoes da Conta" : "Account Settings"}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {locale === "pt"
             ? "Area basica para dados de conta. Podes expandir esta pagina com preferencias e notificacoes."

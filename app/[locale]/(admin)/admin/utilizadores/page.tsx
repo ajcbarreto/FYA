@@ -55,7 +55,7 @@ export default async function AdminUsersPage({ params }: AdminUsersPageProps) {
   return (
     <main className="space-y-6">
       <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-black tracking-tight">{copy.title}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
 

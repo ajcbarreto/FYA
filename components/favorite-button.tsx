@@ -37,10 +37,10 @@ export function FavoriteButton({
           type="submit"
           aria-pressed={isFavorite}
           aria-label={isFavorite ? buttonLabels.remove : buttonLabels.add}
-          className={`inline-flex w-full items-center justify-center gap-2 rounded-full border-2 px-5 py-3.5 text-base font-bold transition-colors ${
+          className={`inline-flex w-full items-center justify-center gap-2 rounded-xl border px-5 py-3 text-sm font-semibold transition-colors ${
             isFavorite
               ? "border-primary bg-primary text-primary-foreground"
-              : "border-primary text-primary hover:bg-primary/5"
+              : "border-border text-foreground hover:border-primary/40 hover:bg-muted"
           }`}
         >
           <Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />

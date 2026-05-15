@@ -96,7 +96,7 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
   return (
     <main className="space-y-6">
       <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-black tracking-tight">{copy.title}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
       </header>
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
@@ -174,7 +174,7 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
 
         <article className="rounded-3xl border border-border/20 bg-card p-6 xl:col-span-3">
           <h2 className="text-lg font-bold">{activeConversation?.applicantName ?? "-"}</h2>
-          <p className="mt-4 text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">{copy.adopterInfo}</p>
+          <p className="mt-4 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{copy.adopterInfo}</p>
           {activeConversation ? (
             <div className="mt-3 space-y-3">
               {application?.mensagemInicial && (
@@ -188,7 +188,7 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
             <p className="mt-3 text-sm text-muted-foreground">{copy.noConversations}</p>
           )}
 
-          <p className="mt-6 text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">{copy.reminder}</p>
+          <p className="mt-6 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{copy.reminder}</p>
           <p className="mt-2 text-sm text-muted-foreground">
             {locale === "pt"
               ? "Confirmar compatibilidade com outros animais durante a visita presencial."

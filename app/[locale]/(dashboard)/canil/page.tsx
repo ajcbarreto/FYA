@@ -104,8 +104,8 @@ export default async function CanilDashboardPage({ params }: CanilDashboardPageP
   return (
     <main className="space-y-8">
       <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">{copy.title}</p>
-        <h1 className="mt-2 text-3xl font-black tracking-tight md:text-4xl">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">{copy.title}</p>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
           {copy.welcomePrefix} {shelter?.nome ?? "FYA Shelter"}
         </h1>
         <p className="mt-3 max-w-3xl text-sm text-muted-foreground">{copy.subtitle}</p>
@@ -117,28 +117,28 @@ export default async function CanilDashboardPage({ params }: CanilDashboardPageP
             <PawPrint className="h-5 w-5" />
           </div>
           <p className="text-sm text-muted-foreground">{copy.cards.totalPets}</p>
-          <p className="mt-1 text-3xl font-black">{stats.total}</p>
+          <p className="mt-1 text-3xl font-bold">{stats.total}</p>
         </article>
         <article className="rounded-3xl border border-border/20 bg-card p-6">
           <div className="mb-4 inline-flex rounded-full bg-secondary/15 p-3 text-secondary">
             <HeartHandshake className="h-5 w-5" />
           </div>
           <p className="text-sm text-muted-foreground">{copy.cards.available}</p>
-          <p className="mt-1 text-3xl font-black">{stats.available}</p>
+          <p className="mt-1 text-3xl font-bold">{stats.available}</p>
         </article>
         <article className="rounded-3xl border border-border/20 bg-card p-6">
           <div className="mb-4 inline-flex rounded-full bg-accent/25 p-3 text-primary">
             <ClipboardList className="h-5 w-5" />
           </div>
           <p className="text-sm text-muted-foreground">{copy.cards.pending}</p>
-          <p className="mt-1 text-3xl font-black">{stats.pending}</p>
+          <p className="mt-1 text-3xl font-bold">{stats.pending}</p>
         </article>
         <article className="rounded-3xl border border-border/20 bg-card p-6">
           <div className="mb-4 inline-flex rounded-full bg-primary/15 p-3 text-primary">
             <Bell className="h-5 w-5" />
           </div>
           <p className="text-sm text-muted-foreground">{copy.cards.adopted}</p>
-          <p className="mt-1 text-3xl font-black">{stats.adopted}</p>
+          <p className="mt-1 text-3xl font-bold">{stats.adopted}</p>
         </article>
       </section>
 

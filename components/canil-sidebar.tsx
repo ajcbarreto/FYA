@@ -55,7 +55,7 @@ export function CanilSidebar({ locale }: CanilSidebarProps) {
   return (
     <aside className="sticky top-24 h-fit w-full rounded-3xl border border-border/25 bg-card p-4 shadow-sm lg:w-72">
       <div className="mb-4 px-3 py-2">
-        <h2 className="text-lg font-black text-primary">FYA (Found Your Animal)</h2>
+        <h2 className="text-lg font-bold text-primary">FYA (Found Your Animal)</h2>
         <p className="text-xs text-muted-foreground">{copy.shelterAdmin}</p>
       </div>
       <nav className="space-y-1">

@@ -59,7 +59,7 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
           />
           <div className="absolute inset-0 bg-primary/15 mix-blend-multiply" />
           <div className="absolute inset-0 bg-gradient-to-t from-primary/45 to-transparent" />
-          <div className="relative z-10 inline-flex w-fit items-center gap-2 rounded-full bg-background/80 px-4 py-2 backdrop-blur-md">
+          <div className="relative z-10 inline-flex w-fit items-center gap-2 rounded-xl bg-background/80 px-4 py-2 backdrop-blur-md">
             <PawPrint className="h-4 w-4 text-primary" />
             <span className="text-xs font-bold uppercase tracking-wider">FYA</span>
           </div>
@@ -102,7 +102,7 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
                     type="email"
                     required
                     placeholder={locale === "pt" ? "tu@email.com" : "hello@example.com"}
-                    className="h-13 w-full rounded-full bg-muted px-14 pr-5 text-sm outline-none ring-0 transition-colors focus:bg-background focus:ring-2 focus:ring-primary/30"
+                    className="h-13 w-full rounded-xl bg-muted px-14 pr-5 text-sm outline-none ring-0 transition-colors focus:bg-background focus:ring-2 focus:ring-primary/30"
                   />
                 </div>
               </div>
@@ -127,7 +127,7 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
                     type="password"
                     required
                     placeholder="••••••••"
-                    className="h-13 w-full rounded-full bg-muted px-14 pr-5 text-sm outline-none ring-0 transition-colors focus:bg-background focus:ring-2 focus:ring-primary/30"
+                    className="h-13 w-full rounded-xl bg-muted px-14 pr-5 text-sm outline-none ring-0 transition-colors focus:bg-background focus:ring-2 focus:ring-primary/30"
                   />
                 </div>
               </div>
@@ -139,7 +139,7 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
 
               <button
                 type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-br from-primary to-accent px-6 py-4 text-base font-bold text-primary-foreground shadow-[0_12px_22px_rgba(157,79,0,0.24)] transition-all hover:scale-[1.01] hover:shadow-[0_16px_28px_rgba(157,79,0,0.3)]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-[0_12px_22px_rgba(157,79,0,0.24)] transition-all hover:scale-[1.01] hover:shadow-[0_16px_28px_rgba(157,79,0,0.3)]"
               >
                 {dictionary.auth.loginSubmit}
                 <ArrowRight className="h-4 w-4" />
@@ -156,10 +156,10 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <button type="button" className="rounded-full bg-muted px-4 py-3 text-sm font-semibold hover:bg-muted/75">
+              <button type="button" className="rounded-xl bg-muted px-4 py-3 text-sm font-semibold hover:bg-muted/75">
                 Google
               </button>
-              <button type="button" className="rounded-full bg-muted px-4 py-3 text-sm font-semibold hover:bg-muted/75">
+              <button type="button" className="rounded-xl bg-muted px-4 py-3 text-sm font-semibold hover:bg-muted/75">
                 Apple
               </button>
             </div>
