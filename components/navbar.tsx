@@ -56,6 +56,16 @@ export async function Navbar({ locale }: NavbarProps) {
         ? `/${locale}/canil/configuracoes`
         : `/${locale}/user/configuracoes`;
   const roleSettingsLabel = role === "canil" ? dictionary.nav.canilSettings : dictionary.nav.userSettings;
+  const roleLabel =
+    role === "admin"
+      ? locale === "pt"
+        ? "Administrador"
+        : "Administrator"
+      : role === "canil"
+        ? "Canil"
+        : locale === "pt"
+          ? "Adotante"
+          : "Adopter";
   const userDisplayName =
     fullName?.trim() ||
     (email?.includes("@") ? email.split("@")[0] : null) ||
@@ -80,6 +90,7 @@ export async function Navbar({ locale }: NavbarProps) {
     { href: `/${locale}`, label: dictionary.nav.home },
     { href: `/${locale}/pets`, label: dictionary.nav.pets },
     { href: `/${locale}/canis`, label: dictionary.nav.shelters },
+    { href: `/${locale}/historias`, label: dictionary.nav.stories },
   ];
   if (user) {
     mobileLinks.push({ href: `/${locale}/notificacoes`, label: dictionary.nav.notifications });
@@ -128,6 +139,9 @@ export async function Navbar({ locale }: NavbarProps) {
             <Link href={`/${locale}/canis`} className="text-muted-foreground transition-colors hover:text-primary">
               {dictionary.nav.shelters}
             </Link>
+            <Link href={`/${locale}/historias`} className="text-muted-foreground transition-colors hover:text-primary">
+              {dictionary.nav.stories}
+            </Link>
 
             {role === "user" && (
               <>
@@ -164,18 +178,18 @@ export async function Navbar({ locale }: NavbarProps) {
             )}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <LanguageSwitcher locale={locale} />
 
             {user && (
               <Link
                 href={`/${locale}/notificacoes`}
                 aria-label={dictionary.nav.notifications}
-                className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-border/50 bg-card/70 text-muted-foreground shadow-sm transition-colors hover:text-primary"
+                className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
               >
                 <Bell className="h-5 w-5" />
                 {unreadNotifications > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-black text-primary-foreground">
+                  <span className="absolute right-0 top-0 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-black text-primary-foreground ring-2 ring-background">
                     {unreadNotifications > 9 ? "9+" : unreadNotifications}
                   </span>
                 )}
@@ -185,7 +199,7 @@ export async function Navbar({ locale }: NavbarProps) {
             {!user && (
               <Link
                 href={`/${locale}/auth/login`}
-                className="hidden rounded-full px-5 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-primary sm:inline-flex"
+                className="hidden h-10 items-center rounded-full border border-border/70 px-5 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:bg-muted hover:text-primary sm:inline-flex"
               >
                 {dictionary.nav.login}
               </Link>
@@ -193,7 +207,7 @@ export async function Navbar({ locale }: NavbarProps) {
             {!user && (
               <Link
                 href={`/${locale}/auth/register`}
-                className="rounded-full bg-gradient-to-br from-primary to-accent px-6 py-2 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-transform hover:scale-[0.98]"
+                className="inline-flex h-10 items-center rounded-full bg-gradient-to-br from-primary to-accent px-5 text-sm font-bold text-primary-foreground shadow-md shadow-primary/25 transition-all hover:shadow-lg hover:shadow-primary/35 hover:brightness-105"
               >
                 {dictionary.nav.register}
               </Link>
@@ -205,6 +219,7 @@ export async function Navbar({ locale }: NavbarProps) {
                 displayName={userDisplayName}
                 email={email}
                 initial={userInitial}
+                roleLabel={roleLabel}
                 dashboardHref={roleDashboardHref}
                 dashboardLabel={roleDashboardLabel}
                 settingsHref={roleSettingsHref}

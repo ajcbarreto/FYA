@@ -161,6 +161,8 @@ export async function getCatalogPets(supabase: SupabaseClient, locale: string, o
   }
   if (options.status) {
     query = query.eq("status", options.status);
+  } else {
+    query = query.neq("status", "adotado");
   }
   if (options.limit && options.limit > 0) {
     const page = Math.max(1, options.page ?? 1);
@@ -202,6 +204,8 @@ export async function getCatalogPetsCount(
   }
   if (options.status) {
     query = query.eq("status", options.status);
+  } else {
+    query = query.neq("status", "adotado");
   }
 
   const { count, error } = await query;
@@ -211,6 +215,22 @@ export async function getCatalogPetsCount(
   }
 
   return count ?? 0;
+}
+
+export async function getAdoptedPets(supabase: SupabaseClient, locale: string, limit = 24) {
+  const { data, error } = await supabase
+    .from("animais")
+    .select("id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,canis(nome,localizacao)")
+    .eq("status", "adotado")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error || !data) {
+    if (error) console.error("[getAdoptedPets] Supabase error:", error.message);
+    return [];
+  }
+
+  return applyPhotoOverrides(supabase, data as AnimalRow[], locale);
 }
 
 export async function getPetById(supabase: SupabaseClient, petId: string, locale: string) {

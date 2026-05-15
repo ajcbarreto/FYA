@@ -38,7 +38,7 @@ export async function getAdminMetrics(supabase: SupabaseClient): Promise<AdminMe
     animalsTotal,
     animalsAvailable,
   ] = await Promise.all([
-    resolveCount("adoptions", head("pedidos_adocao").eq("status", "aprovado")),
+    resolveCount("adoptions", head("pedidos_adocao").eq("status", "concluido")),
     resolveCount("pending", head("pedidos_adocao").in("status", ["pendente", "entrevista"])),
     resolveCount("requests", head("pedidos_adocao")),
     resolveCount("shelters", head("canis")),

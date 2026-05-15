@@ -4,8 +4,10 @@ import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 import { getAdoptionRequestsForCanil, getRowAnimal, localizeRequestStatus, mapRequestApplicantName } from "@/lib/adoption/db";
 import { updateRequestStatus } from "@/app/adoption/actions";
+import { getVisitsByPedido } from "@/lib/adoption/visits";
 import { AdoptionAnswers } from "@/components/adoption-answers";
 import { ToastFeedback } from "@/components/toast-feedback";
+import { VisitPanel } from "@/components/visit-panel";
 
 type CanilRequestsPageProps = {
   params: Promise<{ locale: string }>;
@@ -35,6 +37,10 @@ export default async function CanilRequestsPage({ params, searchParams }: CanilR
   }
 
   const requests = await getAdoptionRequestsForCanil(supabase, shelter.id);
+  const visitsByPedido = await getVisitsByPedido(
+    supabase,
+    requests.map((request) => request.id),
+  );
   const copy =
     locale === "pt"
       ? {
@@ -53,17 +59,23 @@ export default async function CanilRequestsPage({ params, searchParams }: CanilR
             entrevista: "Entrevista",
             aprovado: "Aprovado",
             rejeitado: "Rejeitado",
+            concluido: "Adocao concluida",
           },
           hint: "Atualiza o estado e adiciona notas para manter o adotante informado.",
           notePlaceholder: "Observacoes para o adotante (opcional)",
           save: "Guardar",
-          success: "Pedido atualizado com sucesso.",
+          success: {
+            updated: "Pedido atualizado com sucesso.",
+            visit_updated: "Visita atualizada.",
+          } as Record<string, string>,
           errors: {
             invalid_request: "Pedido invalido.",
             save_failed: "Nao foi possivel guardar alteracoes.",
             unauthorized: "Nao autorizado.",
             no_shelter: "Nao foi encontrado canil associado.",
-          },
+            invalid_visit: "Dados de visita invalidos.",
+            visit_failed: "Nao foi possivel atualizar a visita.",
+          } as Record<string, string>,
         }
       : {
           title: "Adoption Requests",
@@ -81,25 +93,27 @@ export default async function CanilRequestsPage({ params, searchParams }: CanilR
             entrevista: "Interview",
             aprovado: "Approved",
             rejeitado: "Rejected",
+            concluido: "Adoption completed",
           },
           hint: "Update statuses and notes to keep adopters informed.",
           notePlaceholder: "Notes for adopter (optional)",
           save: "Save",
-          success: "Request updated successfully.",
+          success: {
+            updated: "Request updated successfully.",
+            visit_updated: "Visit updated.",
+          } as Record<string, string>,
           errors: {
             invalid_request: "Invalid request.",
             save_failed: "Could not save changes.",
             unauthorized: "Not authorized.",
             no_shelter: "No linked shelter found.",
-          },
+            invalid_visit: "Invalid visit data.",
+            visit_failed: "Could not update the visit.",
+          } as Record<string, string>,
         };
 
   const feedback =
-    success === "updated"
-      ? copy.success
-      : error && copy.errors[error as keyof typeof copy.errors]
-        ? copy.errors[error as keyof typeof copy.errors]
-        : null;
+    (success && copy.success[success]) || (error && copy.errors[error]) || null;
 
   return (
     <main className="space-y-6">
@@ -129,19 +143,23 @@ export default async function CanilRequestsPage({ params, searchParams }: CanilR
                     <td className="px-6 py-4">
                       <p className="font-semibold">{mapRequestApplicantName(request, locale)}</p>
                       <p className="text-xs text-muted-foreground">{getRowAnimal(request)?.nome ?? "-"}</p>
-                      {(request.mensagem_inicial || request.respostas) && (
-                        <details className="mt-3 text-xs text-muted-foreground">
-                          <summary className="cursor-pointer font-semibold text-primary">
-                            {locale === "pt" ? "Ver questionario" : "View questionnaire"}
-                          </summary>
-                          <div className="mt-2 space-y-2">
-                            {request.mensagem_inicial && (
-                              <p className="rounded-xl bg-muted px-3 py-2 italic">{request.mensagem_inicial}</p>
-                            )}
-                            <AdoptionAnswers answers={request.respostas} locale={locale} />
-                          </div>
-                        </details>
-                      )}
+                      <details className="mt-3 text-xs text-muted-foreground">
+                        <summary className="cursor-pointer font-semibold text-primary">
+                          {locale === "pt" ? "Questionario e visitas" : "Questionnaire and visits"}
+                        </summary>
+                        <div className="mt-2 space-y-2">
+                          {request.mensagem_inicial && (
+                            <p className="rounded-xl bg-muted px-3 py-2 italic">{request.mensagem_inicial}</p>
+                          )}
+                          <AdoptionAnswers answers={request.respostas} locale={locale} />
+                          <VisitPanel
+                            locale={locale}
+                            pedidoId={request.id}
+                            visits={visitsByPedido.get(request.id) ?? []}
+                            audience="canil"
+                          />
+                        </div>
+                      </details>
                     </td>
                     <td className="px-6 py-4 text-sm">
                       {new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short", year: "numeric" }).format(
@@ -165,6 +183,7 @@ export default async function CanilRequestsPage({ params, searchParams }: CanilR
                           <option value="pendente">{copy.statuses.pendente}</option>
                           <option value="entrevista">{copy.statuses.entrevista}</option>
                           <option value="aprovado">{copy.statuses.aprovado}</option>
+                          <option value="concluido">{copy.statuses.concluido}</option>
                           <option value="rejeitado">{copy.statuses.rejeitado}</option>
                         </select>
                         <input
