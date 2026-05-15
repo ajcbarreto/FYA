@@ -4,6 +4,8 @@ import { BadgeCheck, Building2, MapPin, PawPrint, Search } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { countAnimalsByShelter, listPublicShelters } from "@/lib/canil/public-directory";
+import { getShelterRatingSummaries } from "@/lib/canil/reviews";
+import { StarRating } from "@/components/star-rating";
 
 type SheltersDirectoryPageProps = {
   params: Promise<{ locale: string }>;
@@ -21,10 +23,11 @@ export default async function SheltersDirectoryPage({ params, searchParams }: Sh
 
   const supabase = await createServerSupabaseClient();
   const shelters = await listPublicShelters(supabase, { search: query || undefined });
-  const animalsCount = await countAnimalsByShelter(
-    supabase,
-    shelters.map((shelter) => shelter.id),
-  );
+  const shelterIds = shelters.map((shelter) => shelter.id);
+  const [animalsCount, ratingSummaries] = await Promise.all([
+    countAnimalsByShelter(supabase, shelterIds),
+    getShelterRatingSummaries(supabase, shelterIds),
+  ]);
 
   const copy =
     locale === "pt"
@@ -81,6 +84,7 @@ export default async function SheltersDirectoryPage({ params, searchParams }: Sh
         <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {shelters.map((shelter) => {
             const count = animalsCount.get(shelter.id) ?? 0;
+            const rating = ratingSummaries.get(shelter.id);
             return (
               <Link
                 key={shelter.id}
@@ -103,6 +107,12 @@ export default async function SheltersDirectoryPage({ params, searchParams }: Sh
                   <MapPin className="h-3.5 w-3.5" />
                   {shelter.localizacao}
                 </p>
+                {rating && rating.count > 0 && (
+                  <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                    <StarRating value={rating.average} />
+                    {rating.average.toFixed(1)} ({rating.count})
+                  </p>
+                )}
                 {shelter.missao && (
                   <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">{shelter.missao}</p>
                 )}

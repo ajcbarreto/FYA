@@ -6,7 +6,7 @@ export type AdoptionRequestRow = {
   animal_id: string;
   canil_id: string;
   applicant_profile_id: string;
-  status: "pendente" | "entrevista" | "aprovado" | "rejeitado";
+  status: "pendente" | "entrevista" | "aprovado" | "rejeitado" | "concluido";
   mensagem_inicial: string | null;
   observacoes_canil: string | null;
   respostas: Record<string, unknown> | null;
@@ -51,17 +51,14 @@ export function getDisplayName(fullName: string | null, email: string, fallback:
 }
 
 export function localizeRequestStatus(status: AdoptionRequestRow["status"], locale: string) {
-  if (locale === "pt") {
-    if (status === "pendente") return "Pendente";
-    if (status === "entrevista") return "Entrevista";
-    if (status === "aprovado") return "Aprovado";
-    return "Rejeitado";
-  }
-
-  if (status === "pendente") return "Pending";
-  if (status === "entrevista") return "Interview";
-  if (status === "aprovado") return "Approved";
-  return "Rejected";
+  const labels: Record<AdoptionRequestRow["status"], { pt: string; en: string }> = {
+    pendente: { pt: "Pendente", en: "Pending" },
+    entrevista: { pt: "Entrevista", en: "Interview" },
+    aprovado: { pt: "Aprovado", en: "Approved" },
+    rejeitado: { pt: "Rejeitado", en: "Rejected" },
+    concluido: { pt: "Adocao concluida", en: "Adoption completed" },
+  };
+  return labels[status][locale === "pt" ? "pt" : "en"];
 }
 
 export async function getCurrentProfileRole(supabase: SupabaseClient, userId: string) {

@@ -1,17 +1,28 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { BadgeCheck, Building2, ChevronLeft, Mail, MapPin, PawPrint, Phone } from "lucide-react";
+import { BadgeCheck, Building2, ChevronLeft, Mail, MapPin, MessageSquareText, PawPrint, Phone } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAnimalsForPublicShelter, getPublicShelterById } from "@/lib/canil/public-directory";
+import {
+  getReviewEligibility,
+  getShelterRatingSummaries,
+  getShelterReviews,
+  reviewAuthorName,
+} from "@/lib/canil/reviews";
+import { submitShelterReview } from "@/app/canil/reviews/actions";
+import { StarRating } from "@/components/star-rating";
+import { ToastFeedback } from "@/components/toast-feedback";
 
 type ShelterPublicPageProps = {
   params: Promise<{ locale: string; shelterId: string }>;
+  searchParams: Promise<{ success?: string; error?: string }>;
 };
 
-export default async function ShelterPublicPage({ params }: ShelterPublicPageProps) {
+export default async function ShelterPublicPage({ params, searchParams }: ShelterPublicPageProps) {
   const { locale, shelterId } = await params;
+  const { success, error } = await searchParams;
 
   if (!isLocale(locale)) {
     notFound();
@@ -24,7 +35,18 @@ export default async function ShelterPublicPage({ params }: ShelterPublicPagePro
     notFound();
   }
 
-  const animals = await getAnimalsForPublicShelter(supabase, shelter.id, locale);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const [animals, reviews, ratingSummaries, eligibility] = await Promise.all([
+    getAnimalsForPublicShelter(supabase, shelter.id, locale),
+    getShelterReviews(supabase, shelter.id),
+    getShelterRatingSummaries(supabase, [shelter.id]),
+    user
+      ? getReviewEligibility(supabase, shelter.id, user.id)
+      : Promise.resolve({ canReview: false, existingReview: null }),
+  ]);
+  const rating = ratingSummaries.get(shelter.id);
   const availableCount = animals.filter((animal) => animal.status.toLowerCase().includes("disponivel") || animal.status.toLowerCase().includes("available")).length;
   const adoptedCount = animals.filter((animal) => animal.status.toLowerCase().includes("adotado") || animal.status.toLowerCase().includes("adopted")).length;
   const joined = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(new Date(shelter.created_at));
@@ -48,6 +70,21 @@ export default async function ShelterPublicPage({ params }: ShelterPublicPagePro
             adopted: "Adotados",
           },
           notProvided: "Nao definido",
+          reviewsTitle: "Avaliacoes",
+          noReviews: "Este canil ainda nao tem avaliacoes.",
+          ratingSummary: (avg: number, count: number) =>
+            `${avg.toFixed(1)} de 5 · ${count} ${count === 1 ? "avaliacao" : "avaliacoes"}`,
+          writeReview: "Deixar avaliacao",
+          editReview: "Atualizar a tua avaliacao",
+          ratingLabel: "Classificacao",
+          commentLabel: "Comentario (opcional)",
+          commentPlaceholder: "Como foi a tua experiencia com este canil?",
+          submitReview: "Publicar avaliacao",
+          messages: {
+            review_saved: "Avaliacao publicada. Obrigado!",
+            invalid_review: "Escolhe uma classificacao valida.",
+            review_failed: "Nao foi possivel guardar a avaliacao.",
+          } as Record<string, string>,
         }
       : {
           back: "Back to shelters",
@@ -66,10 +103,29 @@ export default async function ShelterPublicPage({ params }: ShelterPublicPagePro
             adopted: "Adopted",
           },
           notProvided: "Not provided",
+          reviewsTitle: "Reviews",
+          noReviews: "This shelter has no reviews yet.",
+          ratingSummary: (avg: number, count: number) =>
+            `${avg.toFixed(1)} of 5 · ${count} ${count === 1 ? "review" : "reviews"}`,
+          writeReview: "Leave a review",
+          editReview: "Update your review",
+          ratingLabel: "Rating",
+          commentLabel: "Comment (optional)",
+          commentPlaceholder: "How was your experience with this shelter?",
+          submitReview: "Publish review",
+          messages: {
+            review_saved: "Review published. Thank you!",
+            invalid_review: "Pick a valid rating.",
+            review_failed: "Could not save the review.",
+          } as Record<string, string>,
         };
+
+  const feedback =
+    (success && copy.messages[success]) || (error && copy.messages[error]) || null;
 
   return (
     <main className="mx-auto w-full max-w-7xl flex-1 px-6 pb-16 pt-8 lg:px-8">
+      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
       <Link
         href={`/${locale}/canis`}
         className="mb-6 inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
@@ -97,6 +153,12 @@ export default async function ShelterPublicPage({ params }: ShelterPublicPagePro
               <MapPin className="h-3.5 w-3.5" />
               {shelter.localizacao}
             </p>
+            {rating && rating.count > 0 && (
+              <p className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                <StarRating value={rating.average} />
+                {copy.ratingSummary(rating.average, rating.count)}
+              </p>
+            )}
           </div>
         </div>
       </header>
@@ -146,6 +208,87 @@ export default async function ShelterPublicPage({ params }: ShelterPublicPagePro
                   </Link>
                 ))}
               </div>
+            )}
+          </div>
+
+          <div className="rounded-3xl border border-border/20 bg-card p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="inline-flex items-center gap-2 text-xl font-bold">
+                <MessageSquareText className="h-5 w-5 text-primary" />
+                {copy.reviewsTitle}
+              </h2>
+              {rating && rating.count > 0 && (
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                  <StarRating value={rating.average} />
+                  {rating.average.toFixed(1)} / 5
+                </span>
+              )}
+            </div>
+
+            {eligibility.canReview && (
+              <form
+                action={submitShelterReview}
+                className="mt-4 space-y-3 rounded-2xl border border-border/30 bg-muted/40 p-4"
+              >
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="shelterId" value={shelter.id} />
+                <p className="text-sm font-bold">
+                  {eligibility.existingReview ? copy.editReview : copy.writeReview}
+                </p>
+                <label className="block text-xs font-semibold text-muted-foreground">
+                  {copy.ratingLabel}
+                  <select
+                    name="rating"
+                    defaultValue={eligibility.existingReview?.rating ?? 5}
+                    className="mt-1 h-10 w-full rounded-xl border border-border/30 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    {[5, 4, 3, 2, 1].map((value) => (
+                      <option key={value} value={value}>
+                        {"★".repeat(value)} ({value})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block text-xs font-semibold text-muted-foreground">
+                  {copy.commentLabel}
+                  <textarea
+                    name="comentario"
+                    rows={3}
+                    defaultValue={eligibility.existingReview?.comentario ?? ""}
+                    placeholder={copy.commentPlaceholder}
+                    className="mt-1 w-full rounded-xl border border-border/30 bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </label>
+                <button
+                  type="submit"
+                  className="rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground"
+                >
+                  {copy.submitReview}
+                </button>
+              </form>
+            )}
+
+            {reviews.length === 0 ? (
+              <p className="mt-4 text-sm text-muted-foreground">{copy.noReviews}</p>
+            ) : (
+              <ul className="mt-4 space-y-3">
+                {reviews.map((review) => (
+                  <li key={review.id} className="rounded-2xl border border-border/20 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="font-semibold">{reviewAuthorName(review, locale)}</p>
+                      <StarRating value={review.rating} />
+                    </div>
+                    {review.comentario && (
+                      <p className="mt-2 text-sm text-muted-foreground">{review.comentario}</p>
+                    )}
+                    <p className="mt-1 text-xs text-muted-foreground/70">
+                      {new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short", year: "numeric" }).format(
+                        new Date(review.created_at),
+                      )}
+                    </p>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         </article>

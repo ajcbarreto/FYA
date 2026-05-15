@@ -9,6 +9,7 @@ export type ShelterRecord = {
   missao: string | null;
   telefone: string | null;
   email_contacto: string | null;
+  verificado: boolean;
   created_at: string;
 };
 
@@ -29,7 +30,7 @@ export type ShelterAnimalRecord = {
 export async function getShelterForUser(supabase: SupabaseClient, userId: string) {
   const { data: ownedShelter } = await supabase
     .from("canis")
-    .select("id,owner_profile_id,nome,localizacao,missao,telefone,email_contacto,created_at")
+    .select("id,owner_profile_id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at")
     .eq("owner_profile_id", userId)
     .maybeSingle();
 
@@ -38,7 +39,7 @@ export async function getShelterForUser(supabase: SupabaseClient, userId: string
     : (
         await supabase
           .from("canis")
-          .select("id,owner_profile_id,nome,localizacao,missao,telefone,email_contacto,created_at")
+          .select("id,owner_profile_id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at")
           .order("created_at", { ascending: true })
           .limit(1)
           .maybeSingle()

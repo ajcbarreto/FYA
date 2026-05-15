@@ -5,6 +5,7 @@ type Dictionary = {
     home: string;
     pets: string;
     shelters: string;
+    stories: string;
     notifications: string;
     login: string;
     register: string;
@@ -184,6 +185,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       home: "Home",
       pets: "Catalogo de Pets",
       shelters: "Canis",
+      stories: "Historias",
       notifications: "Notificacoes",
       login: "Entrar",
       register: "Registar",
@@ -365,6 +367,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       home: "Home",
       pets: "Pet Catalog",
       shelters: "Shelters",
+      stories: "Stories",
       notifications: "Notifications",
       login: "Login",
       register: "Register",

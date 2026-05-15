@@ -6,8 +6,9 @@ import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getCurrentProfileRole } from "@/lib/adoption/db";
 import { parseApplicationAnswers } from "@/lib/adoption/application-form";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
+import { notifyAdopterStatusChange, notifyShelterNewRequest } from "@/lib/email/notifications";
 
-const requestStatuses = ["pendente", "entrevista", "aprovado", "rejeitado"] as const;
+const requestStatuses = ["pendente", "entrevista", "aprovado", "rejeitado", "concluido"] as const;
 
 function getLocaleFromForm(formData: FormData) {
   const localeValue = String(formData.get("locale") ?? defaultLocale);
@@ -38,7 +39,11 @@ export async function submitAdoptionRequest(formData: FormData) {
     redirect(`/${locale}/pets/${petId}?error=only_users_can_apply`);
   }
 
-  const { data: animal } = await supabase.from("animais").select("id,canil_id").eq("id", petId).maybeSingle();
+  const { data: animal } = await supabase
+    .from("animais")
+    .select("id,canil_id,nome")
+    .eq("id", petId)
+    .maybeSingle();
   if (!animal) {
     redirect(`/${locale}/pets/${petId}?error=pet_not_found`);
   }
@@ -98,6 +103,12 @@ export async function submitAdoptionRequest(formData: FormData) {
     conteudo: initialMessage,
   });
 
+  await notifyShelterNewRequest(supabase, {
+    canilId: animal.canil_id,
+    animalName: animal.nome,
+    locale,
+  });
+
   if (messageError) {
     redirect(`/${locale}/user/pedidos?success=request_created`);
   }
@@ -144,9 +155,21 @@ export async function updateRequestStatus(formData: FormData) {
     query = query.eq("canil_id", shelter.id);
   }
 
-  const { error } = await query;
+  const { data: updatedRows, error } = await query.select("applicant_profile_id,animais(nome)");
   if (error) {
     redirect(`/${locale}/canil/pedidos?error=save_failed`);
+  }
+
+  const updatedRow = updatedRows?.[0];
+  if (updatedRow) {
+    const animalRelation = updatedRow.animais;
+    const animal = Array.isArray(animalRelation) ? animalRelation[0] : animalRelation;
+    await notifyAdopterStatusChange({
+      applicantProfileId: updatedRow.applicant_profile_id as string,
+      animalName: (animal?.nome as string | undefined) ?? "",
+      status: status as (typeof requestStatuses)[number],
+      locale,
+    });
   }
 
   redirect(`/${locale}/canil/pedidos?success=updated`);

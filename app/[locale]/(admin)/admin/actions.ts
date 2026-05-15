@@ -6,6 +6,7 @@ import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getPetCatalogFiltersKey, parseCommaSeparatedList } from "@/lib/pet-catalog/filter-config";
+import { getPlatformSettingsKey } from "@/lib/admin/platform-settings";
 import type { UserRole } from "@/lib/supabase/types";
 
 function getLocale(formData: FormData): Locale {
@@ -36,13 +37,54 @@ async function requireAdmin(locale: Locale) {
   return supabase;
 }
 
+export async function updatePlatformSettings(formData: FormData) {
+  const locale = getLocale(formData);
+  const supabase = await requireAdmin(locale);
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const platformName = String(formData.get("platformName") ?? "").trim();
+  const contactEmail = String(formData.get("contactEmail") ?? "").trim();
+  const supportEmail = String(formData.get("supportEmail") ?? "").trim();
+  const defaultAdoptionFee = String(formData.get("defaultAdoptionFee") ?? "").trim();
+  const requireVerificationToPublish = String(formData.get("requireVerificationToPublish") ?? "") === "on";
+
+  if (!platformName) {
+    redirect(`/${locale}/admin/configuracoes?error=invalid_platform`);
+  }
+
+  const { error } = await supabase.from("app_settings").upsert(
+    {
+      key: getPlatformSettingsKey(),
+      value: {
+        platformName,
+        contactEmail,
+        supportEmail,
+        defaultAdoptionFee,
+        requireVerificationToPublish,
+      },
+      updated_by: user?.id ?? null,
+    },
+    { onConflict: "key" },
+  );
+
+  if (error) {
+    redirect(`/${locale}/admin/configuracoes?error=platform_failed`);
+  }
+
+  revalidatePath(`/${locale}/admin/configuracoes`);
+  redirect(`/${locale}/admin/configuracoes?success=platform_saved`);
+}
+
 export async function toggleShelterVerification(formData: FormData) {
   const locale = getLocale(formData);
   const shelterId = String(formData.get("shelterId") ?? "").trim();
   const verify = String(formData.get("verify") ?? "") === "true";
 
   if (!shelterId) {
-    redirect(`/${locale}/admin?error=invalid_shelter`);
+    redirect(`/${locale}/admin/canis?error=invalid_shelter`);
   }
 
   const supabase = await requireAdmin(locale);
@@ -52,37 +94,22 @@ export async function toggleShelterVerification(formData: FormData) {
     .eq("id", shelterId);
 
   if (error) {
-    redirect(`/${locale}/admin?error=verification_failed`);
+    redirect(`/${locale}/admin/canis?error=verification_failed`);
   }
 
+  revalidatePath(`/${locale}/admin/canis`);
   revalidatePath(`/${locale}/admin`);
-  redirect(`/${locale}/admin?success=${verify ? "shelter_verified" : "shelter_unverified"}`);
+  redirect(`/${locale}/admin/canis?success=${verify ? "shelter_verified" : "shelter_unverified"}`);
 }
 
 export async function updatePetCatalogFilters(formData: FormData) {
   const locale = getLocale(formData);
   const dictionary = getDictionary(locale);
-  const supabase = await createServerSupabaseClient();
+  const supabase = await requireAdmin(locale);
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect(`/${locale}/auth/login?next=/admin`);
-  }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  const role = profile?.role as UserRole | undefined;
-
-  if (role !== "admin") {
-    redirect(`/${locale}/admin?error=${encodeURIComponent(dictionary.admin.unauthorized)}`);
-  }
 
   const species = parseCommaSeparatedList(String(formData.get("species") ?? ""));
   const ageRanges = parseCommaSeparatedList(String(formData.get("ageRanges") ?? ""));
@@ -97,7 +124,7 @@ export async function updatePetCatalogFilters(formData: FormData) {
     genders.length === 0 ||
     compatibilities.length === 0
   ) {
-    redirect(`/${locale}/admin?error=${encodeURIComponent(dictionary.admin.genericError)}`);
+    redirect(`/${locale}/admin/configuracoes?error=${encodeURIComponent(dictionary.admin.genericError)}`);
   }
 
   const { error } = await supabase.from("app_settings").upsert(
@@ -110,7 +137,7 @@ export async function updatePetCatalogFilters(formData: FormData) {
         genders,
         compatibilities,
       },
-      updated_by: user.id,
+      updated_by: user?.id ?? null,
     },
     {
       onConflict: "key",
@@ -118,8 +145,9 @@ export async function updatePetCatalogFilters(formData: FormData) {
   );
 
   if (error) {
-    redirect(`/${locale}/admin?error=${encodeURIComponent(dictionary.admin.genericError)}`);
+    redirect(`/${locale}/admin/configuracoes?error=${encodeURIComponent(dictionary.admin.genericError)}`);
   }
 
-  redirect(`/${locale}/admin?success=${encodeURIComponent(dictionary.admin.success)}`);
+  revalidatePath(`/${locale}/admin/configuracoes`);
+  redirect(`/${locale}/admin/configuracoes?success=${encodeURIComponent(dictionary.admin.success)}`);
 }

@@ -14,20 +14,20 @@ export function NavbarSkeleton({ locale }: NavbarSkeletonProps) {
           <div className="h-3 w-20 animate-pulse rounded bg-muted" />
           <div className="h-3 w-24 animate-pulse rounded bg-muted" />
         </div>
-        <div className="flex items-center gap-3">
-          <div className="inline-flex items-center rounded-full bg-muted/80 p-1 text-xs font-semibold">
+        <div className="flex items-center gap-2">
+          <div className="inline-flex h-10 items-center rounded-full border border-border/60 bg-muted/60 p-1 text-xs font-bold">
             <span
-              className={`rounded-full px-2.5 py-1 ${locale === "pt" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}
+              className={`rounded-full px-3 py-1.5 ${locale === "pt" ? "bg-background text-primary shadow-sm" : "text-muted-foreground"}`}
             >
               PT
             </span>
             <span
-              className={`rounded-full px-2.5 py-1 ${locale === "en" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}
+              className={`rounded-full px-3 py-1.5 ${locale === "en" ? "bg-background text-primary shadow-sm" : "text-muted-foreground"}`}
             >
               EN
             </span>
           </div>
-          <div className="h-9 w-24 animate-pulse rounded-full bg-muted" />
+          <div className="h-10 w-28 animate-pulse rounded-full bg-muted" />
         </div>
       </nav>
     </header>
