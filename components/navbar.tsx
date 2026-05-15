@@ -1,10 +1,14 @@
 import Link from "next/link";
+import { Bell } from "lucide-react";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { resolveUserRole } from "@/lib/auth/role";
+import { getUnreadNotificationsCount } from "@/lib/notifications/db";
 import type { UserRole } from "@/lib/supabase/types";
 import { AccountDropdown } from "@/components/account-dropdown";
+import { MobileMenu, type MobileLink } from "@/components/mobile-menu";
 
 type NavbarProps = {
   locale: Locale;
@@ -20,35 +24,21 @@ export async function Navbar({ locale }: NavbarProps) {
   let role: UserRole | null = null;
   let fullName: string | null = null;
   let email: string | null = null;
+  let unreadNotifications = 0;
 
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role,full_name,email")
+      .select("full_name,email")
       .eq("id", user.id)
       .maybeSingle();
 
-    role = (profile?.role as UserRole | undefined) ?? null;
     fullName = profile?.full_name ?? null;
     email = profile?.email ?? user.email ?? null;
-
-    // Fallback resilience: if profile role is missing for any reason, infer from owned shelter.
-    if (!role) {
-      const metadataRole = user.user_metadata?.role;
-      if (metadataRole === "admin" || metadataRole === "user" || metadataRole === "canil") {
-        role = metadataRole;
-      } else {
-        const { data: ownedShelter } = await supabase
-          .from("canis")
-          .select("id")
-          .eq("owner_profile_id", user.id)
-          .limit(1)
-          .maybeSingle();
-        if (ownedShelter) {
-          role = "canil";
-        }
-      }
-    }
+    [role, unreadNotifications] = await Promise.all([
+      resolveUserRole(supabase, user),
+      getUnreadNotificationsCount(supabase, user.id),
+    ]);
   }
 
   const roleDashboardHref =
@@ -81,6 +71,40 @@ export async function Navbar({ locale }: NavbarProps) {
           logout: "Sign out",
         };
 
+  const mobileLinks: MobileLink[] = [
+    { href: `/${locale}`, label: dictionary.nav.home },
+    { href: `/${locale}/pets`, label: dictionary.nav.pets },
+    { href: `/${locale}/canis`, label: dictionary.nav.shelters },
+  ];
+  if (user) {
+    mobileLinks.push({ href: `/${locale}/notificacoes`, label: dictionary.nav.notifications });
+  }
+  if (role === "user") {
+    mobileLinks.push(
+      { href: `/${locale}/user`, label: dictionary.nav.userDashboard },
+      { href: `/${locale}/user/favoritos`, label: dictionary.nav.userFavorites },
+      { href: `/${locale}/user/pedidos`, label: dictionary.nav.userRequests },
+      { href: `/${locale}/user/mensagens`, label: dictionary.nav.userMessages },
+    );
+  } else if (role === "canil") {
+    mobileLinks.push(
+      { href: `/${locale}/canil`, label: dictionary.nav.canilDashboard },
+      { href: `/${locale}/canil/configuracoes`, label: dictionary.nav.canilSettings },
+    );
+  } else if (role === "admin") {
+    mobileLinks.push({ href: `/${locale}/admin`, label: dictionary.nav.admin });
+  }
+  if (!user) {
+    mobileLinks.push(
+      { href: `/${locale}/auth/login`, label: dictionary.nav.login },
+      { href: `/${locale}/auth/register`, label: dictionary.nav.register },
+    );
+  }
+  const mobileMenuCopy =
+    locale === "pt"
+      ? { open: "Abrir menu", close: "Fechar menu" }
+      : { open: "Open menu", close: "Close menu" };
+
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
       <nav className="mx-auto w-full max-w-7xl px-6 py-4 lg:px-8">
@@ -96,11 +120,17 @@ export async function Navbar({ locale }: NavbarProps) {
             <Link href={`/${locale}/pets`} className="text-muted-foreground transition-colors hover:text-primary">
               {dictionary.nav.pets}
             </Link>
+            <Link href={`/${locale}/canis`} className="text-muted-foreground transition-colors hover:text-primary">
+              {dictionary.nav.shelters}
+            </Link>
 
             {role === "user" && (
               <>
                 <Link href={`/${locale}/user`} className="text-muted-foreground transition-colors hover:text-primary">
                   {dictionary.nav.userDashboard}
+                </Link>
+                <Link href={`/${locale}/user/favoritos`} className="text-muted-foreground transition-colors hover:text-primary">
+                  {dictionary.nav.userFavorites}
                 </Link>
                 <Link href={`/${locale}/user/pedidos`} className="text-muted-foreground transition-colors hover:text-primary">
                   {dictionary.nav.userRequests}
@@ -132,6 +162,21 @@ export async function Navbar({ locale }: NavbarProps) {
           <div className="flex items-center gap-3">
             <LanguageSwitcher locale={locale} />
 
+            {user && (
+              <Link
+                href={`/${locale}/notificacoes`}
+                aria-label={dictionary.nav.notifications}
+                className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-border/50 bg-card/70 text-muted-foreground shadow-sm transition-colors hover:text-primary"
+              >
+                <Bell className="h-5 w-5" />
+                {unreadNotifications > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-black text-primary-foreground">
+                    {unreadNotifications > 9 ? "9+" : unreadNotifications}
+                  </span>
+                )}
+              </Link>
+            )}
+
             {!user && (
               <Link
                 href={`/${locale}/auth/login`}
@@ -162,47 +207,9 @@ export async function Navbar({ locale }: NavbarProps) {
                 menuCopy={menuCopy}
               />
             )}
+
+            <MobileMenu links={mobileLinks} openLabel={mobileMenuCopy.open} closeLabel={mobileMenuCopy.close} />
           </div>
-        </div>
-
-        <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold md:hidden">
-          <Link href={`/${locale}`} className="rounded-full bg-muted px-3 py-1.5 text-muted-foreground hover:text-primary">
-            {dictionary.nav.home}
-          </Link>
-          <Link href={`/${locale}/pets`} className="rounded-full bg-muted px-3 py-1.5 text-muted-foreground hover:text-primary">
-            {dictionary.nav.pets}
-          </Link>
-
-          {role === "user" && (
-            <>
-              <Link href={`/${locale}/user`} className="rounded-full bg-muted px-3 py-1.5 text-muted-foreground hover:text-primary">
-                {dictionary.nav.userDashboard}
-              </Link>
-              <Link href={`/${locale}/user/pedidos`} className="rounded-full bg-muted px-3 py-1.5 text-muted-foreground hover:text-primary">
-                {dictionary.nav.userRequests}
-              </Link>
-              <Link href={`/${locale}/user/mensagens`} className="rounded-full bg-muted px-3 py-1.5 text-muted-foreground hover:text-primary">
-                {dictionary.nav.userMessages}
-              </Link>
-            </>
-          )}
-
-          {role === "canil" && (
-            <>
-              <Link href={`/${locale}/canil`} className="rounded-full bg-muted px-3 py-1.5 text-muted-foreground hover:text-primary">
-                {dictionary.nav.canilDashboard}
-              </Link>
-              <Link href={`/${locale}/canil/configuracoes`} className="rounded-full bg-muted px-3 py-1.5 text-muted-foreground hover:text-primary">
-                {dictionary.nav.canilSettings}
-              </Link>
-            </>
-          )}
-
-          {role === "admin" && (
-            <Link href={`/${locale}/admin`} className="rounded-full bg-muted px-3 py-1.5 text-muted-foreground hover:text-primary">
-              {dictionary.nav.admin}
-            </Link>
-          )}
         </div>
       </nav>
     </header>

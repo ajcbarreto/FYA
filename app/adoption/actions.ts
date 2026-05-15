@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getCurrentProfileRole } from "@/lib/adoption/db";
+import { parseApplicationAnswers } from "@/lib/adoption/application-form";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 
 const requestStatuses = ["pendente", "entrevista", "aprovado", "rejeitado"] as const;
@@ -16,7 +17,8 @@ function getLocaleFromForm(formData: FormData) {
 export async function submitAdoptionRequest(formData: FormData) {
   const locale = getLocaleFromForm(formData);
   const petId = String(formData.get("petId") ?? "");
-  const message = String(formData.get("message") ?? "").trim();
+  const answers = parseApplicationAnswers(formData);
+  const message = (answers.message ?? "").trim();
 
   if (!petId) {
     redirect(`/${locale}/pets?error=invalid_pet`);
@@ -58,6 +60,7 @@ export async function submitAdoptionRequest(formData: FormData) {
     applicant_profile_id: user.id,
     status: "pendente" as const,
     mensagem_inicial: message || null,
+    respostas: answers as unknown as Record<string, unknown>,
   };
 
   const { error: requestError } = await supabase.from("pedidos_adocao").upsert(requestPayload);

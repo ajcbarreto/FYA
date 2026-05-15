@@ -2,8 +2,15 @@ import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
-import { getConversationsForCanil, getMessagesByConversationId, mapConversationListItem } from "@/lib/adoption/db";
-import { sendAdoptionMessage } from "@/app/adoption/actions";
+import {
+  getApplicationAnswersForConversation,
+  getConversationsForCanil,
+  getMessagesByConversationId,
+  mapConversationListItem,
+} from "@/lib/adoption/db";
+import { ChatThread } from "@/components/chat-thread";
+import { ToastFeedback } from "@/components/toast-feedback";
+import { AdoptionAnswers } from "@/components/adoption-answers";
 
 type CanilMessagesPageProps = {
   params: Promise<{ locale: string }>;
@@ -38,6 +45,13 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
     ? conversations.find((conversation) => conversation.id === selectedConversationId) ?? conversations[0] ?? null
     : conversations[0] ?? null;
   const messages = activeConversation ? await getMessagesByConversationId(supabase, activeConversation.id) : [];
+  const application = activeConversation
+    ? await getApplicationAnswersForConversation(supabase, {
+        pedidoId: activeConversation.pedidoId,
+        animalId: activeConversation.animalId,
+        applicantId: activeConversation.applicantId,
+      })
+    : null;
 
   const copy =
     locale === "pt"
@@ -84,15 +98,7 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
       <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
         <h1 className="text-3xl font-black tracking-tight">{copy.title}</h1>
       </header>
-      {feedback && (
-        <p
-          className={`rounded-2xl px-4 py-3 text-sm ${
-            success ? "border border-secondary/30 bg-secondary/10 text-secondary" : "border border-destructive/40 bg-destructive/10 text-destructive"
-          }`}
-        >
-          {feedback}
-        </p>
-      )}
+      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
         <article className="rounded-3xl border border-border/20 bg-card p-4 xl:col-span-4">
@@ -141,45 +147,25 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
                 </p>
               </div>
 
-              <div className="space-y-4 py-6">
-                {messages.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">{copy.noConversations}</p>
-                ) : (
-                  messages.map((message) => {
-                    const isMine = message.sender_profile_id === user.id;
-                    return (
-                      <div
-                        key={message.id}
-                        className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
-                          isMine ? "ml-auto rounded-br-sm bg-primary text-primary-foreground" : "rounded-bl-sm bg-muted"
-                        }`}
-                      >
-                        <p>{message.conteudo}</p>
-                        <p className={`mt-1 text-[10px] ${isMine ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-                          {new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(message.created_at))}
-                        </p>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-
-              <div className="pt-4">
-                <form action={sendAdoptionMessage} className="flex items-center gap-2 rounded-full bg-muted px-3 py-2">
-                  <input type="hidden" name="locale" value={locale} />
-                  <input type="hidden" name="audience" value="canil" />
-                  <input type="hidden" name="conversationId" value={activeConversation.id} />
-                  <input
-                    type="text"
-                    name="message"
-                    placeholder={copy.inputPlaceholder}
-                    className="h-9 flex-1 bg-transparent px-2 text-sm outline-none"
-                  />
-                  <button type="submit" className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">
-                    {copy.send}
-                  </button>
-                </form>
-              </div>
+              <ChatThread
+                key={activeConversation.id}
+                conversationId={activeConversation.id}
+                currentUserId={user.id}
+                audience="canil"
+                locale={locale}
+                initialMessages={messages.map((message) => ({
+                  id: message.id,
+                  conversa_id: message.conversa_id,
+                  sender_profile_id: message.sender_profile_id,
+                  conteudo: message.conteudo,
+                  created_at: message.created_at,
+                }))}
+                copy={{
+                  empty: copy.noConversations,
+                  inputPlaceholder: copy.inputPlaceholder,
+                  send: copy.send,
+                }}
+              />
             </>
           ) : (
             <p className="text-sm text-muted-foreground">{copy.noConversations}</p>
@@ -189,11 +175,18 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
         <article className="rounded-3xl border border-border/20 bg-card p-6 xl:col-span-3">
           <h2 className="text-lg font-bold">{activeConversation?.applicantName ?? "-"}</h2>
           <p className="mt-4 text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">{copy.adopterInfo}</p>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li className="rounded-xl bg-muted px-3 py-2">{copy.profileVerified}</li>
-            <li className="rounded-xl bg-muted px-3 py-2">{locale === "pt" ? "Casa com quintal" : "House with backyard"}</li>
-            <li className="rounded-xl bg-muted px-3 py-2">{locale === "pt" ? "Resposta media: < 2h" : "Average response: < 2h"}</li>
-          </ul>
+          {activeConversation ? (
+            <div className="mt-3 space-y-3">
+              {application?.mensagemInicial && (
+                <p className="rounded-xl bg-muted px-3 py-2 text-sm italic text-muted-foreground">
+                  {application.mensagemInicial}
+                </p>
+              )}
+              <AdoptionAnswers answers={application?.respostas ?? null} locale={locale} />
+            </div>
+          ) : (
+            <p className="mt-3 text-sm text-muted-foreground">{copy.noConversations}</p>
+          )}
 
           <p className="mt-6 text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">{copy.reminder}</p>
           <p className="mt-2 text-sm text-muted-foreground">

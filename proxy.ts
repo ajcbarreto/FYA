@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { defaultLocale, isLocale } from "./lib/i18n/config";
+import { resolveUserRole } from "./lib/auth/role";
 import { createProxySupabaseClient } from "./lib/supabase/proxy-client";
 import type { UserRole } from "./lib/supabase/types";
 
@@ -10,13 +11,19 @@ const protectedRoleByPrefix: Record<string, UserRole> = {
 };
 
 function getRequiredRole(pathname: string) {
-  return Object.entries(protectedRoleByPrefix).find(([prefix]) =>
-    pathname.startsWith(prefix),
+  return Object.entries(protectedRoleByPrefix).find(
+    ([prefix]) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   )?.[1];
 }
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Rotas nao localizadas (route handlers) — nao prefixar com locale.
+  if (pathname === "/auth/callback" || pathname.startsWith("/auth/callback/")) {
+    return NextResponse.next();
+  }
+
   const segments = pathname.split("/").filter(Boolean);
   const maybeLocale = segments[0];
 
@@ -55,32 +62,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  let role = profile?.role as UserRole | undefined;
-
-  if (!role) {
-    const metadataRole = user.user_metadata?.role;
-    if (metadataRole === "admin" || metadataRole === "user" || metadataRole === "canil") {
-      role = metadataRole;
-    } else {
-      const { data: ownedShelter } = await supabase
-        .from("canis")
-        .select("id")
-        .eq("owner_profile_id", user.id)
-        .limit(1)
-        .maybeSingle();
-
-      if (ownedShelter) {
-        role = "canil";
-      }
-    }
-  }
-
+  const role = await resolveUserRole(supabase, user);
   const authorized = role === requiredRole || (role === "admin" && requiredRole !== "admin");
 
   if (!authorized) {

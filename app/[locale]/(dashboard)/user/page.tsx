@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { FileText, MessageCircle, Search } from "lucide-react";
+import { FileText, Heart, MessageCircle, Search } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAdoptionRequestsForUser, getConversationsForUser } from "@/lib/adoption/db";
+import { getFavoriteAnimalIds } from "@/lib/favorites/db";
 
 type UserDashboardPageProps = {
   params: Promise<{ locale: string }>;
@@ -24,9 +25,10 @@ export default async function UserDashboardPage({ params }: UserDashboardPagePro
     redirect(`/${locale}/auth/login?next=/user`);
   }
 
-  const [requests, conversations] = await Promise.all([
+  const [requests, conversations, favorites] = await Promise.all([
     getAdoptionRequestsForUser(supabase, user.id),
     getConversationsForUser(supabase, user.id),
+    getFavoriteAnimalIds(supabase, user.id),
   ]);
 
   const copy =
@@ -39,11 +41,13 @@ export default async function UserDashboardPage({ params }: UserDashboardPagePro
             pending: "Em analise",
             approved: "Aprovados",
             chats: "Conversas ativas",
+            favorites: "Favoritos",
           },
           actions: {
             browsePets: "Explorar pets",
             viewRequests: "Ver pedidos",
             openMessages: "Abrir mensagens",
+            viewFavorites: "Ver favoritos",
           },
         }
       : {
@@ -54,11 +58,13 @@ export default async function UserDashboardPage({ params }: UserDashboardPagePro
             pending: "In review",
             approved: "Approved",
             chats: "Active chats",
+            favorites: "Favorites",
           },
           actions: {
             browsePets: "Browse pets",
             viewRequests: "View requests",
             openMessages: "Open messages",
+            viewFavorites: "View favorites",
           },
         };
 
@@ -67,6 +73,7 @@ export default async function UserDashboardPage({ params }: UserDashboardPagePro
     pending: requests.filter((request) => ["pendente", "entrevista"].includes(request.status)).length,
     approved: requests.filter((request) => request.status === "aprovado").length,
     chats: conversations.length,
+    favorites: favorites.size,
   };
 
   return (
@@ -76,7 +83,7 @@ export default async function UserDashboardPage({ params }: UserDashboardPagePro
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
 
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
         <article className="rounded-2xl border border-border/20 bg-card p-5">
           <p className="text-sm text-muted-foreground">{copy.cards.total}</p>
           <p className="mt-1 text-3xl font-black">{stats.total}</p>
@@ -93,12 +100,20 @@ export default async function UserDashboardPage({ params }: UserDashboardPagePro
           <p className="text-sm text-muted-foreground">{copy.cards.chats}</p>
           <p className="mt-1 text-3xl font-black">{stats.chats}</p>
         </article>
+        <article className="rounded-2xl border border-border/20 bg-card p-5">
+          <p className="text-sm text-muted-foreground">{copy.cards.favorites}</p>
+          <p className="mt-1 text-3xl font-black text-primary">{stats.favorites}</p>
+        </article>
       </section>
 
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Link href={`/${locale}/pets`} className="flex items-center gap-3 rounded-2xl border border-border/20 bg-card p-5 hover:bg-muted">
           <Search className="h-5 w-5 text-primary" />
           <span className="font-semibold">{copy.actions.browsePets}</span>
+        </Link>
+        <Link href={`/${locale}/user/favoritos`} className="flex items-center gap-3 rounded-2xl border border-border/20 bg-card p-5 hover:bg-muted">
+          <Heart className="h-5 w-5 text-primary" />
+          <span className="font-semibold">{copy.actions.viewFavorites}</span>
         </Link>
         <Link href={`/${locale}/user/pedidos`} className="flex items-center gap-3 rounded-2xl border border-border/20 bg-card p-5 hover:bg-muted">
           <FileText className="h-5 w-5 text-primary" />

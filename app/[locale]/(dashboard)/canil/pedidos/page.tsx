@@ -4,6 +4,8 @@ import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 import { getAdoptionRequestsForCanil, getRowAnimal, localizeRequestStatus, mapRequestApplicantName } from "@/lib/adoption/db";
 import { updateRequestStatus } from "@/app/adoption/actions";
+import { AdoptionAnswers } from "@/components/adoption-answers";
+import { ToastFeedback } from "@/components/toast-feedback";
 
 type CanilRequestsPageProps = {
   params: Promise<{ locale: string }>;
@@ -105,15 +107,7 @@ export default async function CanilRequestsPage({ params, searchParams }: CanilR
         <h1 className="text-3xl font-black tracking-tight">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
-      {feedback && (
-        <p
-          className={`rounded-2xl px-4 py-3 text-sm ${
-            success ? "border border-secondary/30 bg-secondary/10 text-secondary" : "border border-destructive/40 bg-destructive/10 text-destructive"
-          }`}
-        >
-          {feedback}
-        </p>
-      )}
+      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       <section className="overflow-hidden rounded-3xl border border-border/20 bg-card">
         {requests.length === 0 ? (
@@ -131,10 +125,23 @@ export default async function CanilRequestsPage({ params, searchParams }: CanilR
               </thead>
               <tbody>
                 {requests.map((request) => (
-                  <tr key={request.id} className="border-t border-border/15">
+                  <tr key={request.id} className="border-t border-border/15 align-top">
                     <td className="px-6 py-4">
                       <p className="font-semibold">{mapRequestApplicantName(request, locale)}</p>
                       <p className="text-xs text-muted-foreground">{getRowAnimal(request)?.nome ?? "-"}</p>
+                      {(request.mensagem_inicial || request.respostas) && (
+                        <details className="mt-3 text-xs text-muted-foreground">
+                          <summary className="cursor-pointer font-semibold text-primary">
+                            {locale === "pt" ? "Ver questionario" : "View questionnaire"}
+                          </summary>
+                          <div className="mt-2 space-y-2">
+                            {request.mensagem_inicial && (
+                              <p className="rounded-xl bg-muted px-3 py-2 italic">{request.mensagem_inicial}</p>
+                            )}
+                            <AdoptionAnswers answers={request.respostas} locale={locale} />
+                          </div>
+                        </details>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-sm">
                       {new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short", year: "numeric" }).format(

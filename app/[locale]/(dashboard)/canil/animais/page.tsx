@@ -1,8 +1,11 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ImagePlus, Plus } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser, localizeAnimalStatus, localizeSpecies } from "@/lib/canil/shelter-data";
 import { updateAnimalStatus } from "@/app/[locale]/(dashboard)/canil/actions";
+import { ToastFeedback } from "@/components/toast-feedback";
 
 type CanilPetsPageProps = {
   params: Promise<{ locale: string }>;
@@ -44,12 +47,17 @@ export default async function CanilPetsPage({ params, searchParams }: CanilPetsP
             em_tratamento: "Em tratamento",
             adotado: "Adotado",
           },
-          success: "Estado do animal atualizado com sucesso.",
+          success: {
+            updated: "Estado do animal atualizado com sucesso.",
+            animal_deleted: "Animal removido.",
+          },
           errors: {
             invalid_status: "Estado invalido.",
             save_failed: "Nao foi possivel guardar as alteracoes.",
             no_shelter: "Nao foi encontrado um canil para a tua conta.",
             invalid_data: "Dados invalidos.",
+            not_authorized: "Sem permissao para este animal.",
+            delete_failed: "Nao foi possivel remover o animal.",
           },
         }
       : {
@@ -67,12 +75,17 @@ export default async function CanilPetsPage({ params, searchParams }: CanilPetsP
             em_tratamento: "In treatment",
             adotado: "Adopted",
           },
-          success: "Pet status was updated successfully.",
+          success: {
+            updated: "Pet status was updated successfully.",
+            animal_deleted: "Pet removed.",
+          },
           errors: {
             invalid_status: "Invalid status.",
             save_failed: "Could not save the changes.",
             no_shelter: "No shelter was found for your account.",
             invalid_data: "Invalid data.",
+            not_authorized: "Not allowed for this pet.",
+            delete_failed: "Could not remove the pet.",
           },
         };
 
@@ -83,28 +96,27 @@ export default async function CanilPetsPage({ params, searchParams }: CanilPetsP
   };
 
   const feedback =
-    success === "updated"
-      ? copy.success
-      : error && copy.errors[error as keyof typeof copy.errors]
-        ? copy.errors[error as keyof typeof copy.errors]
-        : null;
+    (success && copy.success[success as keyof typeof copy.success]) ||
+    (error && copy.errors[error as keyof typeof copy.errors]) ||
+    null;
 
   return (
     <main className="space-y-6">
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-black tracking-tight">{copy.title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
+      <header className="flex flex-col gap-4 rounded-3xl border border-border/20 bg-card p-8 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-black tracking-tight">{copy.title}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
+        </div>
+        <Link
+          href={`/${locale}/canil/animais/novo`}
+          className="inline-flex w-fit items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground"
+        >
+          <Plus className="h-4 w-4" />
+          {locale === "pt" ? "Novo animal" : "New pet"}
+        </Link>
       </header>
 
-      {feedback && (
-        <p
-          className={`rounded-2xl px-4 py-3 text-sm ${
-            success ? "border border-secondary/25 bg-secondary/10 text-secondary" : "border border-destructive/30 bg-destructive/10 text-destructive"
-          }`}
-        >
-          {feedback}
-        </p>
-      )}
+      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <article className="rounded-2xl border border-border/20 bg-card p-5">
@@ -150,23 +162,32 @@ export default async function CanilPetsPage({ params, searchParams }: CanilPetsP
                     <td className="px-6 py-4 text-sm">{animal.idade_anos === null ? "-" : `${animal.idade_anos}`}</td>
                     <td className="px-6 py-4 text-sm font-semibold">{localizeAnimalStatus(animal.status, locale)}</td>
                     <td className="px-6 py-4">
-                      <form action={updateAnimalStatus} className="flex items-center gap-2">
-                        <input type="hidden" name="locale" value={locale} />
-                        <input type="hidden" name="animalId" value={animal.id} />
-                        <select
-                          name="status"
-                          defaultValue={animal.status.toLowerCase()}
-                          className="h-10 rounded-full border border-border/30 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                      <div className="flex flex-wrap items-center gap-2">
+                        <form action={updateAnimalStatus} className="flex items-center gap-2">
+                          <input type="hidden" name="locale" value={locale} />
+                          <input type="hidden" name="animalId" value={animal.id} />
+                          <select
+                            name="status"
+                            defaultValue={animal.status.toLowerCase()}
+                            className="h-10 rounded-full border border-border/30 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                          >
+                            <option value="disponivel">{copy.statusOptions.disponivel}</option>
+                            <option value="reservado">{copy.statusOptions.reservado}</option>
+                            <option value="em_tratamento">{copy.statusOptions.em_tratamento}</option>
+                            <option value="adotado">{copy.statusOptions.adotado}</option>
+                          </select>
+                          <button type="submit" className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">
+                            {copy.save}
+                          </button>
+                        </form>
+                        <Link
+                          href={`/${locale}/canil/animais/${animal.id}`}
+                          className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-2 text-xs font-bold text-muted-foreground hover:bg-muted/80"
                         >
-                          <option value="disponivel">{copy.statusOptions.disponivel}</option>
-                          <option value="reservado">{copy.statusOptions.reservado}</option>
-                          <option value="em_tratamento">{copy.statusOptions.em_tratamento}</option>
-                          <option value="adotado">{copy.statusOptions.adotado}</option>
-                        </select>
-                        <button type="submit" className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">
-                          {copy.save}
-                        </button>
-                      </form>
+                          <ImagePlus className="h-3 w-3" />
+                          {locale === "pt" ? "Fotos" : "Photos"}
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}

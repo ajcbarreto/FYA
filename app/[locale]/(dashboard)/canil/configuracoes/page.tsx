@@ -3,6 +3,7 @@ import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 import { updateShelterSettings } from "@/app/[locale]/(dashboard)/canil/actions";
+import { ToastFeedback } from "@/components/toast-feedback";
 
 type CanilSettingsPageProps = {
   params: Promise<{ locale: string }>;
@@ -94,15 +95,7 @@ export default async function CanilSettingsPage({ params, searchParams }: CanilS
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
 
-      {feedback && (
-        <p
-          className={`rounded-2xl px-4 py-3 text-sm ${
-            success ? "border border-secondary/25 bg-secondary/10 text-secondary" : "border border-destructive/30 bg-destructive/10 text-destructive"
-          }`}
-        >
-          {feedback}
-        </p>
-      )}
+      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       <section className="rounded-3xl border border-border/20 bg-card p-6">
         <form action={updateShelterSettings} className="space-y-5">

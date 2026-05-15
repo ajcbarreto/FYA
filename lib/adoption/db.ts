@@ -9,6 +9,7 @@ export type AdoptionRequestRow = {
   status: "pendente" | "entrevista" | "aprovado" | "rejeitado";
   mensagem_inicial: string | null;
   observacoes_canil: string | null;
+  respostas: Record<string, unknown> | null;
   created_at: string;
   reviewed_at: string | null;
   animais: { nome: string; especie: string; raca: string | null } | { nome: string; especie: string; raca: string | null }[] | null;
@@ -71,7 +72,7 @@ export async function getCurrentProfileRole(supabase: SupabaseClient, userId: st
 export async function getAdoptionRequestsForCanil(supabase: SupabaseClient, canilId: string) {
   const { data, error } = await supabase
     .from("pedidos_adocao")
-    .select("id,animal_id,canil_id,applicant_profile_id,status,mensagem_inicial,observacoes_canil,created_at,reviewed_at,animais(nome,especie,raca),canis(nome,localizacao),profiles!pedidos_adocao_applicant_profile_id_fkey(full_name,email)")
+    .select("id,animal_id,canil_id,applicant_profile_id,status,mensagem_inicial,observacoes_canil,respostas,created_at,reviewed_at,animais(nome,especie,raca),canis(nome,localizacao),profiles!pedidos_adocao_applicant_profile_id_fkey(full_name,email)")
     .eq("canil_id", canilId)
     .order("created_at", { ascending: false });
 
@@ -88,7 +89,7 @@ export async function getAdoptionRequestsForCanil(supabase: SupabaseClient, cani
 export async function getAdoptionRequestsForUser(supabase: SupabaseClient, userId: string) {
   const { data, error } = await supabase
     .from("pedidos_adocao")
-    .select("id,animal_id,canil_id,applicant_profile_id,status,mensagem_inicial,observacoes_canil,created_at,reviewed_at,animais(nome,especie,raca),canis(nome,localizacao),profiles!pedidos_adocao_applicant_profile_id_fkey(full_name,email)")
+    .select("id,animal_id,canil_id,applicant_profile_id,status,mensagem_inicial,observacoes_canil,respostas,created_at,reviewed_at,animais(nome,especie,raca),canis(nome,localizacao),profiles!pedidos_adocao_applicant_profile_id_fkey(full_name,email)")
     .eq("applicant_profile_id", userId)
     .order("created_at", { ascending: false });
 
@@ -170,7 +171,39 @@ export function mapConversationListItem(conversation: ConversationRow, locale: s
     canilName: shelter?.nome ?? "FYA Shelter",
     applicantName: contactName,
     applicantId: conversation.applicant_profile_id,
+    animalId: conversation.animal_id,
+    pedidoId: conversation.pedido_id,
     canilOwnerId: shelter?.owner_profile_id ?? null,
+  };
+}
+
+export async function getApplicationAnswersForConversation(
+  supabase: SupabaseClient,
+  conversation: { pedidoId: string | null; animalId: string | null; applicantId: string },
+) {
+  let query = supabase.from("pedidos_adocao").select("respostas,mensagem_inicial,created_at");
+
+  if (conversation.pedidoId) {
+    query = query.eq("id", conversation.pedidoId);
+  } else if (conversation.animalId) {
+    query = query.eq("animal_id", conversation.animalId).eq("applicant_profile_id", conversation.applicantId);
+  } else {
+    return null;
+  }
+
+  const { data, error } = await query
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) {
+    if (error) console.error("[getApplicationAnswersForConversation] Supabase error:", error.message);
+    return null;
+  }
+
+  return {
+    respostas: (data.respostas as Record<string, unknown> | null) ?? null,
+    mensagemInicial: (data.mensagem_inicial as string | null) ?? null,
   };
 }
 

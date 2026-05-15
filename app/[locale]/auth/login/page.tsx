@@ -5,18 +5,20 @@ import { ArrowRight, Lock, Mail, PawPrint } from "lucide-react";
 import { login } from "@/app/auth/login/actions";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
+import { ToastFeedback } from "@/components/toast-feedback";
 
 type LoginPageProps = {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{
     error?: string;
     next?: string;
+    success?: string;
   }>;
 };
 
 export default async function LoginPage({ params, searchParams }: LoginPageProps) {
   const { locale } = await params;
-  const { error, next } = await searchParams;
+  const { error, next, success } = await searchParams;
 
   if (!isLocale(locale)) {
     notFound();
@@ -32,6 +34,7 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
           rememberDevice: "Lembrar este dispositivo",
           orContinue: "Ou continuar com",
           registerPrompt: "Ainda nao tens conta?",
+          passwordUpdated: "Password atualizada. Inicia sessao com a nova password.",
         }
       : {
           sideTitle: "Welcome back to the pack.",
@@ -40,6 +43,7 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
           rememberDevice: "Remember this device",
           orContinue: "Or continue with",
           registerPrompt: "Don't have an account?",
+          passwordUpdated: "Password updated. Sign in with your new password.",
         };
 
   return (
@@ -77,6 +81,10 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
                 {error}
               </p>
             )}
+            <ToastFeedback
+              message={success === "password_updated" ? copy.passwordUpdated : null}
+              variant="success"
+            />
 
             <form action={login} className="space-y-6">
               <input type="hidden" name="locale" value={locale} />
@@ -104,9 +112,12 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
                   <label htmlFor="password" className="block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
                     {dictionary.auth.password}
                   </label>
-                  <button type="button" className="text-xs font-bold text-primary hover:underline">
+                  <Link
+                    href={`/${locale}/auth/forgot-password`}
+                    className="text-xs font-bold text-primary hover:underline"
+                  >
                     {copy.forgotPassword}
-                  </button>
+                  </Link>
                 </div>
                 <div className="relative">
                   <Lock className="pointer-events-none absolute left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

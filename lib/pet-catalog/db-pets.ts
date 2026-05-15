@@ -1,4 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { listPrimaryPhotosForAnimals } from "@/lib/canil/animal-photos";
+import { sexLabel, sizeLabel, speciesLabel, statusLabel } from "@/lib/i18n/animals";
 
 export type PetCatalogItem = {
   id: string;
@@ -9,6 +11,7 @@ export type PetCatalogItem = {
   traits: string[];
   badge?: "new" | "urgent";
   location: string;
+  shelterId: string;
   shelterName: string;
   description: string;
   status: string;
@@ -58,70 +61,9 @@ function mapAgeLabel(ageYears: number | null, locale: string) {
   return `${ageYears} ${ageYears === 1 ? "year" : "years"}`;
 }
 
-function mapStatusLabel(status: string, locale: string) {
-  const normalized = status.toLowerCase();
-  if (locale === "pt") {
-    if (normalized === "disponivel") return "Disponivel";
-    if (normalized === "reservado") return "Reservado";
-    if (normalized === "em_tratamento") return "Em tratamento";
-    if (normalized === "adotado") return "Adotado";
-    return toTitleCase(status);
-  }
-
-  if (normalized === "disponivel") return "Available";
-  if (normalized === "reservado") return "Reserved";
-  if (normalized === "em_tratamento") return "In treatment";
-  if (normalized === "adotado") return "Adopted";
-  return toTitleCase(status);
-}
-
-function mapSpeciesLabel(species: string, locale: string) {
-  const normalized = species.toLowerCase();
-  if (locale === "pt") {
-    if (normalized === "cao") return "Cao";
-    if (normalized === "gato") return "Gato";
-    return toTitleCase(species);
-  }
-
-  if (normalized === "cao") return "Dog";
-  if (normalized === "gato") return "Cat";
-  return toTitleCase(species);
-}
-
-function mapSexLabel(sex: string | null, locale: string) {
-  if (!sex) {
-    return locale === "pt" ? "N/D" : "N/A";
-  }
-
-  const normalized = sex.toLowerCase();
-  if (locale === "pt") {
-    if (normalized === "macho") return "Macho";
-    if (normalized === "femea") return "Femea";
-    return toTitleCase(sex);
-  }
-
-  if (normalized === "macho") return "Male";
-  if (normalized === "femea") return "Female";
-  return toTitleCase(sex);
-}
-
 function mapSizeTrait(size: string | null, locale: string) {
-  if (!size) {
-    return locale === "pt" ? "Porte n/d" : "Size n/a";
-  }
-
-  const normalized = size.toLowerCase();
-  if (locale === "pt") {
-    if (normalized === "pequeno") return "Porte pequeno";
-    if (normalized === "medio") return "Porte medio";
-    if (normalized === "grande") return "Porte grande";
-    return toTitleCase(size);
-  }
-
-  if (normalized === "pequeno") return "Small size";
-  if (normalized === "medio") return "Medium size";
-  if (normalized === "grande") return "Large size";
-  return toTitleCase(size);
+  if (!size) return locale === "pt" ? "Porte n/d" : "Size n/a";
+  return locale === "pt" ? `Porte ${sizeLabel(size, locale).toLowerCase()}` : `${sizeLabel(size, locale)} size`;
 }
 
 function badgeForStatus(status: string): "new" | "urgent" | undefined {
@@ -160,12 +102,12 @@ function extractShelter(canis: AnimalRow["canis"]) {
   return Array.isArray(canis) ? canis[0] ?? null : canis;
 }
 
-export function toCatalogItem(animal: AnimalRow, locale: string): PetCatalogItem {
+export function toCatalogItem(animal: AnimalRow, locale: string, photoOverride?: string): PetCatalogItem {
   const shelter = extractShelter(animal.canis);
-  const speciesLabel = mapSpeciesLabel(animal.especie, locale);
-  const breed = animal.raca ? toTitleCase(animal.raca) : speciesLabel;
-  const sex = mapSexLabel(animal.sexo, locale);
-  const status = mapStatusLabel(animal.status, locale);
+  const speciesText = speciesLabel(animal.especie, locale);
+  const breed = animal.raca ? toTitleCase(animal.raca) : speciesText;
+  const sex = sexLabel(animal.sexo, locale);
+  const status = statusLabel(animal.status, locale);
 
   return {
     id: animal.id,
@@ -176,11 +118,25 @@ export function toCatalogItem(animal: AnimalRow, locale: string): PetCatalogItem
     traits: [mapSizeTrait(animal.porte, locale), status],
     badge: badgeForStatus(animal.status),
     location: shelter?.localizacao ?? (locale === "pt" ? "Localizacao n/d" : "Location n/a"),
+    shelterId: animal.canil_id,
     shelterName: shelter?.nome ?? (locale === "pt" ? "Abrigo n/d" : "Shelter n/a"),
     description: animal.descricao ?? "",
     status,
-    imageUrl: imageForAnimal(animal),
+    imageUrl: photoOverride ?? imageForAnimal(animal),
   };
+}
+
+async function applyPhotoOverrides(
+  supabase: SupabaseClient,
+  animals: AnimalRow[],
+  locale: string,
+): Promise<PetCatalogItem[]> {
+  if (animals.length === 0) return [];
+  const photoMap = await listPrimaryPhotosForAnimals(
+    supabase,
+    animals.map((animal) => animal.id),
+  );
+  return animals.map((animal) => toCatalogItem(animal, locale, photoMap.get(animal.id)));
 }
 
 export async function getCatalogPets(supabase: SupabaseClient, locale: string, options: CatalogPetsQueryOptions = {}) {
@@ -222,7 +178,7 @@ export async function getCatalogPets(supabase: SupabaseClient, locale: string, o
     return [];
   }
 
-  return (data as AnimalRow[]).map((animal) => toCatalogItem(animal, locale));
+  return applyPhotoOverrides(supabase, data as AnimalRow[], locale);
 }
 
 export async function getCatalogPetsCount(
@@ -271,7 +227,9 @@ export async function getPetById(supabase: SupabaseClient, petId: string, locale
     return null;
   }
 
-  return toCatalogItem(data as AnimalRow, locale);
+  const animal = data as AnimalRow;
+  const photoMap = await listPrimaryPhotosForAnimals(supabase, [animal.id]);
+  return toCatalogItem(animal, locale, photoMap.get(animal.id));
 }
 
 export async function getRelatedPets(supabase: SupabaseClient, petId: string, locale: string, limit = 3) {
@@ -296,5 +254,5 @@ export async function getRelatedPets(supabase: SupabaseClient, petId: string, lo
     return [];
   }
 
-  return (data as AnimalRow[]).map((animal) => toCatalogItem(animal, locale));
+  return applyPhotoOverrides(supabase, data as AnimalRow[], locale);
 }

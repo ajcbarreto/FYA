@@ -2,7 +2,8 @@ import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getConversationsForUser, getMessagesByConversationId, mapConversationListItem } from "@/lib/adoption/db";
-import { sendAdoptionMessage } from "@/app/adoption/actions";
+import { ChatThread } from "@/components/chat-thread";
+import { ToastFeedback } from "@/components/toast-feedback";
 
 type UserMessagesPageProps = {
   params: Promise<{ locale: string }>;
@@ -74,15 +75,7 @@ export default async function UserMessagesPage({ params, searchParams }: UserMes
       <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
         <h1 className="text-3xl font-black tracking-tight">{copy.title}</h1>
       </header>
-      {feedback && (
-        <p
-          className={`rounded-2xl px-4 py-3 text-sm ${
-            success ? "border border-secondary/30 bg-secondary/10 text-secondary" : "border border-destructive/40 bg-destructive/10 text-destructive"
-          }`}
-        >
-          {feedback}
-        </p>
-      )}
+      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
         <article className="rounded-3xl border border-border/20 bg-card p-4 xl:col-span-4">
@@ -130,42 +123,25 @@ export default async function UserMessagesPage({ params, searchParams }: UserMes
                   {copy.withShelter} {activeConversation.canilName}
                 </p>
               </div>
-              <div className="space-y-4 py-6">
-                {messages.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">{copy.noConversations}</p>
-                ) : (
-                  messages.map((message) => {
-                    const isMine = message.sender_profile_id === user.id;
-                    return (
-                      <div
-                        key={message.id}
-                        className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
-                          isMine ? "ml-auto rounded-br-sm bg-primary text-primary-foreground" : "rounded-bl-sm bg-muted"
-                        }`}
-                      >
-                        <p>{message.conteudo}</p>
-                        <p className={`mt-1 text-[10px] ${isMine ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-                          {new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(message.created_at))}
-                        </p>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-              <form action={sendAdoptionMessage} className="flex items-center gap-2 rounded-full bg-muted px-3 py-2">
-                <input type="hidden" name="locale" value={locale} />
-                <input type="hidden" name="audience" value="user" />
-                <input type="hidden" name="conversationId" value={activeConversation.id} />
-                <input
-                  type="text"
-                  name="message"
-                  placeholder={copy.inputPlaceholder}
-                  className="h-9 flex-1 bg-transparent px-2 text-sm outline-none"
-                />
-                <button type="submit" className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">
-                  {copy.send}
-                </button>
-              </form>
+              <ChatThread
+                key={activeConversation.id}
+                conversationId={activeConversation.id}
+                currentUserId={user.id}
+                audience="user"
+                locale={locale}
+                initialMessages={messages.map((message) => ({
+                  id: message.id,
+                  conversa_id: message.conversa_id,
+                  sender_profile_id: message.sender_profile_id,
+                  conteudo: message.conteudo,
+                  created_at: message.created_at,
+                }))}
+                copy={{
+                  empty: copy.noConversations,
+                  inputPlaceholder: copy.inputPlaceholder,
+                  send: copy.send,
+                }}
+              />
             </>
           ) : (
             <p className="text-sm text-muted-foreground">{copy.noConversations}</p>

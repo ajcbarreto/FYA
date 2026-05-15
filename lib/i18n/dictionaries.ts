@@ -4,12 +4,15 @@ type Dictionary = {
   nav: {
     home: string;
     pets: string;
+    shelters: string;
+    notifications: string;
     login: string;
     register: string;
     userDashboard: string;
     userRequests: string;
     userMessages: string;
     userSettings: string;
+    userFavorites: string;
     canilDashboard: string;
     canilSettings: string;
     admin: string;
@@ -180,12 +183,15 @@ const dictionaries: Record<Locale, Dictionary> = {
     nav: {
       home: "Home",
       pets: "Catalogo de Pets",
+      shelters: "Canis",
+      notifications: "Notificacoes",
       login: "Entrar",
       register: "Registar",
       userDashboard: "Dashboard Adotante",
       userRequests: "Meus Pedidos",
       userMessages: "Mensagens",
       userSettings: "Configuracoes",
+      userFavorites: "Favoritos",
       canilDashboard: "Dashboard Canil",
       canilSettings: "Configuracoes do Canil",
       admin: "Admin",
@@ -358,12 +364,15 @@ const dictionaries: Record<Locale, Dictionary> = {
     nav: {
       home: "Home",
       pets: "Pet Catalog",
+      shelters: "Shelters",
+      notifications: "Notifications",
       login: "Login",
       register: "Register",
       userDashboard: "Adopter Dashboard",
       userRequests: "My Requests",
       userMessages: "Messages",
       userSettings: "Settings",
+      userFavorites: "Favorites",
       canilDashboard: "Shelter Dashboard",
       canilSettings: "Shelter Settings",
       admin: "Admin",

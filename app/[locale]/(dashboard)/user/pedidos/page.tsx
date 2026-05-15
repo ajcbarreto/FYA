@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAdoptionRequestsForUser, getRowAnimal, getRowCanil, localizeRequestStatus } from "@/lib/adoption/db";
+import { ToastFeedback } from "@/components/toast-feedback";
 
 type UserRequestsPageProps = {
   params: Promise<{ locale: string }>;
@@ -73,15 +74,7 @@ export default async function UserRequestsPage({ params, searchParams }: UserReq
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
 
-      {feedback && (
-        <p
-          className={`rounded-2xl px-4 py-3 text-sm ${
-            success ? "border border-secondary/30 bg-secondary/10 text-secondary" : "border border-destructive/40 bg-destructive/10 text-destructive"
-          }`}
-        >
-          {feedback}
-        </p>
-      )}
+      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       <section className="overflow-hidden rounded-3xl border border-border/20 bg-card">
         {requests.length === 0 ? (

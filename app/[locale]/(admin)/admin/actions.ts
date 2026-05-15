@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -10,6 +11,52 @@ import type { UserRole } from "@/lib/supabase/types";
 function getLocale(formData: FormData): Locale {
   const localeValue = String(formData.get("locale") ?? defaultLocale);
   return isLocale(localeValue) ? localeValue : defaultLocale;
+}
+
+async function requireAdmin(locale: Locale) {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect(`/${locale}/auth/login?next=/admin`);
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if ((profile?.role as UserRole | undefined) !== "admin") {
+    redirect(`/${locale}/admin?error=unauthorized`);
+  }
+
+  return supabase;
+}
+
+export async function toggleShelterVerification(formData: FormData) {
+  const locale = getLocale(formData);
+  const shelterId = String(formData.get("shelterId") ?? "").trim();
+  const verify = String(formData.get("verify") ?? "") === "true";
+
+  if (!shelterId) {
+    redirect(`/${locale}/admin?error=invalid_shelter`);
+  }
+
+  const supabase = await requireAdmin(locale);
+  const { error } = await supabase
+    .from("canis")
+    .update({ verificado: verify })
+    .eq("id", shelterId);
+
+  if (error) {
+    redirect(`/${locale}/admin?error=verification_failed`);
+  }
+
+  revalidatePath(`/${locale}/admin`);
+  redirect(`/${locale}/admin?success=${verify ? "shelter_verified" : "shelter_unverified"}`);
 }
 
 export async function updatePetCatalogFilters(formData: FormData) {

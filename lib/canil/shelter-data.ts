@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { speciesLabel, statusLabel } from "@/lib/i18n/animals";
 
 export type ShelterRecord = {
   id: string;
@@ -57,32 +58,5 @@ export async function getShelterForUser(supabase: SupabaseClient, userId: string
   };
 }
 
-export function localizeAnimalStatus(status: string, locale: string) {
-  const normalized = status.toLowerCase();
-  if (locale === "pt") {
-    if (normalized === "disponivel") return "Disponivel";
-    if (normalized === "reservado") return "Reservado";
-    if (normalized === "em_tratamento") return "Em tratamento";
-    if (normalized === "adotado") return "Adotado";
-    return status;
-  }
-
-  if (normalized === "disponivel") return "Available";
-  if (normalized === "reservado") return "Reserved";
-  if (normalized === "em_tratamento") return "In treatment";
-  if (normalized === "adotado") return "Adopted";
-  return status;
-}
-
-export function localizeSpecies(species: string, locale: string) {
-  const normalized = species.toLowerCase();
-  if (locale === "pt") {
-    if (normalized === "cao") return "Cao";
-    if (normalized === "gato") return "Gato";
-    return species;
-  }
-
-  if (normalized === "cao") return "Dog";
-  if (normalized === "gato") return "Cat";
-  return species;
-}
+export const localizeAnimalStatus = statusLabel;
+export const localizeSpecies = speciesLabel;

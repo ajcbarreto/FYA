@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ArrowRight, Heart, MapPin, PawPrint, Search, Send, Users, ShieldCheck } from "lucide-react";
+import { ArrowRight, Heart, MapPin, PawPrint, Search, Users, ShieldCheck } from "lucide-react";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
@@ -38,9 +38,6 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
           footerTagline: "Ajudamos cada pet a encontrar um lar para sempre com cuidado e comunidade.",
           company: "Empresa",
           support: "Suporte",
-          newsletter: "Newsletter",
-          newsletterHint: "Recebe novidades sobre pets na tua regiao.",
-          emailPlaceholder: "O teu email",
           about: "Sobre",
           stories: "Historias",
           careers: "Carreiras",
@@ -50,6 +47,9 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
           madeWithLove: "Feito com carinho pela FYA.",
           browseCatalog: "Explorar catalogo",
           learnMore: "Saber mais",
+          sheltersTitle: "Canis",
+          sheltersDescription: "Explora os nossos canis e abrigos parceiros.",
+          sheltersCta: "Ver canis",
         }
       : {
           trusted: "Trusted by 5,000+ families",
@@ -63,9 +63,6 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
           footerTagline: "Helping every pet find their forever home through care and community.",
           company: "Company",
           support: "Support",
-          newsletter: "Newsletter",
-          newsletterHint: "Get updates on new pets in your area.",
-          emailPlaceholder: "Your email",
           about: "About",
           stories: "Stories",
           careers: "Careers",
@@ -75,6 +72,9 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
           madeWithLove: "Made with love by FYA.",
           browseCatalog: "Browse catalog",
           learnMore: "Learn more",
+          sheltersTitle: "Shelters",
+          sheltersDescription: "Browse our partner shelters and rescues.",
+          sheltersCta: "View shelters",
         };
 
   const steps = [
@@ -259,18 +259,15 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
             </ul>
           </div>
           <div>
-            <h4 className="mb-6 font-bold">{content.newsletter}</h4>
-            <p className="mb-4 text-muted-foreground">{content.newsletterHint}</p>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder={content.emailPlaceholder}
-                className="w-full rounded-full bg-card px-4 py-2 text-xs ring-1 ring-border focus:ring-2 focus:ring-primary focus:outline-none"
-              />
-              <button type="button" className="rounded-full bg-primary p-2 text-primary-foreground">
-                <Send className="h-4 w-4" />
-              </button>
-            </div>
+            <h4 className="mb-6 font-bold">{content.sheltersTitle}</h4>
+            <p className="mb-4 text-muted-foreground">{content.sheltersDescription}</p>
+            <Link
+              href={`/${locale}/canis`}
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground"
+            >
+              {content.sheltersCta}
+              <ArrowRight className="h-3 w-3" />
+            </Link>
           </div>
         </div>
         <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-4 border-t border-border/30 px-6 py-6 text-xs text-muted-foreground/80 md:flex-row lg:px-8">

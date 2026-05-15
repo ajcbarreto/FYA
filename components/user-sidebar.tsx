@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType } from "react";
-import { Home, FileText, MessageCircle, Search, Settings } from "lucide-react";
+import { Home, FileText, MessageCircle, Search, Settings, Heart } from "lucide-react";
 import type { Locale } from "@/lib/i18n/config";
 
 type UserSidebarProps = {
@@ -25,6 +25,7 @@ export function UserSidebar({ locale }: UserSidebarProps) {
           links: {
             dashboard: "Dashboard",
             catalog: "Catalogo de Pets",
+            favorites: "Favoritos",
             requests: "Meus Pedidos",
             messages: "Mensagens",
             settings: "Configuracoes",
@@ -35,6 +36,7 @@ export function UserSidebar({ locale }: UserSidebarProps) {
           links: {
             dashboard: "Dashboard",
             catalog: "Pet Catalog",
+            favorites: "Favorites",
             requests: "My Requests",
             messages: "Messages",
             settings: "Settings",
@@ -44,6 +46,7 @@ export function UserSidebar({ locale }: UserSidebarProps) {
   const items: NavItem[] = [
     { href: `/${locale}/user`, label: copy.links.dashboard, icon: Home },
     { href: `/${locale}/pets`, label: copy.links.catalog, icon: Search },
+    { href: `/${locale}/user/favoritos`, label: copy.links.favorites, icon: Heart },
     { href: `/${locale}/user/pedidos`, label: copy.links.requests, icon: FileText },
     { href: `/${locale}/user/mensagens`, label: copy.links.messages, icon: MessageCircle },
     { href: `/${locale}/user/configuracoes`, label: copy.links.settings, icon: Settings },

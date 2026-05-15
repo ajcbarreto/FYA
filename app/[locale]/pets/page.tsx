@@ -2,20 +2,22 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  ArrowRight,
-  Heart,
   PawPrint,
   Search,
   StretchHorizontal,
   VenusAndMars,
   Users,
   Timer,
+  X,
 } from "lucide-react";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getPetCatalogFiltersConfig } from "@/lib/pet-catalog/filter-config";
 import { getCatalogPets, getCatalogPetsCount } from "@/lib/pet-catalog/db-pets";
+import { getFavoriteAnimalIds } from "@/lib/favorites/db";
+import { FavoriteButton } from "@/components/favorite-button";
+import { sexOptions, sizeOptions, speciesOptions, statusOptions } from "@/lib/i18n/animals";
 
 type PetCatalogPageProps = {
   params: Promise<{ locale: string }>;
@@ -40,7 +42,11 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
   const dictionary = getDictionary(locale);
   const filters = dictionary.petCatalog.sections;
   const supabase = await createServerSupabaseClient();
-  const [filterConfig, pets, totalPets] = await Promise.all([
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const [filterConfig, pets, totalPets, favoriteIds] = await Promise.all([
     getPetCatalogFiltersConfig(supabase),
     getCatalogPets(supabase, locale, {
       search: query,
@@ -58,6 +64,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
       size: selectedSize || undefined,
       status: selectedStatus || undefined,
     }),
+    user ? getFavoriteAnimalIds(supabase, user.id) : Promise.resolve(new Set<string>()),
   ]);
   const totalPages = Math.max(1, Math.ceil(totalPets / pageSize));
   const safeCurrentPage = Math.min(currentPage, totalPages);
@@ -67,6 +74,9 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
   if (selectedSex) paginationBaseParams.set("sex", selectedSex);
   if (selectedSize) paginationBaseParams.set("size", selectedSize);
   if (selectedStatus) paginationBaseParams.set("status", selectedStatus);
+  const catalogRedirectPath = `/${locale}/pets${
+    paginationBaseParams.size > 0 ? `?${paginationBaseParams.toString()}` : ""
+  }`;
   const buildPageHref = (targetPage: number) => {
     const params = new URLSearchParams(paginationBaseParams.toString());
     if (targetPage > 1) {
@@ -78,29 +88,26 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
   const visiblePages = Array.from(
     new Set([1, safeCurrentPage - 1, safeCurrentPage, safeCurrentPage + 1, totalPages].filter((value) => value >= 1 && value <= totalPages)),
   ).sort((a, b) => a - b);
-  const speciesOptions = [
-    { value: "", label: locale === "pt" ? "Todas as especies" : "All species" },
-    { value: "cao", label: locale === "pt" ? "Caes" : "Dogs" },
-    { value: "gato", label: locale === "pt" ? "Gatos" : "Cats" },
-  ];
-  const sexOptions = [
-    { value: "", label: locale === "pt" ? "Qualquer genero" : "Any gender" },
-    { value: "macho", label: locale === "pt" ? "Macho" : "Male" },
-    { value: "femea", label: locale === "pt" ? "Femea" : "Female" },
-  ];
-  const sizeOptions = [
-    { value: "", label: locale === "pt" ? "Qualquer porte" : "Any size" },
-    { value: "pequeno", label: locale === "pt" ? "Pequeno" : "Small" },
-    { value: "medio", label: locale === "pt" ? "Medio" : "Medium" },
-    { value: "grande", label: locale === "pt" ? "Grande" : "Large" },
-  ];
-  const statusOptions = [
-    { value: "", label: locale === "pt" ? "Qualquer estado" : "Any status" },
-    { value: "disponivel", label: locale === "pt" ? "Disponivel" : "Available" },
-    { value: "reservado", label: locale === "pt" ? "Reservado" : "Reserved" },
-    { value: "em_tratamento", label: locale === "pt" ? "Em tratamento" : "In treatment" },
-    { value: "adotado", label: locale === "pt" ? "Adotado" : "Adopted" },
-  ];
+  const speciesSelectOptions = speciesOptions(locale);
+  const sexSelectOptions = sexOptions(locale);
+  const sizeSelectOptions = sizeOptions(locale);
+  const statusSelectOptions = statusOptions(locale);
+
+  const labelFor = (options: { value: string; label: string }[], value: string) =>
+    options.find((option) => option.value === value)?.label ?? value;
+  const buildFilterHrefWithout = (key: string) => {
+    const params = new URLSearchParams(paginationBaseParams.toString());
+    params.delete(key);
+    const serialized = params.toString();
+    return serialized ? `/${locale}/pets?${serialized}` : `/${locale}/pets`;
+  };
+  const activeFilters = [
+    query ? { key: "q", label: query } : null,
+    selectedSpecies ? { key: "species", label: labelFor(speciesSelectOptions, selectedSpecies) } : null,
+    selectedSex ? { key: "sex", label: labelFor(sexSelectOptions, selectedSex) } : null,
+    selectedSize ? { key: "size", label: labelFor(sizeSelectOptions, selectedSize) } : null,
+    selectedStatus ? { key: "status", label: labelFor(statusSelectOptions, selectedStatus) } : null,
+  ].filter((value): value is { key: string; label: string } => value !== null);
   const sectionRows = [
     { icon: Timer, label: filters.ageRange, values: filterConfig.ageRanges },
     { icon: StretchHorizontal, label: filters.size, values: filterConfig.sizes },
@@ -113,22 +120,22 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
           tagline: "Ajudamos pets a encontrar familias para sempre.",
           discover: "Descobrir",
           support: "Suporte",
-          journey: "Junta-te a jornada",
-          discoverLinks: ["Encontrar pet", "Historias de sucesso", "Diretorio de canis", "Guia de cuidados"],
+          discoverLinks: [
+            { label: "Encontrar pet", href: `/${locale}/pets` },
+            { label: "Diretorio de canis", href: `/${locale}/canis` },
+          ],
           supportLinks: ["Centro de ajuda", "Contactar", "Privacidade", "Termos de servico"],
-          updates: "Recebe novidades de adocao e historias de sucesso no teu email.",
-          email: "Email",
           crafted: "© 2026 FYA (Found Your Animal). Feito com carinho.",
         }
       : {
           tagline: "Helping pets find their forever families.",
           discover: "Discover",
           support: "Support",
-          journey: "Join our journey",
-          discoverLinks: ["Find a pet", "Success stories", "Shelter directory", "Pet care guide"],
+          discoverLinks: [
+            { label: "Find a pet", href: `/${locale}/pets` },
+            { label: "Shelter directory", href: `/${locale}/canis` },
+          ],
           supportLinks: ["Help center", "Contact us", "Privacy policy", "Terms of service"],
-          updates: "Get adoption updates and success stories in your inbox.",
-          email: "Email address",
           crafted: "© 2026 FYA (Found Your Animal). Made with love.",
         };
 
@@ -186,29 +193,19 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
           </div>
 
           <form method="get" className="flex flex-col gap-3 md:gap-4">
-            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-              <div className="relative w-full md:max-w-md">
-                <label htmlFor="catalog-search" className="sr-only">
-                  {dictionary.petCatalog.searchPlaceholder}
-                </label>
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  id="catalog-search"
-                  name="q"
-                  type="search"
-                  placeholder={dictionary.petCatalog.searchPlaceholder}
-                  defaultValue={query}
-                  className="h-11 w-full rounded-full bg-muted px-11 pr-4 text-sm outline-none ring-0 transition-all focus:ring-2 focus:ring-primary/40"
-                />
-              </div>
-              <div className="inline-flex w-fit items-center rounded-full bg-muted p-1.5">
-                <button type="button" className="rounded-full bg-card px-6 py-1.5 text-sm font-bold text-primary shadow-sm">
-                  {dictionary.petCatalog.gridView}
-                </button>
-                <button type="button" className="rounded-full px-6 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-card/70">
-                  {dictionary.petCatalog.listView}
-                </button>
-              </div>
+            <div className="relative w-full md:max-w-md">
+              <label htmlFor="catalog-search" className="sr-only">
+                {dictionary.petCatalog.searchPlaceholder}
+              </label>
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                id="catalog-search"
+                name="q"
+                type="search"
+                placeholder={dictionary.petCatalog.searchPlaceholder}
+                defaultValue={query}
+                className="h-11 w-full rounded-full bg-muted px-11 pr-4 text-sm outline-none ring-0 transition-all focus:ring-2 focus:ring-primary/40"
+              />
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-5">
               <select
@@ -216,7 +213,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
                 defaultValue={selectedSpecies}
                 className="h-11 rounded-full bg-muted px-4 text-sm outline-none ring-0 transition-all focus:ring-2 focus:ring-primary/40"
               >
-                {speciesOptions.map((option) => (
+                {speciesSelectOptions.map((option) => (
                   <option key={option.value || "all"} value={option.value}>
                     {option.label}
                   </option>
@@ -227,7 +224,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
                 defaultValue={selectedSex}
                 className="h-11 rounded-full bg-muted px-4 text-sm outline-none ring-0 transition-all focus:ring-2 focus:ring-primary/40"
               >
-                {sexOptions.map((option) => (
+                {sexSelectOptions.map((option) => (
                   <option key={option.value || "all"} value={option.value}>
                     {option.label}
                   </option>
@@ -238,7 +235,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
                 defaultValue={selectedSize}
                 className="h-11 rounded-full bg-muted px-4 text-sm outline-none ring-0 transition-all focus:ring-2 focus:ring-primary/40"
               >
-                {sizeOptions.map((option) => (
+                {sizeSelectOptions.map((option) => (
                   <option key={option.value || "all"} value={option.value}>
                     {option.label}
                   </option>
@@ -249,7 +246,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
                 defaultValue={selectedStatus}
                 className="h-11 rounded-full bg-muted px-4 text-sm outline-none ring-0 transition-all focus:ring-2 focus:ring-primary/40"
               >
-                {statusOptions.map((option) => (
+                {statusSelectOptions.map((option) => (
                   <option key={option.value || "all"} value={option.value}>
                     {option.label}
                   </option>
@@ -263,6 +260,30 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
               </button>
             </div>
           </form>
+
+          {activeFilters.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                {locale === "pt" ? "Filtros ativos:" : "Active filters:"}
+              </span>
+              {activeFilters.map((filter) => (
+                <Link
+                  key={filter.key}
+                  href={buildFilterHrefWithout(filter.key)}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary transition-colors hover:bg-primary/20"
+                >
+                  {filter.label}
+                  <X className="h-3 w-3" />
+                </Link>
+              ))}
+              <Link
+                href={`/${locale}/pets`}
+                className="rounded-full px-3 py-1 text-xs font-bold text-secondary hover:underline"
+              >
+                {dictionary.petCatalog.clearFilters}
+              </Link>
+            </div>
+          )}
         </header>
 
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -279,13 +300,12 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                <button
-                  type="button"
-                  aria-label={`Favorite ${pet.name}`}
-                  className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/40 text-white backdrop-blur-md transition-all hover:bg-primary hover:text-primary-foreground"
-                >
-                  <Heart className="h-4 w-4" />
-                </button>
+                <FavoriteButton
+                  animalId={pet.id}
+                  locale={locale}
+                  isFavorite={favoriteIds.has(pet.id)}
+                  redirectTo={catalogRedirectPath}
+                />
 
                 {pet.badge && (
                   <span
@@ -365,7 +385,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
         )}
 
         <footer className="mt-24 w-full border-t border-border/30 bg-muted/45">
-          <div className="grid grid-cols-1 gap-10 px-8 py-16 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-10 px-8 py-16 md:grid-cols-3">
             <div className="space-y-4">
               <div className="text-2xl font-black text-primary">FYA</div>
               <p className="text-sm text-muted-foreground">{footerCopy.tagline}</p>
@@ -374,7 +394,11 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
               <h4 className="mb-5 text-base font-bold text-secondary">{footerCopy.discover}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 {footerCopy.discoverLinks.map((link) => (
-                  <li key={link}>{link}</li>
+                  <li key={link.label}>
+                    <Link href={link.href} className="hover:text-primary">
+                      {link.label}
+                    </Link>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -385,20 +409,6 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
                   <li key={link}>{link}</li>
                 ))}
               </ul>
-            </div>
-            <div>
-              <h4 className="mb-5 text-base font-bold text-secondary">{footerCopy.journey}</h4>
-              <p className="mb-4 text-xs text-muted-foreground">{footerCopy.updates}</p>
-              <div className="relative">
-                <input
-                  type="email"
-                  placeholder={footerCopy.email}
-                  className="h-11 w-full rounded-full border border-border/50 bg-card px-4 pr-12 text-sm outline-none ring-0 focus:ring-2 focus:ring-primary/20"
-                />
-                <button type="button" className="absolute right-1.5 top-1.5 rounded-full bg-primary px-3 py-2 text-primary-foreground">
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
             </div>
           </div>
           <div className="border-t border-border/20 px-8 py-6 text-center text-[11px] font-bold uppercase tracking-widest text-muted-foreground">

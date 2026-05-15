@@ -18,6 +18,10 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getPetById, getRelatedPets } from "@/lib/pet-catalog/db-pets";
+import { getFavoriteAnimalIds } from "@/lib/favorites/db";
+import { listAnimalPhotos } from "@/lib/canil/animal-photos";
+import { FavoriteButton } from "@/components/favorite-button";
+import { ToastFeedback } from "@/components/toast-feedback";
 import { submitAdoptionRequest } from "@/app/adoption/actions";
 
 type PetDetailsPageProps = {
@@ -35,22 +39,27 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
 
   const dictionary = getDictionary(locale);
   const supabase = await createServerSupabaseClient();
-  const [pet, relatedPets] = await Promise.all([
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const [pet, relatedPets, favoriteIds, animalPhotos] = await Promise.all([
     getPetById(supabase, petId, locale),
     getRelatedPets(supabase, petId, locale),
+    user ? getFavoriteAnimalIds(supabase, user.id) : Promise.resolve(new Set<string>()),
+    listAnimalPhotos(supabase, petId),
   ]);
 
   if (!pet) {
     notFound();
   }
+  const isFavorite = favoriteIds.has(pet.id);
   const healthStatus = [locale === "pt" ? "Vacinacao em dia" : "Vaccinations up to date", pet.status];
   const personality = pet.traits;
-  const galleryImages = [
-    pet.imageUrl,
-    `${pet.imageUrl}&sat=-20`,
-    `${pet.imageUrl}&sat=20`,
-    `${pet.imageUrl}&blur=1`,
-  ];
+  const realPhotos = animalPhotos
+    .map((photo) => photo.public_url)
+    .filter((value): value is string => Boolean(value));
+  const galleryImages = realPhotos.length > 0 ? realPhotos.slice(0, 4) : [pet.imageUrl];
   const subtitle =
     locale === "pt" ? `A alma especial do ${pet.shelterName}` : `The golden soul of ${pet.shelterName}`;
   const weight =
@@ -126,24 +135,21 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
             </div>
           </article>
 
-          <div className="grid grid-cols-4 gap-4">
-            {galleryImages.map((image, index) => (
-              <div key={image} className="relative aspect-square overflow-hidden rounded-2xl">
-                <Image
-                  src={image}
-                  alt={`${pet.name} ${index + 1}`}
-                  fill
-                  sizes="(max-width: 1024px) 25vw, 16vw"
-                  className="object-cover"
-                />
-                {index === 3 && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-sm font-bold text-white">
-                    +2
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+          {galleryImages.length > 1 && (
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+              {galleryImages.map((image, index) => (
+                <div key={image} className="relative aspect-square overflow-hidden rounded-2xl">
+                  <Image
+                    src={image}
+                    alt={`${pet.name} ${index + 1}`}
+                    fill
+                    sizes="(max-width: 1024px) 50vw, 16vw"
+                    className="object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="space-y-8 pt-6">
             <div className="space-y-3">
@@ -211,17 +217,7 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
         </section>
 
         <aside className="space-y-6 lg:col-span-4">
-          {feedback && (
-            <p
-              className={`rounded-2xl px-4 py-3 text-sm ${
-                feedbackIsError
-                  ? "border border-destructive/40 bg-destructive/10 text-destructive"
-                  : "border border-secondary/30 bg-secondary/10 text-secondary"
-              }`}
-            >
-              {feedback}
-            </p>
-          )}
+          <ToastFeedback message={feedback} variant={feedbackIsError ? "error" : "success"} />
           <article className="space-y-8 rounded-[2.5rem] border border-border/35 bg-card p-8 shadow-sm">
             <h3 className="border-b border-border/35 pb-4 text-xl font-bold">
               {locale === "pt" ? "Estatisticas principais" : "Key statistics"}
@@ -259,29 +255,135 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
               </div>
             </div>
 
-            <form action={submitAdoptionRequest} className="space-y-3 pt-2">
+            <form action={submitAdoptionRequest} className="space-y-4 pt-2">
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="petId" value={pet.id} />
-              <textarea
-                name="message"
-                rows={3}
-                placeholder={locale === "pt" ? "Escreve uma mensagem inicial para o canil..." : "Write an initial message to the shelter..."}
-                className="w-full rounded-2xl border border-border/30 bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-              />
+
+              <fieldset className="space-y-3 rounded-2xl border border-border/30 p-4">
+                <legend className="px-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  {locale === "pt" ? "Sobre a tua casa" : "About your home"}
+                </legend>
+                <label className="block text-xs font-semibold text-muted-foreground">
+                  {locale === "pt" ? "Tipo de habitacao" : "Housing type"}
+                  <select
+                    name="housing_type"
+                    defaultValue=""
+                    className="mt-1 h-10 w-full rounded-xl border border-border/30 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="">{locale === "pt" ? "Seleciona..." : "Select..."}</option>
+                    <option value="apartment">{locale === "pt" ? "Apartamento" : "Apartment"}</option>
+                    <option value="house">{locale === "pt" ? "Casa" : "House"}</option>
+                    <option value="shared">{locale === "pt" ? "Casa partilhada" : "Shared home"}</option>
+                    <option value="other">{locale === "pt" ? "Outro" : "Other"}</option>
+                  </select>
+                </label>
+                <label className="block text-xs font-semibold text-muted-foreground">
+                  {locale === "pt" ? "Numero de pessoas em casa" : "Household size"}
+                  <select
+                    name="household_size"
+                    defaultValue=""
+                    className="mt-1 h-10 w-full rounded-xl border border-border/30 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="">{locale === "pt" ? "Seleciona..." : "Select..."}</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4+">4+</option>
+                  </select>
+                </label>
+                <div className="flex flex-wrap gap-3 text-xs font-semibold">
+                  <label className="inline-flex items-center gap-2">
+                    <input type="checkbox" name="has_garden" value="true" className="h-4 w-4 rounded border-border" />
+                    {locale === "pt" ? "Quintal/Jardim" : "Garden"}
+                  </label>
+                  <label className="inline-flex items-center gap-2">
+                    <input type="checkbox" name="has_children" value="true" className="h-4 w-4 rounded border-border" />
+                    {locale === "pt" ? "Criancas" : "Children"}
+                  </label>
+                  <label className="inline-flex items-center gap-2">
+                    <input type="checkbox" name="has_other_pets" value="true" className="h-4 w-4 rounded border-border" />
+                    {locale === "pt" ? "Outros animais" : "Other pets"}
+                  </label>
+                </div>
+                <label className="block text-xs font-semibold text-muted-foreground">
+                  {locale === "pt" ? "Detalhes sobre outros animais (opcional)" : "Other pets details (optional)"}
+                  <input
+                    name="other_pets_detail"
+                    placeholder={locale === "pt" ? "Ex: 1 gato esterilizado" : "e.g. 1 neutered cat"}
+                    className="mt-1 h-10 w-full rounded-xl border border-border/30 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </label>
+              </fieldset>
+
+              <fieldset className="space-y-3 rounded-2xl border border-border/30 p-4">
+                <legend className="px-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  {locale === "pt" ? "Experiencia e rotina" : "Experience and routine"}
+                </legend>
+                <label className="block text-xs font-semibold text-muted-foreground">
+                  {locale === "pt" ? "Experiencia com animais" : "Pet experience"}
+                  <select
+                    name="experience"
+                    defaultValue=""
+                    className="mt-1 h-10 w-full rounded-xl border border-border/30 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="">{locale === "pt" ? "Seleciona..." : "Select..."}</option>
+                    <option value="none">{locale === "pt" ? "Sem experiencia" : "None"}</option>
+                    <option value="some">{locale === "pt" ? "Alguma experiencia" : "Some"}</option>
+                    <option value="experienced">{locale === "pt" ? "Muita experiencia" : "Experienced"}</option>
+                  </select>
+                </label>
+                <label className="block text-xs font-semibold text-muted-foreground">
+                  {locale === "pt" ? "Horas sozinho/dia" : "Hours alone per day"}
+                  <select
+                    name="hours_alone"
+                    defaultValue=""
+                    className="mt-1 h-10 w-full rounded-xl border border-border/30 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="">{locale === "pt" ? "Seleciona..." : "Select..."}</option>
+                    <option value="0-2">0-2</option>
+                    <option value="3-5">3-5</option>
+                    <option value="6-8">6-8</option>
+                    <option value="8+">8+</option>
+                  </select>
+                </label>
+                <label className="block text-xs font-semibold text-muted-foreground">
+                  {locale === "pt" ? "Motivo para adotar" : "Reason to adopt"}
+                  <input
+                    name="reason"
+                    placeholder={locale === "pt" ? "Em poucas palavras..." : "In a few words..."}
+                    className="mt-1 h-10 w-full rounded-xl border border-border/30 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </label>
+              </fieldset>
+
+              <label className="block text-xs font-semibold text-muted-foreground">
+                {locale === "pt" ? "Mensagem ao canil" : "Message to shelter"}
+                <textarea
+                  name="message"
+                  rows={3}
+                  placeholder={locale === "pt" ? "Escreve uma mensagem inicial..." : "Write an initial message..."}
+                  className="mt-1 w-full rounded-2xl border border-border/30 bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </label>
+
               <button
                 type="submit"
                 className="w-full rounded-full bg-primary px-5 py-4 text-lg font-bold text-primary-foreground shadow-xl shadow-primary/25 transition-transform hover:scale-[1.01]"
               >
                 {dictionary.petDetails.applyCta}
               </button>
-              <button
-                type="button"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary px-5 py-3.5 text-base font-bold text-primary transition-colors hover:bg-primary/5"
-              >
-                <Heart className="h-4 w-4" />
-                {dictionary.petDetails.saveCta}
-              </button>
             </form>
+            <FavoriteButton
+              animalId={pet.id}
+              locale={locale}
+              isFavorite={isFavorite}
+              redirectTo={`/${locale}/pets/${pet.id}`}
+              size="lg"
+              labels={{
+                add: dictionary.petDetails.saveCta,
+                remove: locale === "pt" ? "Remover dos favoritos" : "Remove from favorites",
+              }}
+            />
           </article>
 
           <article className="space-y-5 rounded-[2.5rem] bg-secondary p-8 text-secondary-foreground">
@@ -303,7 +405,10 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
               </p>
             </div>
             <div className="h-36 rounded-3xl bg-white/12" />
-            <Link href={`/${locale}/canil/perfil`} className="block text-center text-sm font-bold underline underline-offset-4">
+            <Link
+              href={`/${locale}/canis/${pet.shelterId}`}
+              className="block text-center text-sm font-bold underline underline-offset-4"
+            >
               {locale === "pt" ? "Ver perfil do abrigo" : "View shelter profile"}
             </Link>
           </article>
