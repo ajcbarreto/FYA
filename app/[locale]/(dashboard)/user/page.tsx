@@ -79,30 +79,30 @@ export default async function UserDashboardPage({ params }: UserDashboardPagePro
   return (
     <main className="space-y-6">
       <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-black tracking-tight">{copy.title}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
 
       <section className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
         <article className="rounded-2xl border border-border/20 bg-card p-5">
           <p className="text-sm text-muted-foreground">{copy.cards.total}</p>
-          <p className="mt-1 text-3xl font-black">{stats.total}</p>
+          <p className="mt-1 text-3xl font-bold">{stats.total}</p>
         </article>
         <article className="rounded-2xl border border-border/20 bg-card p-5">
           <p className="text-sm text-muted-foreground">{copy.cards.pending}</p>
-          <p className="mt-1 text-3xl font-black text-primary">{stats.pending}</p>
+          <p className="mt-1 text-3xl font-bold text-primary">{stats.pending}</p>
         </article>
         <article className="rounded-2xl border border-border/20 bg-card p-5">
           <p className="text-sm text-muted-foreground">{copy.cards.approved}</p>
-          <p className="mt-1 text-3xl font-black text-secondary">{stats.approved}</p>
+          <p className="mt-1 text-3xl font-bold text-secondary">{stats.approved}</p>
         </article>
         <article className="rounded-2xl border border-border/20 bg-card p-5">
           <p className="text-sm text-muted-foreground">{copy.cards.chats}</p>
-          <p className="mt-1 text-3xl font-black">{stats.chats}</p>
+          <p className="mt-1 text-3xl font-bold">{stats.chats}</p>
         </article>
         <article className="rounded-2xl border border-border/20 bg-card p-5">
           <p className="text-sm text-muted-foreground">{copy.cards.favorites}</p>
-          <p className="mt-1 text-3xl font-black text-primary">{stats.favorites}</p>
+          <p className="mt-1 text-3xl font-bold text-primary">{stats.favorites}</p>
         </article>
       </section>
 

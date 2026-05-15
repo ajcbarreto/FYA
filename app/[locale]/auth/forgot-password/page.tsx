@@ -71,13 +71,13 @@ export default async function ForgotPasswordPage({ params, searchParams }: Forgo
                 type="email"
                 required
                 placeholder={copy.emailPlaceholder}
-                className="h-12 w-full rounded-full bg-muted px-11 text-sm outline-none focus:ring-2 focus:ring-primary/30"
+                className="h-12 w-full rounded-xl bg-muted px-11 text-sm outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
           </div>
           <button
             type="submit"
-            className="w-full rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
+            className="w-full rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
           >
             {copy.submit}
           </button>

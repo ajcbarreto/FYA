@@ -148,7 +148,7 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
       </Link>
 
       <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-black tracking-tight">{copy.title}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
 

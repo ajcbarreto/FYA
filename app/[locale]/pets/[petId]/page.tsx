@@ -368,7 +368,7 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
 
               <button
                 type="submit"
-                className="w-full rounded-full bg-primary px-5 py-4 text-lg font-bold text-primary-foreground shadow-xl shadow-primary/25 transition-transform hover:scale-[1.01]"
+                className="w-full rounded-xl bg-primary px-5 py-3.5 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
               >
                 {dictionary.petDetails.applyCta}
               </button>
@@ -426,7 +426,7 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
       <section className="mt-24 space-y-10">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-black">{dictionary.petDetails.similarPetsTitle}</h2>
+            <h2 className="text-3xl font-bold">{dictionary.petDetails.similarPetsTitle}</h2>
             <p className="mt-2 text-muted-foreground">
               {locale === "pt"
                 ? `Mais amigos do ${pet.shelterName}`

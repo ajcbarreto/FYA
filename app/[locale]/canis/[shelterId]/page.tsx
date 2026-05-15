@@ -173,15 +173,15 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
             <div className="mt-6 grid grid-cols-3 gap-4 text-center">
               <div className="rounded-2xl bg-muted p-4">
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.stats.total}</p>
-                <p className="mt-1 text-2xl font-black">{animals.length}</p>
+                <p className="mt-1 text-2xl font-bold">{animals.length}</p>
               </div>
               <div className="rounded-2xl bg-muted p-4">
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.stats.available}</p>
-                <p className="mt-1 text-2xl font-black text-secondary">{availableCount}</p>
+                <p className="mt-1 text-2xl font-bold text-secondary">{availableCount}</p>
               </div>
               <div className="rounded-2xl bg-muted p-4">
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.stats.adopted}</p>
-                <p className="mt-1 text-2xl font-black text-primary">{adoptedCount}</p>
+                <p className="mt-1 text-2xl font-bold text-primary">{adoptedCount}</p>
               </div>
             </div>
           </div>

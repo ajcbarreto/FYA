@@ -75,7 +75,7 @@ export default async function MatchPage({ params }: MatchPageProps) {
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-6 pb-16 pt-10 lg:px-8">
-      <div className="rounded-3xl bg-gradient-to-br from-primary to-accent p-8 text-center text-primary-foreground md:p-12">
+      <div className="rounded-3xl bg-primary p-8 text-center text-primary-foreground md:p-12">
         <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-bold uppercase tracking-widest">
           <Sparkles className="h-3.5 w-3.5" />
           {copy.eyebrow}
@@ -95,7 +95,7 @@ export default async function MatchPage({ params }: MatchPageProps) {
           return (
             <fieldset key={question.name} className="rounded-2xl border border-border/40 bg-card p-5">
               <legend className="flex items-center gap-2 px-1 text-sm font-bold">
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-xs font-black text-primary">
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">
                   {index + 1}
                 </span>
                 <Icon className="h-4 w-4 text-primary" />
@@ -125,7 +125,7 @@ export default async function MatchPage({ params }: MatchPageProps) {
         <div className="space-y-3 text-center">
           <button
             type="submit"
-            className="w-full rounded-full bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:brightness-105"
+            className="w-full rounded-full bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-lg transition-all hover:brightness-105"
           >
             {copy.submit}
           </button>

@@ -125,7 +125,7 @@ export async function Navbar({ locale }: NavbarProps) {
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
       <nav className="mx-auto w-full max-w-7xl px-6 py-4 lg:px-8">
         <div className="flex items-center justify-between">
-          <Link href={`/${locale}`} className="text-2xl font-black tracking-tight text-primary">
+          <Link href={`/${locale}`} className="text-2xl font-bold tracking-tight text-primary">
             FYA
           </Link>
 
@@ -189,7 +189,7 @@ export async function Navbar({ locale }: NavbarProps) {
               >
                 <Bell className="h-5 w-5" />
                 {unreadNotifications > 0 && (
-                  <span className="absolute right-0 top-0 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-black text-primary-foreground ring-2 ring-background">
+                  <span className="absolute right-0 top-0 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground ring-2 ring-background">
                     {unreadNotifications > 9 ? "9+" : unreadNotifications}
                   </span>
                 )}
@@ -199,7 +199,7 @@ export async function Navbar({ locale }: NavbarProps) {
             {!user && (
               <Link
                 href={`/${locale}/auth/login`}
-                className="hidden h-10 items-center rounded-full border border-border/70 px-5 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:bg-muted hover:text-primary sm:inline-flex"
+                className="hidden h-10 items-center rounded-lg px-4 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:inline-flex"
               >
                 {dictionary.nav.login}
               </Link>
@@ -207,7 +207,7 @@ export async function Navbar({ locale }: NavbarProps) {
             {!user && (
               <Link
                 href={`/${locale}/auth/register`}
-                className="inline-flex h-10 items-center rounded-full bg-gradient-to-br from-primary to-accent px-5 text-sm font-bold text-primary-foreground shadow-md shadow-primary/25 transition-all hover:shadow-lg hover:shadow-primary/35 hover:brightness-105"
+                className="inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
               >
                 {dictionary.nav.register}
               </Link>

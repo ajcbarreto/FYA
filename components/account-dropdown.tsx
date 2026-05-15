@@ -52,9 +52,9 @@ export function AccountDropdown({
         <button
           type="button"
           aria-label={menuCopy.openMenu}
-          className="group inline-flex h-10 items-center gap-2 rounded-full border border-border/60 bg-card pl-1 pr-2.5 shadow-sm transition-colors hover:border-primary/30 hover:bg-muted"
+          className="group inline-flex h-10 items-center gap-2 rounded-lg border border-border/60 bg-card pl-1 pr-2.5 transition-colors hover:bg-muted"
         >
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-xs font-black text-primary-foreground">
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
             {initial}
           </span>
           <span className="hidden max-w-[120px] truncate text-sm font-semibold sm:inline">
@@ -68,7 +68,7 @@ export function AccountDropdown({
         className="w-72 rounded-2xl border-border/50 p-2 shadow-xl"
       >
         <div className="flex items-center gap-3 rounded-xl bg-muted/60 p-3">
-          <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-base font-black text-primary-foreground">
+          <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground">
             {initial}
           </span>
           <div className="min-w-0">

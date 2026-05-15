@@ -144,7 +144,7 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
               />
             </div>
             <div className="pb-2 text-white">
-              <h1 className="text-5xl font-black tracking-tight">{shelterName}</h1>
+              <h1 className="text-5xl font-bold tracking-tight">{shelterName}</h1>
               <p className="mt-2 flex items-center gap-2 text-base font-semibold text-white/90">
                 <ShieldCheck className="h-4 w-4 text-primary" />
                 {dictionary.canilProfile.verifiedLabel}:{" "}
@@ -159,7 +159,7 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
       <section className="mx-auto mb-24 grid w-full max-w-7xl grid-cols-1 gap-14 px-6 lg:grid-cols-12 lg:px-8">
         <div className="space-y-10 lg:col-span-8">
           <div>
-            <h2 className="mb-8 text-4xl font-black tracking-tight text-secondary">{dictionary.canilProfile.aboutTitle}</h2>
+            <h2 className="mb-8 text-4xl font-bold tracking-tight text-secondary">{dictionary.canilProfile.aboutTitle}</h2>
             <p className="border-l-8 border-primary/35 py-4 pl-6 text-lg italic leading-relaxed text-muted-foreground">
               {dictionary.canilProfile.aboutDescription}
             </p>
@@ -178,7 +178,7 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
               return (
                 <article key={block.label} className="rounded-3xl border border-border/30 bg-muted/35 p-7 text-center transition-colors hover:bg-secondary/5">
                   <Icon className="mx-auto mb-4 h-8 w-8 text-secondary" />
-                  <p className="mb-2 text-[11px] font-black uppercase tracking-[0.18em] text-primary">{block.label}</p>
+                  <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-primary">{block.label}</p>
                   <p className="whitespace-pre-line text-sm font-bold">{block.value}</p>
                 </article>
               );
@@ -188,7 +188,7 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
 
         <aside className="space-y-6 lg:col-span-4">
           <div className="rounded-3xl border border-primary/20 bg-primary/5 p-8 shadow-sm">
-            <h3 className="mb-3 text-2xl font-black text-primary">
+            <h3 className="mb-3 text-2xl font-bold text-primary">
               {locale === "pt" ? "Apoie o nosso trabalho" : "Support our work"}
             </h3>
             <p className="mb-7 text-sm text-muted-foreground">
@@ -196,17 +196,17 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
                 ? "As contribuicoes ajudam tratamentos veterinarios, alimentacao e melhoria de espacos."
                 : "Contributions directly support veterinary treatment, food, and shelter improvements."}
             </p>
-            <button type="button" className="mb-3 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-br from-primary to-accent px-6 py-4 text-sm font-black text-primary-foreground shadow-xl shadow-primary/20 transition-transform hover:scale-[0.99]">
+            <button type="button" className="mb-3 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 text-sm font-bold text-primary-foreground shadow-xl transition-transform hover:scale-[0.99]">
               <Heart className="h-4 w-4" />
               {locale === "pt" ? "Doar ao abrigo" : "Donate to shelter"}
             </button>
-            <button type="button" className="w-full rounded-full border-2 border-primary px-6 py-4 text-sm font-black text-primary transition-colors hover:bg-primary/5">
+            <button type="button" className="w-full rounded-full border-2 border-primary px-6 py-4 text-sm font-bold text-primary transition-colors hover:bg-primary/5">
               {locale === "pt" ? "Ser voluntario" : "Volunteer with us"}
             </button>
           </div>
 
           <div className="rounded-3xl border border-border/35 bg-muted/35 p-7 shadow-sm">
-            <h4 className="mb-5 text-lg font-black text-secondary">
+            <h4 className="mb-5 text-lg font-bold text-secondary">
               {locale === "pt" ? "Estatisticas do abrigo" : "Shelter statistics"}
             </h4>
             <div className="space-y-4">
@@ -223,7 +223,7 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
               ].map((item) => (
                 <div key={item.title} className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">{item.title}</span>
-                  <span className="text-xl font-black text-secondary">{item.value}</span>
+                  <span className="text-xl font-bold text-secondary">{item.value}</span>
                 </div>
               ))}
             </div>
@@ -235,7 +235,7 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
         <div className="mx-auto w-full max-w-7xl px-6 lg:px-8">
           <div className="mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <h2 className="text-4xl font-black tracking-tight text-secondary">
+              <h2 className="text-4xl font-bold tracking-tight text-secondary">
                 {locale === "pt" ? "Residentes a procura de lar" : "Residents seeking homes"}
               </h2>
               <p className="mt-4 max-w-2xl text-muted-foreground">
@@ -269,7 +269,7 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
                   />
                   {pet.badge && (
                     <span
-                      className={`absolute left-4 top-4 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white ${
+                      className={`absolute left-4 top-4 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-white ${
                         pet.badge === "new" ? "bg-primary" : "bg-destructive"
                       }`}
                     >
@@ -279,22 +279,22 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
                 </div>
                 <div className="p-6">
                   <div className="mb-2 flex items-start justify-between">
-                    <h3 className="text-2xl font-black text-primary">{pet.name}</h3>
-                    <span className="text-base font-black text-secondary">{pet.age}</span>
+                    <h3 className="text-2xl font-bold text-primary">{pet.name}</h3>
+                    <span className="text-base font-bold text-secondary">{pet.age}</span>
                   </div>
                   <p className="mb-4 text-sm font-bold text-muted-foreground">
                     {pet.species} • {pet.sex}
                   </p>
                   <div className="mb-6 flex flex-wrap gap-2">
                     {pet.traits.map((trait) => (
-                      <span key={trait} className="rounded-full bg-secondary/10 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-secondary">
+                      <span key={trait} className="rounded-full bg-secondary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-secondary">
                         {trait}
                       </span>
                     ))}
                   </div>
                   <Link
                     href={`/${locale}/pets/${pet.id}`}
-                    className="inline-flex w-full items-center justify-center rounded-full bg-secondary px-4 py-3 text-xs font-black uppercase tracking-[0.14em] text-secondary-foreground transition-opacity hover:opacity-90"
+                    className="inline-flex w-full items-center justify-center rounded-full bg-secondary px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-secondary-foreground transition-opacity hover:opacity-90"
                   >
                     {locale === "pt" ? `Conhecer ${pet.name}` : `Meet ${pet.name}`}
                   </Link>
@@ -304,7 +304,7 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
           </div>
 
           <div className="mt-16 flex justify-center">
-            <div className="inline-flex items-center gap-2 rounded-full border-2 border-primary px-8 py-4 text-sm font-black uppercase tracking-widest text-primary">
+            <div className="inline-flex items-center gap-2 rounded-full border-2 border-primary px-8 py-4 text-sm font-bold uppercase tracking-widest text-primary">
               {locale === "pt" ? "Ver todos os residentes" : "View all residents"}
               <ArrowDown className="h-4 w-4" />
             </div>
