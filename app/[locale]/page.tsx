@@ -24,58 +24,7 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
     getCatalogPets(supabase, locale, { limit: 4 }),
     getCatalogPetsCount(supabase),
   ]);
-  const content =
-    locale === "pt"
-      ? {
-          trusted: "Confiado por 5.000+ familias",
-          urgentTitle: "Pets urgentes",
-          urgentSubtitle: "Estes amigos estao ha mais tempo a espera de um lar.",
-          seeAll: "Ver todos",
-          todayFound: `${totalPets} pets encontrados`,
-          nearYou: "Na tua area hoje",
-          howSubtitle:
-            "Tres passos simples para encontrares o teu novo membro da familia com seguranca e acompanhamento.",
-          footerTagline: "Ajudamos cada pet a encontrar um lar para sempre com cuidado e comunidade.",
-          company: "Empresa",
-          support: "Suporte",
-          about: "Sobre",
-          stories: "Historias",
-          careers: "Carreiras",
-          helpCenter: "Centro de ajuda",
-          contact: "Contacto",
-          privacy: "Privacidade",
-          madeWithLove: "Feito com carinho pela FYA.",
-          browseCatalog: "Explorar catalogo",
-          learnMore: "Saber mais",
-          sheltersTitle: "Canis",
-          sheltersDescription: "Explora os nossos canis e abrigos parceiros.",
-          sheltersCta: "Ver canis",
-        }
-      : {
-          trusted: "Trusted by 5,000+ families",
-          urgentTitle: "Urgent pets",
-          urgentSubtitle: "These friends have been waiting the longest for a home.",
-          seeAll: "See all",
-          todayFound: `${totalPets} pets found`,
-          nearYou: "In your area today",
-          howSubtitle:
-            "Three simple steps to bring your new family member home with confidence and guidance.",
-          footerTagline: "Helping every pet find their forever home through care and community.",
-          company: "Company",
-          support: "Support",
-          about: "About",
-          stories: "Stories",
-          careers: "Careers",
-          helpCenter: "Help center",
-          contact: "Contact",
-          privacy: "Privacy policy",
-          madeWithLove: "Made with love by FYA.",
-          browseCatalog: "Browse catalog",
-          learnMore: "Learn more",
-          sheltersTitle: "Shelters",
-          sheltersDescription: "Browse our partner shelters and rescues.",
-          sheltersCta: "View shelters",
-        };
+  const content = dictionary.home;
 
   const steps = [
     { icon: Search, title: dictionary.home.steps.searchTitle, description: dictionary.home.steps.searchDescription },
@@ -93,7 +42,7 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
           </div>
           <h1 className="max-w-2xl text-5xl font-extrabold leading-[1.08] tracking-tight lg:text-7xl">
             {dictionary.home.title}{" "}
-            <span className="text-secondary">{locale === "pt" ? "para toda a familia" : "for every family"}</span>
+            <span className="text-secondary">{content.heroTitleAccent}</span>
           </h1>
           <p className="max-w-xl text-lg leading-relaxed text-muted-foreground">{dictionary.home.subtitle}</p>
           <div className="flex flex-wrap gap-3">
@@ -117,7 +66,7 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
           <div className="relative aspect-square overflow-hidden rounded-2xl shadow-2xl">
             <Image
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIgI4hK1OJrZt7EYogXqM0gNrsB9cteCk_tD7p7wfZ-_nWeAzyA80QW_vA-zbLGagTGGsyz5jIz0fP7Kdd8bCMlVQU-UeSZQqSO7-MLh4xqDtGATWAyVAzgJyQLSO2NcFE4SKC7v1tb9A5NY95NCjTY0-QBBoXwXZmjgG3ijmqAVvxQjZa9m8_RYbDtkHa03tjMxLSiXk9GnlzF1l3AkDmWbWjgiSmcJRFs_EP7tID8f-uVlTbZJqMpDRkbJ6Lej6seyDKHiGFnw8"
-              alt={locale === "pt" ? "Cao e gato juntos" : "Dog and cat together"}
+              alt={content.heroImageAlt}
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 50vw"
@@ -129,7 +78,7 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
               <PawPrint className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-bold">{content.todayFound}</p>
+              <p className="text-sm font-bold">{content.todayFound(totalPets)}</p>
               <p className="text-xs text-muted-foreground">{content.nearYou}</p>
             </div>
           </div>
@@ -181,7 +130,7 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
                     ))}
                   </div>
                   <span className="inline-flex w-full items-center justify-center rounded-xl bg-muted px-4 py-2.5 text-sm font-semibold text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                    {locale === "pt" ? `Conhecer ${pet.name}` : `Meet ${pet.name}`}
+                    {content.meetPet(pet.name)}
                   </span>
                 </div>
               </Link>

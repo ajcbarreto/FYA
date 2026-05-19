@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { Check, MessageSquareText, X } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 import { getReviewsForModeration, reviewAuthorName, type ReviewEstado } from "@/lib/canil/reviews";
@@ -35,45 +36,12 @@ export default async function CanilReviewsPage({ params, searchParams }: CanilRe
   const pending = reviews.filter((review) => review.estado === "pendente");
   const moderated = reviews.filter((review) => review.estado !== "pendente");
 
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Avaliacoes do canil",
-          subtitle: "Aprova ou rejeita as avaliacoes que os adotantes deixaram. So as aprovadas ficam visiveis.",
-          noShelter: "Nao foi encontrado um canil associado a esta conta.",
-          pendingTitle: "A aguardar moderacao",
-          historyTitle: "Avaliacoes moderadas",
-          emptyPending: "Sem avaliacoes pendentes.",
-          emptyHistory: "Ainda nao moderaste nenhuma avaliacao.",
-          approve: "Aprovar",
-          reject: "Rejeitar",
-          estados: { pendente: "Pendente", aprovada: "Aprovada", rejeitada: "Rejeitada" } as Record<ReviewEstado, string>,
-          messages: {
-            review_approved: "Avaliacao aprovada.",
-            review_rejected: "Avaliacao rejeitada.",
-            invalid_review: "Avaliacao invalida.",
-            moderation_failed: "Nao foi possivel moderar a avaliacao.",
-          } as Record<string, string>,
-        }
-      : {
-          title: "Shelter reviews",
-          subtitle: "Approve or reject reviews left by adopters. Only approved ones become visible.",
-          noShelter: "No shelter is linked to this account.",
-          pendingTitle: "Awaiting moderation",
-          historyTitle: "Moderated reviews",
-          emptyPending: "No pending reviews.",
-          emptyHistory: "You have not moderated any review yet.",
-          approve: "Approve",
-          reject: "Reject",
-          estados: { pendente: "Pending", aprovada: "Approved", rejeitada: "Rejected" } as Record<ReviewEstado, string>,
-          messages: {
-            review_approved: "Review approved.",
-            review_rejected: "Review rejected.",
-            invalid_review: "Invalid review.",
-            moderation_failed: "Could not moderate the review.",
-          } as Record<string, string>,
-        };
-
+  const copy = getDictionary(locale).canilReviewsPage;
+  const estadoLabel: Record<ReviewEstado, string> = {
+    pendente: copy.estadoPending,
+    aprovada: copy.estadoApproved,
+    rejeitada: copy.estadoRejected,
+  };
   const feedback = (success && copy.messages[success]) || (error && copy.messages[error]) || null;
 
   const estadoClass = (estado: ReviewEstado) =>
@@ -165,7 +133,7 @@ export default async function CanilReviewsPage({ params, searchParams }: CanilRe
                       <span className="flex items-center gap-2">
                         <StarRating value={review.rating} />
                         <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${estadoClass(review.estado)}`}>
-                          {copy.estados[review.estado]}
+                          {estadoLabel[review.estado]}
                         </span>
                       </span>
                     </div>

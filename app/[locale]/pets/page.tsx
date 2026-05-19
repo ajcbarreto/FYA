@@ -99,28 +99,10 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
   ].filter((value): value is { key: string; label: string } => value !== null);
   const hasActiveFilters = activeFilters.length > 0;
 
-  const copy =
-    locale === "pt"
-      ? {
-          resultsFound: (count: number) => `${count} ${count === 1 ? "animal encontrado" : "animais encontrados"}`,
-          noResultsCount: "Sem animais a corresponder.",
-          filters: "Filtros",
-          apply: "Aplicar",
-          activeFilters: "Filtros ativos:",
-          emptySearch: "Nao encontramos resultados para esses filtros.",
-          emptyDb: "Sem animais disponiveis de momento.",
-          select: { species: speciesSelectOptions, sex: sexSelectOptions, size: sizeSelectOptions, status: statusSelectOptions },
-        }
-      : {
-          resultsFound: (count: number) => `${count} ${count === 1 ? "pet found" : "pets found"}`,
-          noResultsCount: "No pets match your filters.",
-          filters: "Filters",
-          apply: "Apply",
-          activeFilters: "Active filters:",
-          emptySearch: "We could not find results for these filters.",
-          emptyDb: "No pets available right now.",
-          select: { species: speciesSelectOptions, sex: sexSelectOptions, size: sizeSelectOptions, status: statusSelectOptions },
-        };
+  const copy = {
+    ...dictionary.petCatalog,
+    select: { species: speciesSelectOptions, sex: sexSelectOptions, size: sizeSelectOptions, status: statusSelectOptions },
+  };
 
   const selectClass =
     "h-10 min-w-[140px] flex-1 rounded-lg border border-border/40 bg-background px-3 text-sm outline-none transition-all focus:ring-2 focus:ring-primary/30";
@@ -140,7 +122,7 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
             className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
             <Sparkles className="h-4 w-4" />
-            {locale === "pt" ? "Encontrar o meu match" : "Find my match"}
+            {dictionary.petCatalog.findMyMatch}
           </Link>
         </div>
 

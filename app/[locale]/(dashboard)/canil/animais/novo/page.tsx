@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 import { AnimalForm } from "@/components/animal-form";
@@ -35,32 +36,8 @@ export default async function NewAnimalPage({ params, searchParams }: NewAnimalP
     redirect(`/${locale}/canil/animais?error=no_shelter`);
   }
 
-  const copy =
-    locale === "pt"
-      ? {
-          back: "Voltar aos animais",
-          title: "Novo animal",
-          subtitle: "Adiciona um animal ao inventario do teu canil.",
-          submit: "Criar animal",
-          errors: {
-            invalid_data: "Preenche pelo menos nome, especie e estado.",
-            save_failed: "Nao foi possivel criar o animal.",
-            needs_verification: "O teu canil precisa de ser verificado pelo admin antes de publicar animais.",
-          },
-        }
-      : {
-          back: "Back to pets",
-          title: "New pet",
-          subtitle: "Add a pet to your shelter inventory.",
-          submit: "Create pet",
-          errors: {
-            invalid_data: "Provide at least name, species and status.",
-            save_failed: "Could not create the pet.",
-            needs_verification: "Your shelter must be verified by an admin before publishing animals.",
-          },
-        };
-
-  const feedback = error && copy.errors[error as keyof typeof copy.errors] ? copy.errors[error as keyof typeof copy.errors] : null;
+  const copy = getDictionary(locale).canilNewAnimal;
+  const feedback = error && copy.errorMessages[error] ? copy.errorMessages[error] : null;
 
   return (
     <main className="space-y-6">

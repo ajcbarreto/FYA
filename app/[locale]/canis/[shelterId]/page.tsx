@@ -4,6 +4,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { BadgeCheck, Building2, ChevronLeft, Mail, MapPin, MessageSquareText, PawPrint, Phone } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAnimalsForPublicShelter, getPublicShelterById } from "@/lib/canil/public-directory";
 import {
@@ -33,17 +34,16 @@ export async function generateMetadata({
 
   const supabase = await createServerSupabaseClient();
   const shelter = await getPublicShelterById(supabase, shelterId);
+  const t = getDictionary(locale).shelterPublic;
 
   if (!shelter) {
-    return { title: locale === "pt" ? "Canil nao encontrado | FYA" : "Shelter not found | FYA" };
+    return { title: t.metaNotFound };
   }
 
   const title = `${shelter.nome} | FYA`;
   const description =
     shelter.missao?.trim().slice(0, 160) ||
-    (locale === "pt"
-      ? `Conhece o canil ${shelter.nome} em ${shelter.localizacao} e os animais para adocao.`
-      : `Discover ${shelter.nome} shelter in ${shelter.localizacao} and its pets available for adoption.`);
+    t.metaDescription(shelter.nome, shelter.localizacao);
 
   return {
     title,
@@ -83,85 +83,10 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
   const adoptedCount = animals.filter((animal) => animal.status.toLowerCase().includes("adotado") || animal.status.toLowerCase().includes("adopted")).length;
   const joined = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(new Date(shelter.created_at));
 
-  const copy =
-    locale === "pt"
-      ? {
-          back: "Voltar aos canis",
-          aboutTitle: "Sobre o canil",
-          contactTitle: "Contactos",
-          phoneLabel: "Telefone",
-          emailLabel: "Email",
-          locationLabel: "Localizacao",
-          joinedLabel: "Na FYA desde",
-          residentsTitle: "Animais a procura de lar",
-          noResidents: "Este canil ainda nao tem animais publicados.",
-          openPet: "Ver pet",
-          stats: {
-            total: "Total de animais",
-            available: "Disponiveis",
-            adopted: "Adotados",
-          },
-          notProvided: "Nao definido",
-          reviewsTitle: "Avaliacoes",
-          noReviews: "Este canil ainda nao tem avaliacoes.",
-          ratingSummary: (avg: number, count: number) =>
-            `${avg.toFixed(1)} de 5 · ${count} ${count === 1 ? "avaliacao" : "avaliacoes"}`,
-          writeReview: "Deixar avaliacao",
-          editReview: "Atualizar a tua avaliacao",
-          ratingLabel: "Classificacao",
-          commentLabel: "Comentario (opcional)",
-          commentPlaceholder: "Como foi a tua experiencia com este canil?",
-          submitReview: "Enviar avaliacao",
-          moderationNote: "A tua avaliacao so fica visivel depois de o canil a aprovar.",
-          pendingNote: "A tua avaliacao foi enviada e aguarda aprovacao do canil.",
-          rejectedNote: "A tua avaliacao anterior nao foi aprovada. Podes editar e reenviar.",
-          loginToReview: "Inicia sessao para avaliar este canil.",
-          messages: {
-            review_pending: "Avaliacao enviada. Vai ser revista pelo canil antes de aparecer.",
-            invalid_review: "Escolhe uma classificacao valida.",
-            review_failed: "Nao foi possivel guardar a avaliacao.",
-          } as Record<string, string>,
-        }
-      : {
-          back: "Back to shelters",
-          aboutTitle: "About the shelter",
-          contactTitle: "Contact",
-          phoneLabel: "Phone",
-          emailLabel: "Email",
-          locationLabel: "Location",
-          joinedLabel: "On FYA since",
-          residentsTitle: "Pets looking for a home",
-          noResidents: "This shelter has not published pets yet.",
-          openPet: "Open pet",
-          stats: {
-            total: "Total pets",
-            available: "Available",
-            adopted: "Adopted",
-          },
-          notProvided: "Not provided",
-          reviewsTitle: "Reviews",
-          noReviews: "This shelter has no reviews yet.",
-          ratingSummary: (avg: number, count: number) =>
-            `${avg.toFixed(1)} of 5 · ${count} ${count === 1 ? "review" : "reviews"}`,
-          writeReview: "Leave a review",
-          editReview: "Update your review",
-          ratingLabel: "Rating",
-          commentLabel: "Comment (optional)",
-          commentPlaceholder: "How was your experience with this shelter?",
-          submitReview: "Send review",
-          moderationNote: "Your review is only visible after the shelter approves it.",
-          pendingNote: "Your review was sent and is awaiting the shelter's approval.",
-          rejectedNote: "Your previous review was not approved. You can edit and resend it.",
-          loginToReview: "Sign in to review this shelter.",
-          messages: {
-            review_pending: "Review sent. The shelter will review it before it appears.",
-            invalid_review: "Pick a valid rating.",
-            review_failed: "Could not save the review.",
-          } as Record<string, string>,
-        };
-
+  const copy = getDictionary(locale).shelterPublic;
+  const reviewMessages: Record<string, string> = copy.reviewMessages;
   const feedback =
-    (success && copy.messages[success]) || (error && copy.messages[error]) || null;
+    (success && reviewMessages[success]) || (error && reviewMessages[error]) || null;
 
   return (
     <main className="mx-auto w-full max-w-7xl flex-1 px-6 pb-16 pt-8 lg:px-8">
@@ -185,7 +110,7 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
               {shelter.verificado && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-secondary/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-secondary">
                   <BadgeCheck className="h-3.5 w-3.5" />
-                  {locale === "pt" ? "Verificado" : "Verified"}
+                  {copy.verified}
                 </span>
               )}
             </div>
@@ -208,19 +133,19 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
           <div className="rounded-3xl border border-border/20 bg-card p-6">
             <h2 className="text-xl font-bold">{copy.aboutTitle}</h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              {shelter.missao ?? (locale === "pt" ? "Sem descricao publicada." : "No public description yet.")}
+              {shelter.missao ?? copy.noDescription}
             </p>
             <div className="mt-6 grid grid-cols-3 gap-4 text-center">
               <div className="rounded-2xl bg-muted p-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.stats.total}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.statsTotal}</p>
                 <p className="mt-1 text-2xl font-bold">{animals.length}</p>
               </div>
               <div className="rounded-2xl bg-muted p-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.stats.available}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.statsAvailable}</p>
                 <p className="mt-1 text-2xl font-bold text-secondary">{availableCount}</p>
               </div>
               <div className="rounded-2xl bg-muted p-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.stats.adopted}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.statsAdopted}</p>
                 <p className="mt-1 text-2xl font-bold text-primary">{adoptedCount}</p>
               </div>
             </div>

@@ -1,5 +1,7 @@
 import { Heart } from "lucide-react";
 import { toggleFavorite } from "@/app/favorites/actions";
+import type { Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 type FavoriteButtonProps = {
   animalId: string;
@@ -21,9 +23,10 @@ export function FavoriteButton({
   size = "sm",
   labels,
 }: FavoriteButtonProps) {
+  const favoriteButton = getDictionary(locale as Locale).favoriteButton;
   const buttonLabels = labels ?? {
-    add: locale === "pt" ? "Guardar pet" : "Save pet",
-    remove: locale === "pt" ? "Remover dos favoritos" : "Remove from favorites",
+    add: favoriteButton.save,
+    remove: favoriteButton.remove,
   };
 
   if (size === "lg") {

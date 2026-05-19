@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser-client";
 import { sendAdoptionMessage } from "@/app/adoption/actions";
+import type { Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 export type ChatMessage = {
   id: string;
@@ -35,8 +37,9 @@ function dayLabel(iso: string, locale: string) {
   const date = new Date(iso);
   const now = new Date();
   const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  if (dayKey(date) === dayKey(now)) return locale === "pt" ? "Hoje" : "Today";
-  if (dayKey(date) === dayKey(yesterday)) return locale === "pt" ? "Ontem" : "Yesterday";
+  const t = getDictionary(locale as Locale).chatThread;
+  if (dayKey(date) === dayKey(now)) return t.today;
+  if (dayKey(date) === dayKey(yesterday)) return t.yesterday;
   return new Intl.DateTimeFormat(locale, { day: "2-digit", month: "long" }).format(date);
 }
 

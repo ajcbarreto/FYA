@@ -58,33 +58,21 @@ export async function Navbar({ locale }: NavbarProps) {
   const roleSettingsLabel = role === "canil" ? dictionary.nav.canilSettings : dictionary.nav.userSettings;
   const roleLabel =
     role === "admin"
-      ? locale === "pt"
-        ? "Administrador"
-        : "Administrator"
+      ? dictionary.nav.roleAdmin
       : role === "canil"
-        ? "Canil"
-        : locale === "pt"
-          ? "Adotante"
-          : "Adopter";
+        ? dictionary.nav.roleCanil
+        : dictionary.nav.roleAdopter;
   const userDisplayName =
     fullName?.trim() ||
     (email?.includes("@") ? email.split("@")[0] : null) ||
-    (locale === "pt" ? "Conta" : "Account");
+    dictionary.nav.accountFallback;
   const userInitial = userDisplayName.charAt(0).toUpperCase();
-  const menuCopy =
-    locale === "pt"
-      ? {
-          openMenu: "Abrir menu da conta",
-          panel: "Meu painel",
-          settings: "Configuracoes",
-          logout: "Terminar sessao",
-        }
-      : {
-          openMenu: "Open account menu",
-          panel: "My dashboard",
-          settings: "Settings",
-          logout: "Sign out",
-        };
+  const menuCopy = {
+    openMenu: dictionary.nav.openAccountMenu,
+    panel: dictionary.nav.myDashboard,
+    settings: dictionary.nav.menuSettings,
+    logout: dictionary.nav.menuLogout,
+  };
 
   const mobileLinks: MobileLink[] = [
     { href: `/${locale}`, label: dictionary.nav.home },
@@ -116,10 +104,7 @@ export async function Navbar({ locale }: NavbarProps) {
       { href: `/${locale}/auth/register`, label: dictionary.nav.register },
     );
   }
-  const mobileMenuCopy =
-    locale === "pt"
-      ? { open: "Abrir menu", close: "Fechar menu" }
-      : { open: "Open menu", close: "Close menu" };
+  const mobileMenuCopy = { open: dictionary.nav.openMenu, close: dictionary.nav.closeMenu };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">

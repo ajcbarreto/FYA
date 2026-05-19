@@ -8,6 +8,16 @@ type SendEmailInput = {
   html: string;
 };
 
+const MAX_ATTEMPTS = 3;
+const BASE_DELAY_MS = 500;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Erros transitorios: rate limit (429) e falhas do lado do servidor (5xx).
+function isRetryableStatus(status: number) {
+  return status === 429 || status >= 500;
+}
+
 export async function sendEmail({ to, subject, html }: SendEmailInput): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM ?? "FYA <onboarding@resend.dev>";
@@ -20,20 +30,35 @@ export async function sendEmail({ to, subject, html }: SendEmailInput): Promise<
     return;
   }
 
-  try {
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ from, to, subject, html }),
-    });
-    if (!response.ok) {
-      console.error(`[email] Resend respondeu ${response.status} para ${to}.`);
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ from, to, subject, html }),
+      });
+
+      if (response.ok) {
+        return;
+      }
+
+      if (isRetryableStatus(response.status) && attempt < MAX_ATTEMPTS) {
+        await sleep(BASE_DELAY_MS * 2 ** (attempt - 1));
+        continue;
+      }
+
+      console.error(`[email] Resend respondeu ${response.status} para ${to} (tentativa ${attempt}).`);
+      return;
+    } catch (error) {
+      if (attempt < MAX_ATTEMPTS) {
+        await sleep(BASE_DELAY_MS * 2 ** (attempt - 1));
+        continue;
+      }
+      console.error(`[email] Falha ao enviar email para ${to} apos ${attempt} tentativas:`, error);
     }
-  } catch (error) {
-    console.error("[email] Falha ao enviar email:", error);
   }
 }
 

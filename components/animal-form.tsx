@@ -1,3 +1,6 @@
+import type { Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+
 type AnimalFormValues = {
   nome?: string;
   especie?: string;
@@ -18,30 +21,7 @@ type AnimalFormProps = {
 };
 
 export function AnimalForm({ locale, action, animalId, values, submitLabel }: AnimalFormProps) {
-  const isPt = locale === "pt";
-  const t = {
-    name: isPt ? "Nome" : "Name",
-    species: isPt ? "Especie" : "Species",
-    breed: isPt ? "Raca" : "Breed",
-    sex: isPt ? "Genero" : "Gender",
-    age: isPt ? "Idade (anos)" : "Age (years)",
-    size: isPt ? "Porte" : "Size",
-    status: isPt ? "Estado" : "Status",
-    description: isPt ? "Descricao" : "Description",
-    select: isPt ? "Seleciona..." : "Select...",
-    species_cao: isPt ? "Cao" : "Dog",
-    species_gato: isPt ? "Gato" : "Cat",
-    species_outro: isPt ? "Outro" : "Other",
-    sex_macho: isPt ? "Macho" : "Male",
-    sex_femea: isPt ? "Femea" : "Female",
-    size_pequeno: isPt ? "Pequeno" : "Small",
-    size_medio: isPt ? "Medio" : "Medium",
-    size_grande: isPt ? "Grande" : "Large",
-    status_disponivel: isPt ? "Disponivel" : "Available",
-    status_reservado: isPt ? "Reservado" : "Reserved",
-    status_em_tratamento: isPt ? "Em tratamento" : "In treatment",
-    status_adotado: isPt ? "Adotado" : "Adopted",
-  };
+  const t = getDictionary(locale as Locale).animalForm;
   const inputClass =
     "h-11 w-full rounded-xl border border-border/25 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20";
 
@@ -64,9 +44,9 @@ export function AnimalForm({ locale, action, animalId, values, submitLabel }: An
           </label>
           <select id="especie" name="especie" defaultValue={values?.especie ?? ""} required className={inputClass}>
             <option value="">{t.select}</option>
-            <option value="cao">{t.species_cao}</option>
-            <option value="gato">{t.species_gato}</option>
-            <option value="outro">{t.species_outro}</option>
+            <option value="cao">{t.speciesDog}</option>
+            <option value="gato">{t.speciesCat}</option>
+            <option value="outro">{t.speciesOther}</option>
           </select>
         </div>
         <div className="space-y-2">
@@ -81,8 +61,8 @@ export function AnimalForm({ locale, action, animalId, values, submitLabel }: An
           </label>
           <select id="sexo" name="sexo" defaultValue={values?.sexo ?? ""} className={inputClass}>
             <option value="">{t.select}</option>
-            <option value="macho">{t.sex_macho}</option>
-            <option value="femea">{t.sex_femea}</option>
+            <option value="macho">{t.sexMale}</option>
+            <option value="femea">{t.sexFemale}</option>
           </select>
         </div>
         <div className="space-y-2">
@@ -105,9 +85,9 @@ export function AnimalForm({ locale, action, animalId, values, submitLabel }: An
           </label>
           <select id="porte" name="porte" defaultValue={values?.porte ?? ""} className={inputClass}>
             <option value="">{t.select}</option>
-            <option value="pequeno">{t.size_pequeno}</option>
-            <option value="medio">{t.size_medio}</option>
-            <option value="grande">{t.size_grande}</option>
+            <option value="pequeno">{t.sizeSmall}</option>
+            <option value="medio">{t.sizeMedium}</option>
+            <option value="grande">{t.sizeLarge}</option>
           </select>
         </div>
         <div className="space-y-2">
@@ -115,10 +95,10 @@ export function AnimalForm({ locale, action, animalId, values, submitLabel }: An
             {t.status}
           </label>
           <select id="status" name="status" defaultValue={values?.status ?? "disponivel"} required className={inputClass}>
-            <option value="disponivel">{t.status_disponivel}</option>
-            <option value="reservado">{t.status_reservado}</option>
-            <option value="em_tratamento">{t.status_em_tratamento}</option>
-            <option value="adotado">{t.status_adotado}</option>
+            <option value="disponivel">{t.statusAvailable}</option>
+            <option value="reservado">{t.statusReserved}</option>
+            <option value="em_tratamento">{t.statusInTreatment}</option>
+            <option value="adotado">{t.statusAdopted}</option>
           </select>
         </div>
       </div>

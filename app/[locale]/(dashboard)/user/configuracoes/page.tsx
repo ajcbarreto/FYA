@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 
 type UserSettingsPageProps = {
@@ -23,22 +24,19 @@ export default async function UserSettingsPage({ params }: UserSettingsPageProps
 
   const { data: profile } = await supabase.from("profiles").select("full_name,email").eq("id", user.id).single();
   const displayName = profile?.full_name ?? user.user_metadata.full_name ?? user.email ?? "User";
+  const t = getDictionary(locale).userSettings;
 
   return (
     <main className="space-y-6">
       <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{locale === "pt" ? "Configuracoes da Conta" : "Account Settings"}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {locale === "pt"
-            ? "Area basica para dados de conta. Podes expandir esta pagina com preferencias e notificacoes."
-            : "Basic account area. You can later extend this page with preferences and notifications."}
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t.subtitle}</p>
       </header>
 
       <section className="rounded-3xl border border-border/20 bg-card p-6">
         <dl className="space-y-4 text-sm">
           <div>
-            <dt className="text-muted-foreground">{locale === "pt" ? "Nome" : "Name"}</dt>
+            <dt className="text-muted-foreground">{t.name}</dt>
             <dd className="font-semibold">{displayName}</dd>
           </div>
           <div>
@@ -46,8 +44,8 @@ export default async function UserSettingsPage({ params }: UserSettingsPageProps
             <dd className="font-semibold">{profile?.email ?? user.email ?? "-"}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">{locale === "pt" ? "Tipo de conta" : "Account type"}</dt>
-            <dd className="font-semibold">{locale === "pt" ? "Adotante" : "Adopter"}</dd>
+            <dt className="text-muted-foreground">{t.accountType}</dt>
+            <dd className="font-semibold">{t.adopter}</dd>
           </div>
         </dl>
       </section>

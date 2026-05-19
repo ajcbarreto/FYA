@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Lock } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { updatePassword } from "@/app/auth/password/actions";
 import { ToastFeedback } from "@/components/toast-feedback";
 
@@ -17,36 +18,8 @@ export default async function ResetPasswordPage({ params, searchParams }: ResetP
     notFound();
   }
 
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Definir nova password",
-          subtitle: "Escolhe uma nova password para a tua conta.",
-          passwordLabel: "Nova password",
-          confirmLabel: "Confirmar password",
-          submit: "Guardar password",
-          errors: {
-            weak_password: "A password tem de ter pelo menos 6 caracteres.",
-            mismatch: "As passwords nao coincidem.",
-            expired: "O link expirou. Pede um novo link de recuperacao.",
-            update_failed: "Nao foi possivel atualizar a password.",
-          },
-        }
-      : {
-          title: "Set new password",
-          subtitle: "Choose a new password for your account.",
-          passwordLabel: "New password",
-          confirmLabel: "Confirm password",
-          submit: "Save password",
-          errors: {
-            weak_password: "Password must be at least 6 characters.",
-            mismatch: "Passwords do not match.",
-            expired: "The link expired. Request a new recovery link.",
-            update_failed: "Could not update the password.",
-          },
-        };
-
-  const feedback = error && copy.errors[error as keyof typeof copy.errors] ? copy.errors[error as keyof typeof copy.errors] : null;
+  const copy = getDictionary(locale).resetPassword;
+  const feedback = error && copy.errorMessages[error] ? copy.errorMessages[error] : null;
   const inputClass =
     "h-12 w-full rounded-xl bg-muted px-11 text-sm outline-none focus:ring-2 focus:ring-primary/30";
 

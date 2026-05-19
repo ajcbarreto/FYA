@@ -26,40 +26,23 @@ export default async function ShelterRegistrationPage({
   }
 
   const dictionary = getDictionary(locale);
-  const content =
-    locale === "pt"
-      ? {
-          eyebrow: "Junte-se a nossa missao",
-          title: "Registo de Canis",
-          subtitlePrefix: "Torne o seu abrigo parte da rede",
-          subtitleSuffix: "Juntos, criamos ligacoes duradouras entre animais e familias amorosas.",
-          benefitsTitle: "Porque a FYA?",
-          benefit1Title: "Visibilidade total",
-          benefit1Text: "Alcance milhares de potenciais adotantes todos os dias.",
-          benefit2Title: "Gestao facilitada",
-          benefit2Text: "Ferramentas intuitivas para gerir perfis de animais e candidaturas.",
-          benefit3Title: "Rede de apoio",
-          benefit3Text: "Acesso a recursos exclusivos e parcerias com veterinarios.",
-          imageQuote: '"Mudar vidas, um patudo de cada vez."',
-          hasAccount: "Ja tens conta?",
-          browseFile: "Procurar ficheiro",
-        }
-      : {
-          eyebrow: "Join our mission",
-          title: "Shelter Registration",
-          subtitlePrefix: "Bring your shelter into the",
-          subtitleSuffix: "network and create lasting matches between pets and loving families.",
-          benefitsTitle: "Why FYA?",
-          benefit1Title: "Total visibility",
-          benefit1Text: "Reach thousands of potential adopters every day.",
-          benefit2Title: "Easy management",
-          benefit2Text: "Intuitive tools to manage pets and adoption requests.",
-          benefit3Title: "Support network",
-          benefit3Text: "Access exclusive resources and partner vet initiatives.",
-          imageQuote: '"Changing lives, one paw at a time."',
-          hasAccount: "Already have an account?",
-          browseFile: "Browse file",
-        };
+  const auth = dictionary.auth;
+  const content = {
+    eyebrow: auth.shelterRegEyebrow,
+    title: auth.shelterRegTitle,
+    subtitlePrefix: auth.shelterRegSubtitlePrefix,
+    subtitleSuffix: auth.shelterRegSubtitleSuffix,
+    benefitsTitle: auth.shelterBenefitsTitle,
+    benefit1Title: auth.shelterBenefit1Title,
+    benefit1Text: auth.shelterBenefit1Text,
+    benefit2Title: auth.shelterBenefit2Title,
+    benefit2Text: auth.shelterBenefit2Text,
+    benefit3Title: auth.shelterBenefit3Title,
+    benefit3Text: auth.shelterBenefit3Text,
+    imageQuote: auth.shelterImageQuote,
+    hasAccount: auth.hasAccount,
+    browseFile: auth.shelterBrowseFile,
+  };
 
   return (
     <main className="mx-auto w-full max-w-7xl flex-1 px-6 pb-20 pt-12 lg:px-8">
@@ -120,7 +103,7 @@ export default async function ShelterRegistrationPage({
           <div className="relative h-64 overflow-hidden rounded-3xl shadow-xl">
             <Image
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuoGWPNxgccv2PjP-EljrPZXeo21I3n6e1XE9YzPCzxMv50Zyf-2ceJmBnCbeumIC62eCf6b-57Jj_Spc6469NsNooVsVaJTuA0KJvhU3QvTq-ZgrRFVNQ2rCYucMZdjjXdt5TQTB4WPeWFpY7cMwfBO6hX84Ycx3qGsl1GiQEvZUGeEsCyX4YR-eRHXQ263xrXVvNV1qVa-QA-Y_Iqxx6kcBRsf8fCtCytfTwTCC2CRPD-WYXRXZyv_SsU5czIcNJFIUpY3hVSWU"
-              alt={locale === "pt" ? "Caes felizes num abrigo" : "Happy shelter dogs"}
+              alt={auth.shelterDogsAlt}
               fill
               sizes="(max-width: 1024px) 100vw, 33vw"
               className="object-cover"

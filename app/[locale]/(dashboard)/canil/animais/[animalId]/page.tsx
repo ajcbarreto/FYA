@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, Star, Trash2, Upload } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 import { listAnimalPhotos } from "@/lib/canil/animal-photos";
@@ -65,76 +66,10 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
   }
 
   const photos = await listAnimalPhotos(supabase, animalId);
-  const copy =
-    locale === "pt"
-      ? {
-          back: "Voltar aos animais",
-          title: animal.nome,
-          subtitle: "Gere fotos e dados do animal.",
-          detailsTitle: "Dados do animal",
-          saveDetails: "Guardar dados",
-          dangerTitle: "Zona de perigo",
-          dangerHint: "Apagar o animal remove tambem fotos e pedidos associados.",
-          deleteAnimal: "Apagar animal",
-          uploadTitle: "Adicionar foto",
-          uploadHint: "JPG, PNG ou WebP ate 5MB.",
-          upload: "Carregar foto",
-          noPhotos: "Sem fotos ainda. Carrega a primeira imagem.",
-          primary: "Principal",
-          setPrimary: "Definir como principal",
-          remove: "Apagar",
-          messages: {
-            created: "Animal criado. Adiciona fotos abaixo.",
-            updated: "Dados atualizados.",
-            uploaded: "Foto adicionada.",
-            primary_set: "Foto definida como principal.",
-            deleted: "Foto apagada.",
-            upload_failed: "Nao foi possivel carregar a foto.",
-            photo_too_large: "Ficheiro acima de 5MB.",
-            invalid_data: "Dados invalidos.",
-            not_authorized: "Sem permissao.",
-            delete_failed: "Nao foi possivel apagar.",
-            update_failed: "Nao foi possivel atualizar.",
-            save_failed: "Nao foi possivel guardar.",
-            photo_not_found: "Foto nao encontrada.",
-          },
-        }
-      : {
-          back: "Back to pets",
-          title: animal.nome,
-          subtitle: "Manage photos and pet details.",
-          detailsTitle: "Pet details",
-          saveDetails: "Save details",
-          dangerTitle: "Danger zone",
-          dangerHint: "Deleting the pet also removes its photos and related requests.",
-          deleteAnimal: "Delete pet",
-          uploadTitle: "Add photo",
-          uploadHint: "JPG, PNG or WebP up to 5MB.",
-          upload: "Upload photo",
-          noPhotos: "No photos yet. Upload the first one.",
-          primary: "Primary",
-          setPrimary: "Set as primary",
-          remove: "Delete",
-          messages: {
-            created: "Pet created. Add photos below.",
-            updated: "Details updated.",
-            uploaded: "Photo added.",
-            primary_set: "Photo set as primary.",
-            deleted: "Photo removed.",
-            upload_failed: "Could not upload photo.",
-            photo_too_large: "File exceeds 5MB.",
-            invalid_data: "Invalid data.",
-            not_authorized: "Not allowed.",
-            delete_failed: "Could not delete.",
-            update_failed: "Could not update.",
-            save_failed: "Could not save.",
-            photo_not_found: "Photo not found.",
-          },
-        };
-
+  const copy = { ...getDictionary(locale).canilEditAnimal, title: animal.nome };
   const feedback =
-    (success && copy.messages[success as keyof typeof copy.messages]) ||
-    (error && copy.messages[error as keyof typeof copy.messages]) ||
+    (success && copy.messages[success]) ||
+    (error && copy.messages[error]) ||
     null;
 
   return (

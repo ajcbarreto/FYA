@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getConversationsForUser, getMessagesByConversationId, mapConversationListItem } from "@/lib/adoption/db";
 import { ChatThread } from "@/components/chat-thread";
@@ -44,42 +45,12 @@ export default async function UserMessagesPage({ params, searchParams }: UserMes
     : conversations[0] ?? null;
   const messages = activeConversation ? await getMessagesByConversationId(supabase, activeConversation.id) : [];
 
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Mensagens com Canis",
-          searchPlaceholder: "Pesquisar conversa...",
-          noConversations: "Sem conversas ainda.",
-          inputPlaceholder: "Escreve a tua mensagem...",
-          send: "Enviar",
-          withShelter: "Conversa com",
-          backToList: "Conversas",
-          success: "Mensagem enviada.",
-          errors: {
-            invalid_message: "Mensagem invalida.",
-            send_failed: "Nao foi possivel enviar a mensagem.",
-          },
-        }
-      : {
-          title: "Messages with Shelters",
-          searchPlaceholder: "Search conversation...",
-          noConversations: "No conversations yet.",
-          inputPlaceholder: "Write your message...",
-          send: "Send",
-          withShelter: "Chat with",
-          backToList: "Conversations",
-          success: "Message sent.",
-          errors: {
-            invalid_message: "Invalid message.",
-            send_failed: "Could not send message.",
-          },
-        };
-
+  const copy = getDictionary(locale).userMessages;
   const feedback =
     success === "message_sent"
       ? copy.success
-      : error && copy.errors[error as keyof typeof copy.errors]
-        ? copy.errors[error as keyof typeof copy.errors]
+      : error && copy.errorMessages[error]
+        ? copy.errorMessages[error]
         : null;
 
   return (

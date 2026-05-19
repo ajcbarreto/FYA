@@ -3,6 +3,8 @@ import {
   localizeAnswerValue,
   type AdoptionApplicationAnswers,
 } from "@/lib/adoption/application-form";
+import type { Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 type AdoptionAnswersProps = {
   answers: Record<string, unknown> | null;
@@ -33,9 +35,7 @@ export function AdoptionAnswers({ answers, locale }: AdoptionAnswersProps) {
   if (!hasAnswers(answers)) {
     return (
       <p className="rounded-xl bg-muted px-3 py-2 text-xs text-muted-foreground">
-        {locale === "pt"
-          ? "Sem questionario estruturado para este pedido."
-          : "No structured questionnaire for this request."}
+        {getDictionary(locale as Locale).adoptionAnswers.noAnswers}
       </p>
     );
   }

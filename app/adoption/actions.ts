@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getCurrentProfileRole } from "@/lib/adoption/db";
 import { parseApplicationAnswers } from "@/lib/adoption/application-form";
@@ -96,7 +97,7 @@ export async function submitAdoptionRequest(formData: FormData) {
     }
   }
 
-  const initialMessage = message || (locale === "pt" ? "Ola! Tenho interesse neste animal." : "Hi! I am interested in this pet.");
+  const initialMessage = message || getDictionary(locale).petDetails.initialGreeting;
   const { error: messageError } = await supabase.from("mensagens_adocao").insert({
     conversa_id: conversationId,
     sender_profile_id: user.id,

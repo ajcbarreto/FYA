@@ -30,6 +30,7 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
   }
 
   const dictionary = getDictionary(locale);
+  const cp = dictionary.canilProfile;
   const supabase = await createServerSupabaseClient();
   const {
     data: { user },
@@ -63,46 +64,23 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
   const shelterName = shelter?.nome ?? profile?.full_name ?? user.user_metadata.full_name ?? "FYA Shelter";
   const joinedDate = formatJoinedDate((shelter?.created_at as string | null) ?? profile?.created_at ?? null, locale);
   const isVerified = Boolean(user.email_confirmed_at);
-  const contactBlocks =
-    locale === "pt"
-      ? [
-          {
-            icon: MapPin,
-            label: "VISITE-NOS",
-            value: shelter?.localizacao
-              ? `${shelter.localizacao}\nPortugal`
-              : dictionary.canilProfile.notProvided,
-          },
-          {
-            icon: Phone,
-            label: "LIGUE",
-            value: `${shelter?.telefone ?? dictionary.canilProfile.notProvided}\nMon-Sat: 9h - 18h`,
-          },
-          {
-            icon: Globe,
-            label: "WEBSITE",
-            value: `${shelter?.email_contacto ?? dictionary.canilProfile.notProvided}\n${profile?.email ?? user.email ?? dictionary.canilProfile.notProvided}`,
-          },
-        ]
-      : [
-          {
-            icon: MapPin,
-            label: "VISIT US",
-            value: shelter?.localizacao
-              ? `${shelter.localizacao}\nPortugal`
-              : dictionary.canilProfile.notProvided,
-          },
-          {
-            icon: Phone,
-            label: "CALL US",
-            value: `${shelter?.telefone ?? dictionary.canilProfile.notProvided}\nMon-Sat: 9am - 6pm`,
-          },
-          {
-            icon: Globe,
-            label: "WEBSITE",
-            value: `${shelter?.email_contacto ?? dictionary.canilProfile.notProvided}\n${profile?.email ?? user.email ?? dictionary.canilProfile.notProvided}`,
-          },
-        ];
+  const contactBlocks = [
+    {
+      icon: MapPin,
+      label: cp.contactVisitLabel,
+      value: shelter?.localizacao ? `${shelter.localizacao}\nPortugal` : cp.notProvided,
+    },
+    {
+      icon: Phone,
+      label: cp.contactCallLabel,
+      value: `${shelter?.telefone ?? cp.notProvided}\n${cp.contactHours}`,
+    },
+    {
+      icon: Globe,
+      label: cp.contactWebsiteLabel,
+      value: `${shelter?.email_contacto ?? cp.notProvided}\n${profile?.email ?? user.email ?? cp.notProvided}`,
+    },
+  ];
   const allResidents = ((residentRows ?? []) as AnimalRow[]).map((row) => toCatalogItem(row, locale));
   const residents = allResidents.slice(0, 4);
   const shelterImage =
@@ -116,7 +94,7 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
         <div className="group relative h-[420px] w-full overflow-hidden rounded-3xl">
           <Image
             src={shelterImage}
-            alt={locale === "pt" ? "Interior de abrigo moderno" : "Modern shelter interior"}
+            alt={cp.shelterInteriorAlt}
             fill
             sizes="(max-width: 1024px) 100vw, 1280px"
             className="object-cover transition-transform duration-1000 group-hover:scale-110"
@@ -126,7 +104,7 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
             <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border-4 border-background bg-white p-2 shadow-2xl">
               <Image
                 src={profileLogo}
-                alt={locale === "pt" ? "Logo do abrigo" : "Shelter logo"}
+                alt={cp.shelterLogoAlt}
                 width={112}
                 height={112}
                 className="h-full w-full rounded-full object-cover"
@@ -153,11 +131,7 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
               {dictionary.canilProfile.aboutDescription}
             </p>
             <p className="mt-8 text-base leading-relaxed text-muted-foreground">
-              {shelter?.missao
-                ? shelter.missao
-                : locale === "pt"
-                  ? "A nossa equipa trabalha diariamente para garantir cuidado, seguranca e socializacao de cada animal. Priorizamos adocoes responsaveis com acompanhamento apos a entrega."
-                  : "Our team works daily to ensure care, safety, and socialization for every resident. We prioritize responsible adoptions with post-adoption follow-up."}
+              {shelter?.missao ? shelter.missao : cp.defaultMission}
             </p>
           </div>
 
@@ -178,38 +152,30 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
         <aside className="space-y-6 lg:col-span-4">
           {shelter && (
             <div className="rounded-3xl border border-primary/20 bg-primary/5 p-8 shadow-sm">
-              <h3 className="mb-3 text-2xl font-bold text-primary">
-                {locale === "pt" ? "O teu perfil publico" : "Your public profile"}
-              </h3>
-              <p className="mb-6 text-sm text-muted-foreground">
-                {locale === "pt"
-                  ? "E assim que os adotantes veem o teu canil na FYA. Partilha o link para receberes mais candidaturas."
-                  : "This is how adopters see your shelter on FYA. Share the link to receive more applications."}
-              </p>
+              <h3 className="mb-3 text-2xl font-bold text-primary">{cp.publicProfileTitle}</h3>
+              <p className="mb-6 text-sm text-muted-foreground">{cp.publicProfileText}</p>
               <Link
                 href={`/${locale}/canis/${shelter.id}`}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
               >
-                {locale === "pt" ? "Ver perfil publico" : "View public profile"}
+                {cp.viewPublicProfile}
               </Link>
             </div>
           )}
 
           <div className="rounded-3xl border border-border/35 bg-muted/35 p-7 shadow-sm">
-            <h4 className="mb-5 text-lg font-bold text-secondary">
-              {locale === "pt" ? "Estatisticas do abrigo" : "Shelter statistics"}
-            </h4>
+            <h4 className="mb-5 text-lg font-bold text-secondary">{cp.statsTitle}</h4>
             <div className="space-y-4">
               {[
                 {
-                  title: dictionary.canilProfile.stats.activePets,
-                  value: String(allResidents.filter((pet) => pet.status.toLowerCase().includes(locale === "pt" ? "disponivel" : "available")).length),
+                  title: cp.stats.activePets,
+                  value: String(allResidents.filter((pet) => pet.status.toLowerCase().includes(cp.availableKeyword)).length),
                 },
                 {
-                  title: dictionary.canilProfile.stats.completedAdoptions,
-                  value: String(allResidents.filter((pet) => pet.status.toLowerCase().includes(locale === "pt" ? "reserv" : "reserved")).length),
+                  title: cp.stats.completedAdoptions,
+                  value: String(allResidents.filter((pet) => pet.status.toLowerCase().includes(cp.reservedKeyword)).length),
                 },
-                { title: dictionary.canilProfile.stats.responseTime, value: "< 2h" },
+                { title: cp.stats.responseTime, value: "< 2h" },
               ].map((item) => (
                 <div key={item.title} className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">{item.title}</span>
@@ -225,20 +191,14 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
         <div className="mx-auto w-full max-w-7xl px-6 lg:px-8">
           <div className="mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <h2 className="text-4xl font-bold tracking-tight text-secondary">
-                {locale === "pt" ? "Residentes a procura de lar" : "Residents seeking homes"}
-              </h2>
-              <p className="mt-4 max-w-2xl text-muted-foreground">
-                {locale === "pt"
-                  ? "Conhece os animais atualmente no abrigo. Todos os residentes estao vacinados e prontos para conhecer novas familias."
-                  : "Meet residents currently staying at the shelter. All pets are vaccinated and ready to meet new families."}
-              </p>
+              <h2 className="text-4xl font-bold tracking-tight text-secondary">{cp.residentsTitle}</h2>
+              <p className="mt-4 max-w-2xl text-muted-foreground">{cp.residentsSubtitle}</p>
             </div>
             <div className="relative">
               <select className="appearance-none rounded-full border border-border bg-background px-6 py-3 pr-11 text-sm font-bold uppercase tracking-wider shadow-sm outline-none ring-0 focus:ring-2 focus:ring-secondary/20">
-                <option>{locale === "pt" ? "Todas as especies" : "All species"}</option>
-                <option>{locale === "pt" ? "Caes" : "Dogs"}</option>
-                <option>{locale === "pt" ? "Gatos" : "Cats"}</option>
+                <option>{cp.allSpecies}</option>
+                <option>{cp.dogs}</option>
+                <option>{cp.cats}</option>
               </select>
             </div>
           </div>
@@ -286,7 +246,7 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
                     href={`/${locale}/pets/${pet.id}`}
                     className="inline-flex w-full items-center justify-center rounded-full bg-secondary px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-secondary-foreground transition-opacity hover:opacity-90"
                   >
-                    {locale === "pt" ? `Conhecer ${pet.name}` : `Meet ${pet.name}`}
+                    {cp.meetPet(pet.name)}
                   </Link>
                 </div>
               </article>
@@ -295,7 +255,7 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
 
           <div className="mt-16 flex justify-center">
             <div className="inline-flex items-center gap-2 rounded-full border-2 border-primary px-8 py-4 text-sm font-bold uppercase tracking-widest text-primary">
-              {locale === "pt" ? "Ver todos os residentes" : "View all residents"}
+              {cp.viewAllResidents}
               <ArrowDown className="h-4 w-4" />
             </div>
           </div>

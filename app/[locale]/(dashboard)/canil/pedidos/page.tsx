@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 import { getAdoptionRequestsForCanil, getRowAnimal, localizeRequestStatus, mapRequestApplicantName } from "@/lib/adoption/db";
@@ -41,79 +42,11 @@ export default async function CanilRequestsPage({ params, searchParams }: CanilR
     supabase,
     requests.map((request) => request.id),
   );
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Pedidos de Adocao",
-          subtitle: "Fila de candidaturas recebidas para os teus animais.",
-          columns: {
-            applicant: "Candidato e Pet",
-            date: "Submissao",
-            status: "Estado",
-            actions: "Acoes",
-          },
-          empty: "Sem pedidos no momento. Quando chegarem novos pedidos, eles vao aparecer aqui.",
-          action: "Atualizar pedido",
-          statuses: {
-            pendente: "Pendente",
-            entrevista: "Entrevista",
-            aprovado: "Aprovado",
-            rejeitado: "Rejeitado",
-            concluido: "Adocao concluida",
-          },
-          hint: "Atualiza o estado e adiciona notas para manter o adotante informado.",
-          notePlaceholder: "Observacoes para o adotante (opcional)",
-          save: "Guardar",
-          success: {
-            updated: "Pedido atualizado com sucesso.",
-            visit_updated: "Visita atualizada.",
-          } as Record<string, string>,
-          errors: {
-            invalid_request: "Pedido invalido.",
-            save_failed: "Nao foi possivel guardar alteracoes.",
-            unauthorized: "Nao autorizado.",
-            no_shelter: "Nao foi encontrado canil associado.",
-            invalid_visit: "Dados de visita invalidos.",
-            visit_failed: "Nao foi possivel atualizar a visita.",
-          } as Record<string, string>,
-        }
-      : {
-          title: "Adoption Requests",
-          subtitle: "Queue of applications received for your pets.",
-          columns: {
-            applicant: "Applicant & Pet",
-            date: "Submission",
-            status: "Status",
-            actions: "Actions",
-          },
-          empty: "No requests right now. New requests will show up here.",
-          action: "Update request",
-          statuses: {
-            pendente: "Pending",
-            entrevista: "Interview",
-            aprovado: "Approved",
-            rejeitado: "Rejected",
-            concluido: "Adoption completed",
-          },
-          hint: "Update statuses and notes to keep adopters informed.",
-          notePlaceholder: "Notes for adopter (optional)",
-          save: "Save",
-          success: {
-            updated: "Request updated successfully.",
-            visit_updated: "Visit updated.",
-          } as Record<string, string>,
-          errors: {
-            invalid_request: "Invalid request.",
-            save_failed: "Could not save changes.",
-            unauthorized: "Not authorized.",
-            no_shelter: "No linked shelter found.",
-            invalid_visit: "Invalid visit data.",
-            visit_failed: "Could not update the visit.",
-          } as Record<string, string>,
-        };
-
+  const copy = getDictionary(locale).canilRequestsPage;
   const feedback =
-    (success && copy.success[success]) || (error && copy.errors[error]) || null;
+    (success && copy.successMessages[success]) ||
+    (error && copy.errorMessages[error]) ||
+    null;
 
   return (
     <main className="space-y-6">
@@ -131,10 +64,10 @@ export default async function CanilRequestsPage({ params, searchParams }: CanilR
             <table className="w-full min-w-[760px] text-left">
               <thead className="bg-muted text-xs uppercase tracking-[0.14em] text-muted-foreground">
                 <tr>
-                  <th className="px-6 py-4 font-bold">{copy.columns.applicant}</th>
-                  <th className="px-6 py-4 font-bold">{copy.columns.date}</th>
-                  <th className="px-6 py-4 font-bold">{copy.columns.status}</th>
-                  <th className="px-6 py-4 font-bold">{copy.columns.actions}</th>
+                  <th className="px-6 py-4 font-bold">{copy.columnApplicant}</th>
+                  <th className="px-6 py-4 font-bold">{copy.columnDate}</th>
+                  <th className="px-6 py-4 font-bold">{copy.columnStatus}</th>
+                  <th className="px-6 py-4 font-bold">{copy.columnActions}</th>
                 </tr>
               </thead>
               <tbody>
@@ -145,7 +78,7 @@ export default async function CanilRequestsPage({ params, searchParams }: CanilR
                       <p className="text-xs text-muted-foreground">{getRowAnimal(request)?.nome ?? "-"}</p>
                       <details className="mt-3 text-xs text-muted-foreground">
                         <summary className="cursor-pointer font-semibold text-primary">
-                          {locale === "pt" ? "Questionario e visitas" : "Questionnaire and visits"}
+                          {copy.questionnaireVisits}
                         </summary>
                         <div className="mt-2 space-y-2">
                           {request.mensagem_inicial && (

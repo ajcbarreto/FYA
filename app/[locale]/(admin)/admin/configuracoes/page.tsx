@@ -27,46 +27,7 @@ export default async function AdminSettingsPage({ params, searchParams }: AdminS
     getPlatformSettings(supabase),
   ]);
 
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Configuracoes da plataforma",
-          subtitle: "Define os dados globais e o comportamento da FYA.",
-          platformTitle: "Identidade e contactos",
-          platformName: "Nome da plataforma",
-          contactEmail: "Email de contacto",
-          supportEmail: "Email de apoio",
-          adoptionFee: "Taxa de adocao sugerida",
-          adoptionFeeHint: "Texto livre mostrado no detalhe do animal (ex: 150 EUR). Deixa vazio para nao mostrar.",
-          requireVerification: "Exigir canil verificado para publicar animais",
-          requireVerificationHint:
-            "Se ativo, um canil so consegue criar novos animais depois de ser verificado pelo admin.",
-          save: "Guardar configuracoes",
-          messages: {
-            platform_saved: "Configuracoes da plataforma guardadas.",
-            invalid_platform: "Indica pelo menos o nome da plataforma.",
-            platform_failed: "Nao foi possivel guardar as configuracoes.",
-          } as Record<string, string>,
-        }
-      : {
-          title: "Platform settings",
-          subtitle: "Define FYA's global data and behaviour.",
-          platformTitle: "Identity and contacts",
-          platformName: "Platform name",
-          contactEmail: "Contact email",
-          supportEmail: "Support email",
-          adoptionFee: "Suggested adoption fee",
-          adoptionFeeHint: "Free text shown on the pet detail page (e.g. 150 EUR). Leave empty to hide.",
-          requireVerification: "Require verified shelter to publish animals",
-          requireVerificationHint:
-            "When enabled, a shelter can only create new animals after being verified by an admin.",
-          save: "Save settings",
-          messages: {
-            platform_saved: "Platform settings saved.",
-            invalid_platform: "Provide at least the platform name.",
-            platform_failed: "Could not save the settings.",
-          } as Record<string, string>,
-        };
+  const copy = getDictionary(locale).adminSettings;
 
   const feedback =
     (success && (copy.messages[success] ?? decodeURIComponent(success))) ||

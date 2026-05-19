@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 
 type AdminUsersPageProps = {
@@ -29,28 +30,12 @@ export default async function AdminUsersPage({ params }: AdminUsersPageProps) {
 
   const profiles = (data as ProfileAdminRow[] | null) ?? [];
 
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Utilizadores",
-          subtitle: "Todos os perfis registados na plataforma.",
-          colName: "Nome",
-          colEmail: "Email",
-          colRole: "Perfil",
-          colJoined: "Registo",
-          empty: "Sem utilizadores.",
-          roles: { admin: "Admin", canil: "Canil", user: "Adotante" } as Record<string, string>,
-        }
-      : {
-          title: "Users",
-          subtitle: "All profiles registered on the platform.",
-          colName: "Name",
-          colEmail: "Email",
-          colRole: "Role",
-          colJoined: "Joined",
-          empty: "No users.",
-          roles: { admin: "Admin", canil: "Shelter", user: "Adopter" } as Record<string, string>,
-        };
+  const copy = getDictionary(locale).adminUsers;
+  const roles: Record<string, string> = {
+    admin: copy.roleAdmin,
+    canil: copy.roleCanil,
+    user: copy.roleAdopter,
+  };
 
   return (
     <main className="space-y-6">
@@ -80,7 +65,7 @@ export default async function AdminUsersPage({ params }: AdminUsersPageProps) {
                     <td className="px-6 py-4 text-sm text-muted-foreground">{profile.email}</td>
                     <td className="px-6 py-4">
                       <span className="rounded-full bg-muted px-3 py-1 text-xs font-bold text-muted-foreground">
-                        {copy.roles[profile.role] ?? profile.role}
+                        {roles[profile.role] ?? profile.role}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">

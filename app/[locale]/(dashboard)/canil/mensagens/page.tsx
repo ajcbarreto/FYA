@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 import {
@@ -63,44 +64,12 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
       })
     : null;
 
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Mensagens",
-          searchPlaceholder: "Procurar conversas...",
-          noConversations: "Sem conversas no momento.",
-          inputPlaceholder: "Escreve a tua mensagem...",
-          send: "Enviar",
-          adopterInfo: "Sobre o adotante",
-          profileVerified: "Perfil verificado",
-          reminder: "Lembrete",
-          success: "Mensagem enviada.",
-          errors: {
-            invalid_message: "Mensagem invalida.",
-            send_failed: "Nao foi possivel enviar a mensagem.",
-          },
-        }
-      : {
-          title: "Messages",
-          searchPlaceholder: "Search conversations...",
-          noConversations: "No conversations yet.",
-          inputPlaceholder: "Write your message...",
-          send: "Send",
-          adopterInfo: "About the adopter",
-          profileVerified: "Verified profile",
-          reminder: "Reminder",
-          success: "Message sent.",
-          errors: {
-            invalid_message: "Invalid message.",
-            send_failed: "Could not send message.",
-          },
-        };
-
+  const copy = getDictionary(locale).canilMessages;
   const feedback =
     success === "message_sent"
       ? copy.success
-      : error && copy.errors[error as keyof typeof copy.errors]
-        ? copy.errors[error as keyof typeof copy.errors]
+      : error && copy.errorMessages[error as keyof typeof copy.errorMessages]
+        ? copy.errorMessages[error as keyof typeof copy.errorMessages]
         : null;
 
   return (
@@ -171,7 +140,7 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
                 <div className="min-w-0">
                   <p className="truncate text-lg font-bold">{activeConversation.animalName}</p>
                   <p className="truncate text-sm text-muted-foreground">
-                    {locale === "pt" ? "Conversa com" : "Chat with"} {activeConversation.applicantName}
+                    {copy.chatWith} {activeConversation.applicantName}
                   </p>
                 </div>
               </div>
@@ -224,11 +193,7 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
           )}
 
           <p className="mt-6 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{copy.reminder}</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {locale === "pt"
-              ? "Confirmar compatibilidade com outros animais durante a visita presencial."
-              : "Confirm compatibility with other pets during the in-person visit."}
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground">{copy.reminderText}</p>
         </article>
       </section>
     </main>

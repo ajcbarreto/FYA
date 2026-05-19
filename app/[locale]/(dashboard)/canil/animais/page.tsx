@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ImagePlus, Plus } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser, localizeAnimalStatus, localizeSpecies } from "@/lib/canil/shelter-data";
 import { updateAnimalStatus } from "@/app/[locale]/(dashboard)/canil/actions";
@@ -30,64 +31,7 @@ export default async function CanilPetsPage({ params, searchParams }: CanilPetsP
   }
 
   const { shelter, animals } = await getShelterForUser(supabase, user.id);
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Gestao de Animais",
-          subtitle: "Atualiza estados dos pets e acompanha o inventario do teu canil.",
-          statusLabel: "Estado",
-          species: "Especie / Raca",
-          age: "Idade",
-          actions: "Acoes",
-          noAnimals: "Ainda nao tens animais registados para este canil.",
-          save: "Guardar",
-          statusOptions: {
-            disponivel: "Disponivel",
-            reservado: "Reservado",
-            em_tratamento: "Em tratamento",
-            adotado: "Adotado",
-          },
-          success: {
-            updated: "Estado do animal atualizado com sucesso.",
-            animal_deleted: "Animal removido.",
-          },
-          errors: {
-            invalid_status: "Estado invalido.",
-            save_failed: "Nao foi possivel guardar as alteracoes.",
-            no_shelter: "Nao foi encontrado um canil para a tua conta.",
-            invalid_data: "Dados invalidos.",
-            not_authorized: "Sem permissao para este animal.",
-            delete_failed: "Nao foi possivel remover o animal.",
-          },
-        }
-      : {
-          title: "Pet Inventory",
-          subtitle: "Update pet statuses and keep your shelter inventory in sync.",
-          statusLabel: "Status",
-          species: "Species / Breed",
-          age: "Age",
-          actions: "Actions",
-          noAnimals: "No pets were found for this shelter yet.",
-          save: "Save",
-          statusOptions: {
-            disponivel: "Available",
-            reservado: "Reserved",
-            em_tratamento: "In treatment",
-            adotado: "Adopted",
-          },
-          success: {
-            updated: "Pet status was updated successfully.",
-            animal_deleted: "Pet removed.",
-          },
-          errors: {
-            invalid_status: "Invalid status.",
-            save_failed: "Could not save the changes.",
-            no_shelter: "No shelter was found for your account.",
-            invalid_data: "Invalid data.",
-            not_authorized: "Not allowed for this pet.",
-            delete_failed: "Could not remove the pet.",
-          },
-        };
+  const copy = getDictionary(locale).canilPets;
 
   const summary = {
     available: animals.filter((animal) => animal.status.toLowerCase() === "disponivel").length,
@@ -96,8 +40,8 @@ export default async function CanilPetsPage({ params, searchParams }: CanilPetsP
   };
 
   const feedback =
-    (success && copy.success[success as keyof typeof copy.success]) ||
-    (error && copy.errors[error as keyof typeof copy.errors]) ||
+    (success && copy.successMessages[success as keyof typeof copy.successMessages]) ||
+    (error && copy.errorMessages[error as keyof typeof copy.errorMessages]) ||
     null;
 
   return (
@@ -112,7 +56,7 @@ export default async function CanilPetsPage({ params, searchParams }: CanilPetsP
           className="inline-flex w-fit items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground"
         >
           <Plus className="h-4 w-4" />
-          {locale === "pt" ? "Novo animal" : "New pet"}
+          {copy.newPet}
         </Link>
       </header>
 
@@ -185,7 +129,7 @@ export default async function CanilPetsPage({ params, searchParams }: CanilPetsP
                           className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-2 text-xs font-bold text-muted-foreground hover:bg-muted/80"
                         >
                           <ImagePlus className="h-3 w-3" />
-                          {locale === "pt" ? "Fotos" : "Photos"}
+                          {copy.photos}
                         </Link>
                       </div>
                     </td>

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { BadgeCheck, Building2, MapPin, ShieldOff } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { toggleShelterVerification } from "@/app/[locale]/(admin)/admin/actions";
 import { ToastFeedback } from "@/components/toast-feedback";
@@ -35,51 +36,8 @@ export default async function AdminSheltersPage({ params, searchParams }: AdminS
 
   const shelters = (data as ShelterAdminRow[] | null) ?? [];
 
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Canis registados",
-          subtitle: "Verifica os canis parceiros para aumentar a confianca dos adotantes.",
-          verified: "Verificado",
-          pending: "Pendente",
-          verify: "Verificar",
-          unverify: "Remover verificacao",
-          colName: "Canil",
-          colJoined: "Registado",
-          colStatus: "Estado",
-          colActions: "Acoes",
-          empty: "Sem canis registados.",
-          messages: {
-            shelter_verified: "Canil verificado.",
-            shelter_unverified: "Verificacao removida.",
-            unauthorized: "Nao autorizado.",
-            invalid_shelter: "Canil invalido.",
-            verification_failed: "Nao foi possivel atualizar a verificacao.",
-          },
-        }
-      : {
-          title: "Registered shelters",
-          subtitle: "Verify partner shelters to build adopter trust.",
-          verified: "Verified",
-          pending: "Pending",
-          verify: "Verify",
-          unverify: "Remove verification",
-          colName: "Shelter",
-          colJoined: "Joined",
-          colStatus: "Status",
-          colActions: "Actions",
-          empty: "No shelters registered.",
-          messages: {
-            shelter_verified: "Shelter verified.",
-            shelter_unverified: "Verification removed.",
-            unauthorized: "Not authorized.",
-            invalid_shelter: "Invalid shelter.",
-            verification_failed: "Could not update verification.",
-          },
-        };
-
-  const messageMap = copy.messages as Record<string, string>;
-  const feedback = (success && messageMap[success]) || (error && messageMap[error]) || null;
+  const copy = getDictionary(locale).adminShelters;
+  const feedback = (success && copy.messages[success]) || (error && copy.messages[error]) || null;
 
   return (
     <main className="space-y-6">

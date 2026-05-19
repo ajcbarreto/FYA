@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BadgeCheck, Building2, MapPin, PawPrint, Search } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { countAnimalsByShelter, listPublicShelters } from "@/lib/canil/public-directory";
 import { getShelterRatingSummaries } from "@/lib/canil/reviews";
@@ -29,26 +30,7 @@ export default async function SheltersDirectoryPage({ params, searchParams }: Sh
     getShelterRatingSummaries(supabase, shelterIds),
   ]);
 
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Canis e abrigos parceiros",
-          subtitle: "Conhece as organizacoes que dao casa aos animais na FYA.",
-          searchPlaceholder: "Procurar por nome, cidade ou missao...",
-          empty: "Sem canis encontrados para essa pesquisa.",
-          totalPets: (count: number) => `${count} ${count === 1 ? "animal" : "animais"}`,
-          openCanil: "Ver canil",
-          submit: "Procurar",
-        }
-      : {
-          title: "Partner shelters",
-          subtitle: "Meet the organizations that give pets a home through FYA.",
-          searchPlaceholder: "Search by name, city or mission...",
-          empty: "No shelters match this search.",
-          totalPets: (count: number) => `${count} ${count === 1 ? "pet" : "pets"}`,
-          openCanil: "Open shelter",
-          submit: "Search",
-        };
+  const copy = getDictionary(locale).shelterDirectory;
 
   return (
     <main className="mx-auto w-full max-w-7xl flex-1 px-6 pb-16 pt-10 lg:px-8">
@@ -98,7 +80,7 @@ export default async function SheltersDirectoryPage({ params, searchParams }: Sh
                   {shelter.verificado && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-secondary/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary">
                       <BadgeCheck className="h-3 w-3" />
-                      {locale === "pt" ? "Verificado" : "Verified"}
+                      {copy.verified}
                     </span>
                   )}
                 </div>

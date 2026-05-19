@@ -6,6 +6,8 @@ import {
   visitStatusClass,
   type VisitRow,
 } from "@/lib/adoption/visits";
+import type { Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 type VisitPanelProps = {
   locale: string;
@@ -16,16 +18,7 @@ type VisitPanelProps = {
 };
 
 export function VisitPanel({ locale, pedidoId, visits, audience, canPropose = false }: VisitPanelProps) {
-  const isPt = locale === "pt";
-  const t = {
-    title: isPt ? "Visitas" : "Visits",
-    none: isPt ? "Sem visitas agendadas." : "No visits scheduled.",
-    propose: isPt ? "Propor visita" : "Propose a visit",
-    submit: isPt ? "Propor" : "Propose",
-    confirm: isPt ? "Confirmar" : "Confirm",
-    cancel: isPt ? "Cancelar" : "Cancel",
-    markDone: isPt ? "Marcar realizada" : "Mark completed",
-  };
+  const t = getDictionary(locale as Locale).visitPanel;
 
   return (
     <div className="space-y-2 rounded-xl bg-muted/50 p-3 text-xs">

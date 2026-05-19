@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Building2, HeartHandshake, PawPrint, ClipboardList, ShieldAlert, UserPlus, Users, ArrowRight } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAdminMetrics } from "@/lib/admin/metrics";
 
@@ -19,72 +20,17 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
   const supabase = await createServerSupabaseClient();
   const metrics = await getAdminMetrics(supabase);
 
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Visao geral da plataforma",
-          subtitle: "Indicadores principais da FYA num so lugar.",
-          cards: {
-            adoptions: "Adocoes concluidas",
-            pending: "Pedidos pendentes",
-            requests: "Total de pedidos",
-            sheltersPending: "Canis por verificar",
-            shelters: "Canis registados",
-            users: "Utilizadores",
-            newUsers: "Novos esta semana",
-            animals: "Animais na plataforma",
-            available: "Animais disponiveis",
-          },
-          attentionTitle: "Precisa de atencao",
-          attentionVerify: (count: number) =>
-            count === 1 ? "1 canil aguarda verificacao." : `${count} canis aguardam verificacao.`,
-          attentionRequests: (count: number) =>
-            count === 1 ? "1 pedido de adocao pendente na plataforma." : `${count} pedidos de adocao pendentes na plataforma.`,
-          allClear: "Tudo em dia. Sem itens pendentes.",
-          quickTitle: "Acessos rapidos",
-          quick: {
-            shelters: "Gerir canis",
-            users: "Ver utilizadores",
-            settings: "Configuracoes da plataforma",
-          },
-        }
-      : {
-          title: "Platform overview",
-          subtitle: "FYA's key indicators in one place.",
-          cards: {
-            adoptions: "Completed adoptions",
-            pending: "Pending requests",
-            requests: "Total requests",
-            sheltersPending: "Shelters to verify",
-            shelters: "Registered shelters",
-            users: "Users",
-            newUsers: "New this week",
-            animals: "Animals on platform",
-            available: "Available animals",
-          },
-          attentionTitle: "Needs attention",
-          attentionVerify: (count: number) =>
-            count === 1 ? "1 shelter is awaiting verification." : `${count} shelters are awaiting verification.`,
-          attentionRequests: (count: number) =>
-            count === 1 ? "1 adoption request pending platform-wide." : `${count} adoption requests pending platform-wide.`,
-          allClear: "All caught up. No pending items.",
-          quickTitle: "Quick links",
-          quick: {
-            shelters: "Manage shelters",
-            users: "View users",
-            settings: "Platform settings",
-          },
-        };
+  const copy = getDictionary(locale).adminDashboard;
 
   const cards = [
-    { label: copy.cards.adoptions, value: metrics.adoptionsCompleted, icon: HeartHandshake, accent: "text-secondary" },
-    { label: copy.cards.pending, value: metrics.pendingRequests, icon: ClipboardList, accent: "text-primary" },
-    { label: copy.cards.sheltersPending, value: metrics.sheltersPending, icon: ShieldAlert, accent: "text-destructive" },
-    { label: copy.cards.newUsers, value: metrics.newUsersThisWeek, icon: UserPlus, accent: "text-primary" },
-    { label: copy.cards.shelters, value: metrics.sheltersTotal, icon: Building2, accent: "text-foreground" },
-    { label: copy.cards.users, value: metrics.usersTotal, icon: Users, accent: "text-foreground" },
-    { label: copy.cards.animals, value: metrics.animalsTotal, icon: PawPrint, accent: "text-foreground" },
-    { label: copy.cards.available, value: metrics.animalsAvailable, icon: PawPrint, accent: "text-secondary" },
+    { label: copy.cardAdoptions, value: metrics.adoptionsCompleted, icon: HeartHandshake, accent: "text-secondary" },
+    { label: copy.cardPending, value: metrics.pendingRequests, icon: ClipboardList, accent: "text-primary" },
+    { label: copy.cardSheltersPending, value: metrics.sheltersPending, icon: ShieldAlert, accent: "text-destructive" },
+    { label: copy.cardNewUsers, value: metrics.newUsersThisWeek, icon: UserPlus, accent: "text-primary" },
+    { label: copy.cardShelters, value: metrics.sheltersTotal, icon: Building2, accent: "text-foreground" },
+    { label: copy.cardUsers, value: metrics.usersTotal, icon: Users, accent: "text-foreground" },
+    { label: copy.cardAnimals, value: metrics.animalsTotal, icon: PawPrint, accent: "text-foreground" },
+    { label: copy.cardAvailable, value: metrics.animalsAvailable, icon: PawPrint, accent: "text-secondary" },
   ];
 
   const attentionItems = [
@@ -97,9 +43,9 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
   ].filter((value): value is { text: string; href: string | null } => value !== null);
 
   const quickLinks = [
-    { href: `/${locale}/admin/canis`, label: copy.quick.shelters, icon: Building2 },
-    { href: `/${locale}/admin/utilizadores`, label: copy.quick.users, icon: Users },
-    { href: `/${locale}/admin/configuracoes`, label: copy.quick.settings, icon: ClipboardList },
+    { href: `/${locale}/admin/canis`, label: copy.quickShelters, icon: Building2 },
+    { href: `/${locale}/admin/utilizadores`, label: copy.quickUsers, icon: Users },
+    { href: `/${locale}/admin/configuracoes`, label: copy.quickSettings, icon: ClipboardList },
   ];
 
   return (

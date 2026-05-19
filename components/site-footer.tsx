@@ -1,39 +1,20 @@
 import Link from "next/link";
 import type { Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 type SiteFooterProps = {
   locale: Locale;
 };
 
 export function SiteFooter({ locale }: SiteFooterProps) {
-  const isPt = locale === "pt";
-  const copy = isPt
-    ? {
-        tagline: "Ajudamos cada animal a encontrar uma familia para sempre.",
-        discover: "Descobrir",
-        support: "Suporte",
-        discoverLinks: [
-          { label: "Catalogo de pets", href: `/${locale}/pets` },
-          { label: "Canis", href: `/${locale}/canis` },
-          { label: "Historias de sucesso", href: `/${locale}/historias` },
-          { label: "Encontrar o meu match", href: `/${locale}/match` },
-        ],
-        supportLinks: ["Centro de ajuda", "Contacto", "Privacidade", "Termos de servico"],
-        crafted: "© 2026 FYA (Found Your Animal). Feito com carinho.",
-      }
-    : {
-        tagline: "We help every animal find a family forever.",
-        discover: "Discover",
-        support: "Support",
-        discoverLinks: [
-          { label: "Pet catalog", href: `/${locale}/pets` },
-          { label: "Shelters", href: `/${locale}/canis` },
-          { label: "Success stories", href: `/${locale}/historias` },
-          { label: "Find my match", href: `/${locale}/match` },
-        ],
-        supportLinks: ["Help center", "Contact", "Privacy", "Terms of service"],
-        crafted: "© 2026 FYA (Found Your Animal). Made with care.",
-      };
+  const copy = getDictionary(locale).footer;
+  const discoverLinks = [
+    { label: copy.petCatalog, href: `/${locale}/pets` },
+    { label: copy.shelters, href: `/${locale}/canis` },
+    { label: copy.successStories, href: `/${locale}/historias` },
+    { label: copy.findMatch, href: `/${locale}/match` },
+  ];
+  const supportLinks = [copy.helpCenter, copy.contact, copy.privacy, copy.terms];
 
   return (
     <footer className="mt-20 w-full border-t border-border/40 bg-muted/40">
@@ -45,7 +26,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
         <div>
           <h4 className="mb-4 text-sm font-bold">{copy.discover}</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            {copy.discoverLinks.map((link) => (
+            {discoverLinks.map((link) => (
               <li key={link.href}>
                 <Link href={link.href} className="transition-colors hover:text-primary">
                   {link.label}
@@ -57,7 +38,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
         <div>
           <h4 className="mb-4 text-sm font-bold">{copy.support}</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            {copy.supportLinks.map((link) => (
+            {supportLinks.map((link) => (
               <li key={link}>{link}</li>
             ))}
           </ul>

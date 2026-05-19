@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Bell, CalendarClock, ClipboardList, HeartHandshake, MessageCircle, PawPrint } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser, localizeAnimalStatus, localizeSpecies, type ShelterAnimalRecord } from "@/lib/canil/shelter-data";
 
@@ -26,60 +27,7 @@ export default async function CanilDashboardPage({ params }: CanilDashboardPageP
   }
 
   const { shelter, animals } = await getShelterForUser(supabase, user.id);
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Dashboard do Canil",
-          subtitle: "Visao geral operacional do teu canil na FYA (Found Your Animal).",
-          welcomePrefix: "Bem-vindo de volta,",
-          cards: {
-            totalPets: "Total de pets",
-            available: "Disponiveis",
-            pending: "Pendentes",
-            adopted: "Adotados",
-          },
-          sections: {
-            activity: "Atividade Recente",
-            tasks: "Tarefas Prioritarias",
-          },
-          actions: {
-            viewAllPets: "Ver todos os pets",
-            openRequests: "Abrir pedidos de adocao",
-            messages: "Ir para mensagens",
-          },
-          emptyActivity: "Ainda nao ha atividade registada para este canil.",
-          tasks: [
-            "Responder aos novos pedidos pendentes",
-            "Atualizar fotos dos animais com mais visualizacoes",
-            "Validar disponibilidade para visitas desta semana",
-          ],
-        }
-      : {
-          title: "Shelter Dashboard",
-          subtitle: "Operational overview of your shelter inside FYA (Found Your Animal).",
-          welcomePrefix: "Welcome back,",
-          cards: {
-            totalPets: "Total pets",
-            available: "Available",
-            pending: "Pending",
-            adopted: "Adopted",
-          },
-          sections: {
-            activity: "Recent Activity",
-            tasks: "Priority Tasks",
-          },
-          actions: {
-            viewAllPets: "View all pets",
-            openRequests: "Open adoption requests",
-            messages: "Go to messages",
-          },
-          emptyActivity: "There is no recorded activity for this shelter yet.",
-          tasks: [
-            "Reply to new pending requests",
-            "Refresh photos for the most viewed pets",
-            "Confirm this week's in-person visit availability",
-          ],
-        };
+  const copy = getDictionary(locale).canilDashboard;
 
   const stats = {
     total: animals.length,
@@ -116,28 +64,28 @@ export default async function CanilDashboardPage({ params }: CanilDashboardPageP
           <div className="mb-4 inline-flex rounded-full bg-primary/15 p-3 text-primary">
             <PawPrint className="h-5 w-5" />
           </div>
-          <p className="text-sm text-muted-foreground">{copy.cards.totalPets}</p>
+          <p className="text-sm text-muted-foreground">{copy.cardTotalPets}</p>
           <p className="mt-1 text-3xl font-bold">{stats.total}</p>
         </article>
         <article className="rounded-3xl border border-border/20 bg-card p-6">
           <div className="mb-4 inline-flex rounded-full bg-secondary/15 p-3 text-secondary">
             <HeartHandshake className="h-5 w-5" />
           </div>
-          <p className="text-sm text-muted-foreground">{copy.cards.available}</p>
+          <p className="text-sm text-muted-foreground">{copy.cardAvailable}</p>
           <p className="mt-1 text-3xl font-bold">{stats.available}</p>
         </article>
         <article className="rounded-3xl border border-border/20 bg-card p-6">
           <div className="mb-4 inline-flex rounded-full bg-accent/25 p-3 text-primary">
             <ClipboardList className="h-5 w-5" />
           </div>
-          <p className="text-sm text-muted-foreground">{copy.cards.pending}</p>
+          <p className="text-sm text-muted-foreground">{copy.cardPending}</p>
           <p className="mt-1 text-3xl font-bold">{stats.pending}</p>
         </article>
         <article className="rounded-3xl border border-border/20 bg-card p-6">
           <div className="mb-4 inline-flex rounded-full bg-primary/15 p-3 text-primary">
             <Bell className="h-5 w-5" />
           </div>
-          <p className="text-sm text-muted-foreground">{copy.cards.adopted}</p>
+          <p className="text-sm text-muted-foreground">{copy.cardAdopted}</p>
           <p className="mt-1 text-3xl font-bold">{stats.adopted}</p>
         </article>
       </section>
@@ -145,9 +93,9 @@ export default async function CanilDashboardPage({ params }: CanilDashboardPageP
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <article className="rounded-3xl border border-border/20 bg-card p-6 xl:col-span-2">
           <div className="mb-5 flex items-center justify-between gap-4">
-            <h2 className="text-xl font-bold">{copy.sections.activity}</h2>
+            <h2 className="text-xl font-bold">{copy.sectionActivity}</h2>
             <Link href={`/${locale}/canil/animais`} className="text-sm font-bold text-primary hover:underline">
-              {copy.actions.viewAllPets}
+              {copy.viewAllPets}
             </Link>
           </div>
 
@@ -171,7 +119,7 @@ export default async function CanilDashboardPage({ params }: CanilDashboardPageP
         </article>
 
         <article className="rounded-3xl border border-border/20 bg-card p-6">
-          <h2 className="text-xl font-bold">{copy.sections.tasks}</h2>
+          <h2 className="text-xl font-bold">{copy.sectionTasks}</h2>
           <ul className="mt-5 space-y-3">
             {copy.tasks.map((task) => (
               <li key={task} className="flex items-start gap-3 text-sm">
@@ -185,14 +133,14 @@ export default async function CanilDashboardPage({ params }: CanilDashboardPageP
               href={`/${locale}/canil/pedidos`}
               className="block rounded-full bg-primary px-5 py-3 text-center text-sm font-bold text-primary-foreground"
             >
-              {copy.actions.openRequests}
+              {copy.openRequests}
             </Link>
             <Link
               href={`/${locale}/canil/mensagens`}
               className="flex items-center justify-center gap-2 rounded-full border border-border px-5 py-3 text-sm font-bold text-primary hover:bg-muted"
             >
               <MessageCircle className="h-4 w-4" />
-              {copy.actions.messages}
+              {copy.messages}
             </Link>
           </div>
         </article>

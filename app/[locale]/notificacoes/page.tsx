@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { Bell, BellOff, Check, FileText, MessageCircle } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { listNotifications, localizeNotification } from "@/lib/notifications/db";
 import { markAllNotificationsRead, openNotification } from "@/app/notifications/actions";
@@ -27,22 +28,7 @@ export default async function NotificationsPage({ params }: NotificationsPagePro
 
   const notifications = await listNotifications(supabase, user.id);
   const hasUnread = notifications.some((notification) => !notification.lida);
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Notificacoes",
-          subtitle: "Atualizacoes dos teus pedidos e conversas.",
-          markAll: "Marcar todas como lidas",
-          empty: "Sem notificacoes por agora.",
-          open: "Abrir",
-        }
-      : {
-          title: "Notifications",
-          subtitle: "Updates from your requests and conversations.",
-          markAll: "Mark all as read",
-          empty: "No notifications yet.",
-          open: "Open",
-        };
+  const copy = getDictionary(locale).notifications;
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-6 pb-16 pt-10 lg:px-8">

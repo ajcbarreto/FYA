@@ -25,26 +25,15 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
   }
 
   const dictionary = getDictionary(locale);
-  const copy =
-    locale === "pt"
-      ? {
-          sideTitle: "Bem-vindo de volta a matilha.",
-          sideText: "Reconecta-te com canis e encontra o companheiro ideal para a tua familia.",
-          forgotPassword: "Esqueceste a password?",
-          rememberDevice: "Lembrar este dispositivo",
-          orContinue: "Ou continuar com",
-          registerPrompt: "Ainda nao tens conta?",
-          passwordUpdated: "Password atualizada. Inicia sessao com a nova password.",
-        }
-      : {
-          sideTitle: "Welcome back to the pack.",
-          sideText: "Reconnect with local shelters and find the companion that completes your family.",
-          forgotPassword: "Forgot password?",
-          rememberDevice: "Remember this device",
-          orContinue: "Or continue with",
-          registerPrompt: "Don't have an account?",
-          passwordUpdated: "Password updated. Sign in with your new password.",
-        };
+  const auth = dictionary.auth;
+  const copy = {
+    sideTitle: auth.loginSideTitle,
+    sideText: auth.loginSideText,
+    forgotPassword: auth.loginForgotPassword,
+    rememberDevice: auth.loginRememberDevice,
+    registerPrompt: auth.noAccount,
+    passwordUpdated: auth.loginPasswordUpdated,
+  };
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 items-center justify-center px-4 py-10 md:px-8 md:py-12">
@@ -52,7 +41,7 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
         <div className="relative hidden w-1/2 p-12 md:flex md:flex-col md:justify-between">
           <Image
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqoyq7uuDX8byZraMUtO0HvBbcv1cBciDJKIAGd_OJmJmh3oS-FWYWS-RoFfuXBQ7XfLtqOqqgcciPqEMzbp1-ygVwagCWtZYjJ1kn6UhP6ZwE4Zpst-gOQxVZAb8DGq2wZ8-Yekyn-l3Oi_TojuZYuX6JkthIO6bjOdbyCy-9Oyo8puEQ9AImEvZtgN4-xyWeVWHK1-sZ0edrBOSpaOkPG1QXpeTljsqV1-k2153B9MciUJH7VGl2I8SjE5ymIZUMA3E17dLbHWQ"
-            alt={locale === "pt" ? "Cao feliz" : "Happy golden retriever"}
+            alt={auth.loginDogAlt}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover"
@@ -101,7 +90,7 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
                     name="email"
                     type="email"
                     required
-                    placeholder={locale === "pt" ? "tu@email.com" : "hello@example.com"}
+                    placeholder={auth.loginEmailPlaceholder}
                     className="h-13 w-full rounded-xl bg-muted px-14 pr-5 text-sm outline-none ring-0 transition-colors focus:bg-background focus:ring-2 focus:ring-primary/30"
                   />
                 </div>

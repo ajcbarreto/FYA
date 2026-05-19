@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getDisplayName } from "@/lib/adoption/db";
 
@@ -39,7 +40,7 @@ export async function submitShelterReview(formData: FormData) {
   const authorName = getDisplayName(
     profile?.full_name ?? null,
     profile?.email ?? user.email ?? "adopter@fya.local",
-    locale === "pt" ? "Adotante" : "Adopter",
+    getDictionary(locale).nav.roleAdopter,
   );
 
   // Nova/atualizada avaliacao volta a 'pendente' para ser moderada pelo canil.

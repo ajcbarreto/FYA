@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Mail } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { requestPasswordReset } from "@/app/auth/password/actions";
 import { ToastFeedback } from "@/components/toast-feedback";
 
@@ -18,28 +19,7 @@ export default async function ForgotPasswordPage({ params, searchParams }: Forgo
     notFound();
   }
 
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Recuperar password",
-          subtitle: "Indica o teu email e enviamos um link para definires uma nova password.",
-          emailLabel: "Email",
-          emailPlaceholder: "tu@email.com",
-          submit: "Enviar link de recuperacao",
-          backToLogin: "Voltar ao login",
-          sent: "Se existir uma conta com esse email, enviamos um link de recuperacao.",
-          invalid_email: "Indica um email valido.",
-        }
-      : {
-          title: "Reset password",
-          subtitle: "Enter your email and we will send a link to set a new password.",
-          emailLabel: "Email",
-          emailPlaceholder: "you@email.com",
-          submit: "Send recovery link",
-          backToLogin: "Back to login",
-          sent: "If an account exists for that email, we sent a recovery link.",
-          invalid_email: "Enter a valid email.",
-        };
+  const copy = getDictionary(locale).forgotPassword;
 
   const feedback =
     success === "sent" ? copy.sent : error === "invalid_email" ? copy.invalid_email : null;

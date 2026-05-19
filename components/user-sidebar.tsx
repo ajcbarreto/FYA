@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import type { ComponentType } from "react";
 import { Home, FileText, MessageCircle, Search, Settings, Heart } from "lucide-react";
 import type { Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 type UserSidebarProps = {
   locale: Locale;
@@ -18,45 +19,22 @@ type NavItem = {
 
 export function UserSidebar({ locale }: UserSidebarProps) {
   const pathname = usePathname();
-  const copy =
-    locale === "pt"
-      ? {
-          subtitle: "Area do Adotante",
-          links: {
-            dashboard: "Dashboard",
-            catalog: "Catalogo de Pets",
-            favorites: "Favoritos",
-            requests: "Meus Pedidos",
-            messages: "Mensagens",
-            settings: "Configuracoes",
-          },
-        }
-      : {
-          subtitle: "Adopter Area",
-          links: {
-            dashboard: "Dashboard",
-            catalog: "Pet Catalog",
-            favorites: "Favorites",
-            requests: "My Requests",
-            messages: "Messages",
-            settings: "Settings",
-          },
-        };
+  const t = getDictionary(locale).sidebar;
 
   const items: NavItem[] = [
-    { href: `/${locale}/user`, label: copy.links.dashboard, icon: Home },
-    { href: `/${locale}/pets`, label: copy.links.catalog, icon: Search },
-    { href: `/${locale}/user/favoritos`, label: copy.links.favorites, icon: Heart },
-    { href: `/${locale}/user/pedidos`, label: copy.links.requests, icon: FileText },
-    { href: `/${locale}/user/mensagens`, label: copy.links.messages, icon: MessageCircle },
-    { href: `/${locale}/user/configuracoes`, label: copy.links.settings, icon: Settings },
+    { href: `/${locale}/user`, label: t.dashboard, icon: Home },
+    { href: `/${locale}/pets`, label: t.catalog, icon: Search },
+    { href: `/${locale}/user/favoritos`, label: t.favorites, icon: Heart },
+    { href: `/${locale}/user/pedidos`, label: t.requests, icon: FileText },
+    { href: `/${locale}/user/mensagens`, label: t.messages, icon: MessageCircle },
+    { href: `/${locale}/user/configuracoes`, label: t.settings, icon: Settings },
   ];
 
   return (
     <aside className="w-full rounded-2xl border border-border/25 bg-card p-3 lg:sticky lg:top-24 lg:h-fit lg:w-72 lg:p-4">
       <div className="mb-1 hidden px-3 py-2 lg:mb-4 lg:block">
         <h2 className="text-lg font-bold text-primary">FYA (Found Your Animal)</h2>
-        <p className="text-xs text-muted-foreground">{copy.subtitle}</p>
+        <p className="text-xs text-muted-foreground">{t.userSubtitle}</p>
       </div>
       <nav className="flex gap-1.5 overflow-x-auto pb-1 lg:flex-col lg:gap-1 lg:overflow-visible lg:pb-0">
         {items.map((item) => {

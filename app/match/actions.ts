@@ -8,7 +8,12 @@ function getLocaleFromForm(formData: FormData) {
   return (isLocale(localeValue) ? localeValue : defaultLocale) as Locale;
 }
 
-// Mapeia respostas de estilo de vida para filtros do catalogo.
+const VALID_SPECIES = new Set(["cao", "gato"]);
+const VALID_HOME = new Set(["apartamento", "casa", "casa_grande"]);
+const VALID_TIME = new Set(["pouco", "medio", "muito"]);
+
+// Recolhe as respostas do questionario e reabre a pagina de match em modo
+// resultados, onde os animais sao pontuados e ordenados por compatibilidade.
 export async function findMatches(formData: FormData) {
   const locale = getLocaleFromForm(formData);
   const species = String(formData.get("species") ?? "").trim();
@@ -16,25 +21,10 @@ export async function findMatches(formData: FormData) {
   const time = String(formData.get("time") ?? "").trim();
 
   const params = new URLSearchParams();
+  if (VALID_SPECIES.has(species)) params.set("species", species);
+  if (VALID_HOME.has(home)) params.set("home", home);
+  if (VALID_TIME.has(time)) params.set("time", time);
+  params.set("results", "1");
 
-  if (species === "cao" || species === "gato") {
-    params.set("species", species);
-  }
-
-  // Apartamento ou pouco tempo livre -> porte pequeno.
-  // Casa com espaco e muito tempo -> porte grande.
-  let size = "";
-  if (home === "apartamento" || time === "pouco") {
-    size = "pequeno";
-  } else if (home === "casa_grande" && time === "muito") {
-    size = "grande";
-  } else if (home === "casa" || time === "medio") {
-    size = "medio";
-  }
-  if (size) {
-    params.set("size", size);
-  }
-
-  const serialized = params.toString();
-  redirect(serialized ? `/${locale}/pets?${serialized}` : `/${locale}/pets`);
+  redirect(`/${locale}/match?${params.toString()}`);
 }

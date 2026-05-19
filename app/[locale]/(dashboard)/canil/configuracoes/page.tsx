@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 import { updateShelterSettings } from "@/app/[locale]/(dashboard)/canil/actions";
@@ -28,64 +29,12 @@ export default async function CanilSettingsPage({ params, searchParams }: CanilS
   }
 
   const { shelter } = await getShelterForUser(supabase, user.id);
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Configuracoes do Canil",
-          subtitle: "Atualiza os dados publicos usados na pagina do canil.",
-          labels: {
-            nome: "Nome do canil",
-            localizacao: "Localizacao",
-            telefone: "Telefone",
-            email: "Email de contacto",
-            missao: "Missao",
-          },
-          placeholders: {
-            nome: "Canil Esperanca",
-            localizacao: "Lisboa",
-            telefone: "+351 900 000 000",
-            email: "contato@canil.pt",
-            missao: "Descreve brevemente a missao do canil.",
-          },
-          save: "Guardar configuracoes",
-          success: "Configuracoes guardadas com sucesso.",
-          errors: {
-            invalid_data: "Preenche pelo menos nome e localizacao.",
-            save_failed: "Nao foi possivel guardar. Tenta novamente.",
-            no_shelter: "Nao foi encontrado um canil associado a esta conta.",
-          },
-        }
-      : {
-          title: "Shelter Settings",
-          subtitle: "Update public information used on your shelter page.",
-          labels: {
-            nome: "Shelter name",
-            localizacao: "Location",
-            telefone: "Phone",
-            email: "Contact email",
-            missao: "Mission",
-          },
-          placeholders: {
-            nome: "Joyful Sanctuary",
-            localizacao: "Lisbon",
-            telefone: "+351 900 000 000",
-            email: "contact@shelter.org",
-            missao: "Describe your shelter mission and adoption process.",
-          },
-          save: "Save settings",
-          success: "Settings saved successfully.",
-          errors: {
-            invalid_data: "Please provide at least name and location.",
-            save_failed: "Could not save changes. Try again.",
-            no_shelter: "No shelter is linked to this account.",
-          },
-        };
-
+  const copy = getDictionary(locale).canilSettingsPage;
   const feedback =
     success === "saved"
       ? copy.success
-      : error && copy.errors[error as keyof typeof copy.errors]
-        ? copy.errors[error as keyof typeof copy.errors]
+      : error && copy.errorMessages[error]
+        ? copy.errorMessages[error]
         : null;
 
   return (
@@ -103,13 +52,13 @@ export default async function CanilSettingsPage({ params, searchParams }: CanilS
 
           <div className="space-y-2">
             <label htmlFor="nome" className="text-sm font-semibold">
-              {copy.labels.nome}
+              {copy.labelNome}
             </label>
             <input
               id="nome"
               name="nome"
               defaultValue={shelter?.nome ?? ""}
-              placeholder={copy.placeholders.nome}
+              placeholder={copy.placeholderNome}
               className="h-11 w-full rounded-xl border border-border/25 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
               required
             />
@@ -118,26 +67,26 @@ export default async function CanilSettingsPage({ params, searchParams }: CanilS
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label htmlFor="localizacao" className="text-sm font-semibold">
-                {copy.labels.localizacao}
+                {copy.labelLocalizacao}
               </label>
               <input
                 id="localizacao"
                 name="localizacao"
                 defaultValue={shelter?.localizacao ?? ""}
-                placeholder={copy.placeholders.localizacao}
+                placeholder={copy.placeholderLocalizacao}
                 className="h-11 w-full rounded-xl border border-border/25 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
                 required
               />
             </div>
             <div className="space-y-2">
               <label htmlFor="telefone" className="text-sm font-semibold">
-                {copy.labels.telefone}
+                {copy.labelTelefone}
               </label>
               <input
                 id="telefone"
                 name="telefone"
                 defaultValue={shelter?.telefone ?? ""}
-                placeholder={copy.placeholders.telefone}
+                placeholder={copy.placeholderTelefone}
                 className="h-11 w-full rounded-xl border border-border/25 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>
@@ -145,26 +94,26 @@ export default async function CanilSettingsPage({ params, searchParams }: CanilS
 
           <div className="space-y-2">
             <label htmlFor="email_contacto" className="text-sm font-semibold">
-              {copy.labels.email}
+              {copy.labelEmail}
             </label>
             <input
               id="email_contacto"
               name="email_contacto"
               defaultValue={shelter?.email_contacto ?? ""}
-              placeholder={copy.placeholders.email}
+              placeholder={copy.placeholderEmail}
               className="h-11 w-full rounded-xl border border-border/25 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="missao" className="text-sm font-semibold">
-              {copy.labels.missao}
+              {copy.labelMissao}
             </label>
             <textarea
               id="missao"
               name="missao"
               defaultValue={shelter?.missao ?? ""}
-              placeholder={copy.placeholders.missao}
+              placeholder={copy.placeholderMissao}
               rows={5}
               className="w-full rounded-xl border border-border/25 bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20"
             />

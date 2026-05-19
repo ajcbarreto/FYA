@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Heart, PawPrint, Sparkles } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAdoptedPets } from "@/lib/pet-catalog/db-pets";
 
@@ -20,28 +21,7 @@ export default async function SuccessStoriesPage({ params }: SuccessStoriesPageP
   const supabase = await createServerSupabaseClient();
   const adopted = await getAdoptedPets(supabase, locale, 36);
 
-  const copy =
-    locale === "pt"
-      ? {
-          eyebrow: "Historias de sucesso",
-          title: "Cada adopcao e um final feliz",
-          subtitle: "Animais que ja encontraram a sua familia atraves da FYA.",
-          stat: (count: number) => `${count} ${count === 1 ? "amigo encontrou lar" : "amigos encontraram lar"}`,
-          empty: "Ainda nao ha adocoes concluidas registadas. Em breve, as primeiras historias aparecem aqui.",
-          browse: "Explorar animais para adocao",
-          foundHome: "encontrou um lar",
-          via: "atraves de",
-        }
-      : {
-          eyebrow: "Success stories",
-          title: "Every adoption is a happy ending",
-          subtitle: "Pets that have already found their family through FYA.",
-          stat: (count: number) => `${count} ${count === 1 ? "friend found a home" : "friends found a home"}`,
-          empty: "No completed adoptions yet. Soon the first stories will show up here.",
-          browse: "Browse pets for adoption",
-          foundHome: "found a home",
-          via: "via",
-        };
+  const copy = getDictionary(locale).successStories;
 
   return (
     <main className="w-full flex-1 pb-16 pt-10">

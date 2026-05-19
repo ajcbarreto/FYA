@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAdoptionRequestsForUser, getRowAnimal, getRowCanil, localizeRequestStatus } from "@/lib/adoption/db";
 import { getVisitsByPedido } from "@/lib/adoption/visits";
@@ -33,59 +34,11 @@ export default async function UserRequestsPage({ params, searchParams }: UserReq
     supabase,
     requests.map((request) => request.id),
   );
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Meus Pedidos de Adocao",
-          subtitle: "Acompanha o estado das tuas candidaturas.",
-          columns: {
-            pet: "Pet e Canil",
-            status: "Estado",
-            date: "Data",
-            notes: "Notas do Canil",
-          },
-          empty: "Ainda nao tens pedidos. Visita o catalogo e candidata-te a um pet.",
-          visitsLabel: "Visitas",
-          success: {
-            request_created: "Candidatura enviada com sucesso.",
-            visit_proposed: "Visita proposta. Aguarda confirmacao do canil.",
-            visit_updated: "Visita atualizada.",
-          } as Record<string, string>,
-          errors: {
-            request_failed: "Nao foi possivel submeter candidatura.",
-            invalid_visit: "Dados de visita invalidos.",
-            visit_in_past: "Escolhe uma data no futuro.",
-            visit_not_allowed: "Nao e possivel agendar visita para este pedido.",
-            visit_failed: "Nao foi possivel agendar a visita.",
-          } as Record<string, string>,
-        }
-      : {
-          title: "My Adoption Requests",
-          subtitle: "Track the status of your submitted applications.",
-          columns: {
-            pet: "Pet and Shelter",
-            status: "Status",
-            date: "Date",
-            notes: "Shelter notes",
-          },
-          empty: "You have not submitted requests yet. Visit the pet catalog to apply.",
-          visitsLabel: "Visits",
-          success: {
-            request_created: "Application submitted successfully.",
-            visit_proposed: "Visit proposed. Waiting for the shelter to confirm.",
-            visit_updated: "Visit updated.",
-          } as Record<string, string>,
-          errors: {
-            request_failed: "Could not submit request.",
-            invalid_visit: "Invalid visit data.",
-            visit_in_past: "Pick a date in the future.",
-            visit_not_allowed: "You cannot schedule a visit for this request.",
-            visit_failed: "Could not schedule the visit.",
-          } as Record<string, string>,
-        };
-
+  const copy = getDictionary(locale).userRequestsPage;
   const feedback =
-    (success && copy.success[success]) || (error && copy.errors[error]) || null;
+    (success && copy.successMessages[success]) ||
+    (error && copy.errorMessages[error]) ||
+    null;
 
   return (
     <main className="space-y-6">
@@ -104,10 +57,10 @@ export default async function UserRequestsPage({ params, searchParams }: UserReq
             <table className="w-full min-w-[760px] text-left">
               <thead className="bg-muted text-xs uppercase tracking-[0.14em] text-muted-foreground">
                 <tr>
-                  <th className="px-6 py-4 font-bold">{copy.columns.pet}</th>
-                  <th className="px-6 py-4 font-bold">{copy.columns.status}</th>
-                  <th className="px-6 py-4 font-bold">{copy.columns.date}</th>
-                  <th className="px-6 py-4 font-bold">{copy.columns.notes}</th>
+                  <th className="px-6 py-4 font-bold">{copy.columnPet}</th>
+                  <th className="px-6 py-4 font-bold">{copy.columnStatus}</th>
+                  <th className="px-6 py-4 font-bold">{copy.columnDate}</th>
+                  <th className="px-6 py-4 font-bold">{copy.columnNotes}</th>
                 </tr>
               </thead>
               <tbody>
@@ -138,7 +91,7 @@ export default async function UserRequestsPage({ params, searchParams }: UserReq
                         )}
                       </td>
                       <td className="px-6 py-4 text-sm text-muted-foreground">
-                        {request.observacoes_canil ?? (locale === "pt" ? "Sem notas do canil." : "No notes from shelter.")}
+                        {request.observacoes_canil ?? copy.noShelterNotes}
                       </td>
                     </tr>
                   );

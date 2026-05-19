@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { Heart } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getFavoritesForUser } from "@/lib/favorites/db";
 import { toggleFavorite } from "@/app/favorites/actions";
@@ -28,24 +29,7 @@ export default async function UserFavoritesPage({ params }: UserFavoritesPagePro
   }
 
   const favorites = await getFavoritesForUser(supabase, user.id, locale);
-  const copy =
-    locale === "pt"
-      ? {
-          title: "Os meus favoritos",
-          subtitle: "Animais que guardaste para reveres mais tarde.",
-          empty: "Ainda nao tens favoritos. Explora o catalogo e guarda os animais que mais gostares.",
-          browse: "Explorar catalogo",
-          remove: "Remover",
-          view: "Ver detalhes",
-        }
-      : {
-          title: "My favorites",
-          subtitle: "Pets you have saved to revisit later.",
-          empty: "No favorites yet. Browse the catalog and save the pets you like.",
-          browse: "Browse catalog",
-          remove: "Remove",
-          view: "View details",
-        };
+  const copy = getDictionary(locale).userFavorites;
 
   return (
     <main className="space-y-6">
