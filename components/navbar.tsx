@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell } from "lucide-react";
+import { Bell, Heart } from "lucide-react";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
@@ -180,6 +180,16 @@ export async function Navbar({ locale }: NavbarProps) {
 
           <div className="flex items-center gap-2">
             <LanguageSwitcher locale={locale} />
+
+            {role === "user" && (
+              <Link
+                href={`/${locale}/user/favoritos`}
+                aria-label={dictionary.nav.userFavorites}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
+              >
+                <Heart className="h-5 w-5" />
+              </Link>
+            )}
 
             {user && (
               <Link
