@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -19,6 +20,37 @@ type ShelterPublicPageProps = {
   params: Promise<{ locale: string; shelterId: string }>;
   searchParams: Promise<{ success?: string; error?: string }>;
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; shelterId: string }>;
+}): Promise<Metadata> {
+  const { locale, shelterId } = await params;
+  if (!isLocale(locale)) {
+    return {};
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const shelter = await getPublicShelterById(supabase, shelterId);
+
+  if (!shelter) {
+    return { title: locale === "pt" ? "Canil nao encontrado | FYA" : "Shelter not found | FYA" };
+  }
+
+  const title = `${shelter.nome} | FYA`;
+  const description =
+    shelter.missao?.trim().slice(0, 160) ||
+    (locale === "pt"
+      ? `Conhece o canil ${shelter.nome} em ${shelter.localizacao} e os animais para adocao.`
+      : `Discover ${shelter.nome} shelter in ${shelter.localizacao} and its pets available for adoption.`);
+
+  return {
+    title,
+    description,
+    openGraph: { title, description, type: "website" },
+  };
+}
 
 export default async function ShelterPublicPage({ params, searchParams }: ShelterPublicPageProps) {
   const { locale, shelterId } = await params;

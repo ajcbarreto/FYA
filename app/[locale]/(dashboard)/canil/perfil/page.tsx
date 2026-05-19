@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
-import { Heart, MapPin, Phone, Globe, ShieldCheck, ArrowDown } from "lucide-react";
+import { MapPin, Phone, Globe, ShieldCheck, ArrowDown } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { toCatalogItem, type AnimalRow } from "@/lib/pet-catalog/db-pets";
@@ -45,22 +45,11 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
     .eq("id", user.id)
     .single();
 
-  const { data: ownedShelter } = await supabase
+  const { data: shelter } = await supabase
     .from("canis")
     .select("id,nome,localizacao,missao,telefone,email_contacto,created_at")
     .eq("owner_profile_id", user.id)
     .maybeSingle();
-
-  const shelter = ownedShelter
-    ? ownedShelter
-    : (
-        await supabase
-          .from("canis")
-          .select("id,nome,localizacao,missao,telefone,email_contacto,created_at")
-          .order("created_at", { ascending: true })
-          .limit(1)
-          .maybeSingle()
-      ).data;
 
   const { data: residentRows } = shelter
     ? await supabase
@@ -187,23 +176,24 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
         </div>
 
         <aside className="space-y-6 lg:col-span-4">
-          <div className="rounded-3xl border border-primary/20 bg-primary/5 p-8 shadow-sm">
-            <h3 className="mb-3 text-2xl font-bold text-primary">
-              {locale === "pt" ? "Apoie o nosso trabalho" : "Support our work"}
-            </h3>
-            <p className="mb-7 text-sm text-muted-foreground">
-              {locale === "pt"
-                ? "As contribuicoes ajudam tratamentos veterinarios, alimentacao e melhoria de espacos."
-                : "Contributions directly support veterinary treatment, food, and shelter improvements."}
-            </p>
-            <button type="button" className="mb-3 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 text-sm font-bold text-primary-foreground shadow-xl transition-transform hover:scale-[0.99]">
-              <Heart className="h-4 w-4" />
-              {locale === "pt" ? "Doar ao abrigo" : "Donate to shelter"}
-            </button>
-            <button type="button" className="w-full rounded-full border-2 border-primary px-6 py-4 text-sm font-bold text-primary transition-colors hover:bg-primary/5">
-              {locale === "pt" ? "Ser voluntario" : "Volunteer with us"}
-            </button>
-          </div>
+          {shelter && (
+            <div className="rounded-3xl border border-primary/20 bg-primary/5 p-8 shadow-sm">
+              <h3 className="mb-3 text-2xl font-bold text-primary">
+                {locale === "pt" ? "O teu perfil publico" : "Your public profile"}
+              </h3>
+              <p className="mb-6 text-sm text-muted-foreground">
+                {locale === "pt"
+                  ? "E assim que os adotantes veem o teu canil na FYA. Partilha o link para receberes mais candidaturas."
+                  : "This is how adopters see your shelter on FYA. Share the link to receive more applications."}
+              </p>
+              <Link
+                href={`/${locale}/canis/${shelter.id}`}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                {locale === "pt" ? "Ver perfil publico" : "View public profile"}
+              </Link>
+            </div>
+          )}
 
           <div className="rounded-3xl border border-border/35 bg-muted/35 p-7 shadow-sm">
             <h4 className="mb-5 text-lg font-bold text-secondary">

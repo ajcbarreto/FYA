@@ -131,3 +131,30 @@
     @apply font-sans;
   }
 }
+
+/* Tabelas que viram cartoes empilhados no telemovel (sem scroll horizontal). */
+@media (max-width: 767px) {
+  .stacked-table table,
+  .stacked-table tbody,
+  .stacked-table tr,
+  .stacked-table td {
+    display: block;
+    width: 100%;
+  }
+  .stacked-table table {
+    min-width: 0;
+  }
+  .stacked-table thead {
+    display: none;
+  }
+  .stacked-table tr {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 0.625rem 1rem;
+    margin-bottom: 0.75rem;
+  }
+  .stacked-table td {
+    padding: 0.3rem 0;
+    border: 0;
+  }
+}
