@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
@@ -14,12 +16,13 @@ import { AdoptionAnswers } from "@/components/adoption-answers";
 
 type CanilMessagesPageProps = {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ conversation?: string; success?: string; error?: string }>;
+  searchParams: Promise<{ conversation?: string; q?: string; success?: string; error?: string }>;
 };
 
 export default async function CanilMessagesPage({ params, searchParams }: CanilMessagesPageProps) {
   const { locale } = await params;
-  const { conversation: selectedConversationId, success, error } = await searchParams;
+  const { conversation: selectedConversationId, q, success, error } = await searchParams;
+  const query = (q ?? "").trim().toLowerCase();
 
   if (!isLocale(locale)) {
     notFound();
@@ -41,6 +44,13 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
 
   const conversationRows = await getConversationsForCanil(supabase, shelter.id);
   const conversations = conversationRows.map((row) => mapConversationListItem(row, locale));
+  const visibleConversations = query
+    ? conversations.filter((conversation) =>
+        [conversation.canilName, conversation.animalName, conversation.applicantName].some((value) =>
+          value.toLowerCase().includes(query),
+        ),
+      )
+    : conversations;
   const activeConversation = selectedConversationId
     ? conversations.find((conversation) => conversation.id === selectedConversationId) ?? conversations[0] ?? null
     : conversations[0] ?? null;
@@ -101,23 +111,29 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
-        <article className="rounded-3xl border border-border/20 bg-card p-4 xl:col-span-4">
-          <div className="mb-4 px-2">
+        <article
+          className={`rounded-2xl border border-border/20 bg-card p-4 xl:col-span-4 xl:block ${
+            selectedConversationId ? "hidden" : "block"
+          }`}
+        >
+          <form method="get" className="mb-4">
             <input
               type="search"
+              name="q"
+              defaultValue={q ?? ""}
               placeholder={copy.searchPlaceholder}
-              className="h-11 w-full rounded-full bg-muted px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+              className="h-11 w-full rounded-lg border border-border/40 bg-background px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20"
             />
-          </div>
-          <div className="space-y-2">
-            {conversations.length === 0 ? (
+          </form>
+          <div className="space-y-1.5">
+            {visibleConversations.length === 0 ? (
               <p className="px-2 py-4 text-sm text-muted-foreground">{copy.noConversations}</p>
             ) : (
-              conversations.map((conversation) => (
+              visibleConversations.map((conversation) => (
                 <a
                   key={conversation.id}
                   href={`/${locale}/canil/mensagens?conversation=${conversation.id}`}
-                  className={`w-full rounded-2xl px-4 py-3 text-left ${
+                  className={`block w-full rounded-lg px-4 py-3 text-left transition-colors ${
                     activeConversation?.id === conversation.id ? "bg-muted" : "hover:bg-muted/60"
                   }`}
                 >
@@ -137,20 +153,35 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
           </div>
         </article>
 
-        <article className="rounded-3xl border border-border/20 bg-card p-6 xl:col-span-5">
+        <article
+          className={`flex-col rounded-2xl border border-border/20 bg-card p-4 sm:p-6 xl:col-span-5 xl:flex ${
+            selectedConversationId ? "flex" : "hidden"
+          }`}
+        >
           {activeConversation ? (
             <>
-              <div className="border-b border-border/20 pb-4">
-                <p className="text-lg font-bold">{activeConversation.animalName}</p>
-                <p className="text-sm text-muted-foreground">
-                  {locale === "pt" ? "Conversa com" : "Chat with"} {activeConversation.applicantName}
-                </p>
+              <div className="flex items-center gap-3 border-b border-border/20 pb-4">
+                <Link
+                  href={`/${locale}/canil/mensagens`}
+                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground xl:hidden"
+                  aria-label={copy.searchPlaceholder}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Link>
+                <div className="min-w-0">
+                  <p className="truncate text-lg font-bold">{activeConversation.animalName}</p>
+                  <p className="truncate text-sm text-muted-foreground">
+                    {locale === "pt" ? "Conversa com" : "Chat with"} {activeConversation.applicantName}
+                  </p>
+                </div>
               </div>
 
               <ChatThread
                 key={activeConversation.id}
                 conversationId={activeConversation.id}
                 currentUserId={user.id}
+                currentUserInitial={(activeConversation.canilName || user.email || "?").charAt(0).toUpperCase()}
+                otherPartyInitial={(activeConversation.applicantName || "?").charAt(0).toUpperCase()}
                 audience="canil"
                 locale={locale}
                 initialMessages={messages.map((message) => ({
@@ -172,7 +203,11 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
           )}
         </article>
 
-        <article className="rounded-3xl border border-border/20 bg-card p-6 xl:col-span-3">
+        <article
+          className={`rounded-2xl border border-border/20 bg-card p-6 xl:col-span-3 xl:block ${
+            selectedConversationId ? "block" : "hidden"
+          }`}
+        >
           <h2 className="text-lg font-bold">{activeConversation?.applicantName ?? "-"}</h2>
           <p className="mt-4 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{copy.adopterInfo}</p>
           {activeConversation ? (

@@ -139,32 +139,14 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
 
               <button
                 type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-[0_12px_22px_rgba(157,79,0,0.24)] transition-all hover:scale-[1.01] hover:shadow-[0_16px_28px_rgba(157,79,0,0.3)]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
               >
                 {dictionary.auth.loginSubmit}
                 <ArrowRight className="h-4 w-4" />
               </button>
             </form>
 
-            <div className="relative my-10">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border/50" />
-              </div>
-              <div className="relative flex justify-center">
-                <span className="bg-card px-4 text-xs font-medium text-muted-foreground">{copy.orContinue}</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <button type="button" className="rounded-xl bg-muted px-4 py-3 text-sm font-semibold hover:bg-muted/75">
-                Google
-              </button>
-              <button type="button" className="rounded-xl bg-muted px-4 py-3 text-sm font-semibold hover:bg-muted/75">
-                Apple
-              </button>
-            </div>
-
-            <p className="mt-10 text-center text-sm text-muted-foreground">
+            <p className="mt-8 text-center text-sm text-muted-foreground">
               {copy.registerPrompt}{" "}
               <Link href={`/${locale}/auth/register`} className="font-bold text-primary hover:underline">
                 {dictionary.auth.goToRegister}

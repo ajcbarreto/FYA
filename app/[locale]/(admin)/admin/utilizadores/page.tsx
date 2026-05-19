@@ -63,7 +63,7 @@ export default async function AdminUsersPage({ params }: AdminUsersPageProps) {
         {profiles.length === 0 ? (
           <p className="px-6 py-8 text-sm text-muted-foreground">{copy.empty}</p>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto stacked-table">
             <table className="w-full min-w-[680px] text-left">
               <thead className="bg-muted text-xs uppercase tracking-[0.14em] text-muted-foreground">
                 <tr>

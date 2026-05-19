@@ -186,26 +186,11 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
 
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-lg transition-all hover:opacity-95 hover:shadow-xl"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
             >
               {dictionary.auth.submit}
               <ArrowRight className="h-4 w-4" />
             </button>
-
-            <div className="relative flex items-center py-3">
-              <div className="flex-grow border-t border-border/50" />
-              <span className="mx-4 text-xs font-medium text-muted-foreground">{copy.continueWith}</span>
-              <div className="flex-grow border-t border-border/50" />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <button type="button" className="rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium hover:bg-muted">
-                Google
-              </button>
-              <button type="button" className="rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium hover:bg-muted">
-                Facebook
-              </button>
-            </div>
           </form>
         </div>
       </section>

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -28,6 +29,48 @@ type PetDetailsPageProps = {
   params: Promise<{ locale: string; petId: string }>;
   searchParams: Promise<{ success?: string; error?: string }>;
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; petId: string }>;
+}): Promise<Metadata> {
+  const { locale, petId } = await params;
+  if (!isLocale(locale)) {
+    return {};
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const pet = await getPetById(supabase, petId, locale);
+
+  if (!pet) {
+    return { title: locale === "pt" ? "Animal nao encontrado | FYA" : "Pet not found | FYA" };
+  }
+
+  const title = `${pet.name} — ${pet.species} | FYA`;
+  const description =
+    pet.description?.trim().slice(0, 160) ||
+    (locale === "pt"
+      ? `Conhece ${pet.name}, ${pet.species} para adocao em ${pet.location}.`
+      : `Meet ${pet.name}, a ${pet.species} available for adoption in ${pet.location}.`);
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      images: [{ url: pet.imageUrl, alt: pet.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [pet.imageUrl],
+    },
+  };
+}
 
 export default async function PetDetailsPage({ params, searchParams }: PetDetailsPageProps) {
   const { locale, petId } = await params;

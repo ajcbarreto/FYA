@@ -127,7 +127,7 @@ export default async function CanilRequestsPage({ params, searchParams }: CanilR
         {requests.length === 0 ? (
           <p className="px-6 py-8 text-sm text-muted-foreground">{copy.empty}</p>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto stacked-table">
             <table className="w-full min-w-[760px] text-left">
               <thead className="bg-muted text-xs uppercase tracking-[0.14em] text-muted-foreground">
                 <tr>
