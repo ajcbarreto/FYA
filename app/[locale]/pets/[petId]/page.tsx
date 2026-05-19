@@ -172,6 +172,12 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
                 className="object-cover"
               />
             </div>
+            <FavoriteButton
+              animalId={pet.id}
+              locale={locale}
+              isFavorite={isFavorite}
+              redirectTo={`/${locale}/pets/${pet.id}`}
+            />
             <div className="absolute -bottom-4 left-6 inline-flex items-center gap-2 rounded-full bg-secondary px-5 py-2 text-sm font-bold text-secondary-foreground shadow-lg">
               <Heart className="h-4 w-4 fill-current" />
               {locale === "pt" ? "Escolha popular" : "Popular choice"}

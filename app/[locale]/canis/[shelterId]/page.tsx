@@ -111,9 +111,13 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
           ratingLabel: "Classificacao",
           commentLabel: "Comentario (opcional)",
           commentPlaceholder: "Como foi a tua experiencia com este canil?",
-          submitReview: "Publicar avaliacao",
+          submitReview: "Enviar avaliacao",
+          moderationNote: "A tua avaliacao so fica visivel depois de o canil a aprovar.",
+          pendingNote: "A tua avaliacao foi enviada e aguarda aprovacao do canil.",
+          rejectedNote: "A tua avaliacao anterior nao foi aprovada. Podes editar e reenviar.",
+          loginToReview: "Inicia sessao para avaliar este canil.",
           messages: {
-            review_saved: "Avaliacao publicada. Obrigado!",
+            review_pending: "Avaliacao enviada. Vai ser revista pelo canil antes de aparecer.",
             invalid_review: "Escolhe uma classificacao valida.",
             review_failed: "Nao foi possivel guardar a avaliacao.",
           } as Record<string, string>,
@@ -144,9 +148,13 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
           ratingLabel: "Rating",
           commentLabel: "Comment (optional)",
           commentPlaceholder: "How was your experience with this shelter?",
-          submitReview: "Publish review",
+          submitReview: "Send review",
+          moderationNote: "Your review is only visible after the shelter approves it.",
+          pendingNote: "Your review was sent and is awaiting the shelter's approval.",
+          rejectedNote: "Your previous review was not approved. You can edit and resend it.",
+          loginToReview: "Sign in to review this shelter.",
           messages: {
-            review_saved: "Review published. Thank you!",
+            review_pending: "Review sent. The shelter will review it before it appears.",
             invalid_review: "Pick a valid rating.",
             review_failed: "Could not save the review.",
           } as Record<string, string>,
@@ -257,7 +265,7 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
               )}
             </div>
 
-            {eligibility.canReview && (
+            {eligibility.canReview ? (
               <form
                 action={submitShelterReview}
                 className="mt-4 space-y-3 rounded-2xl border border-border/30 bg-muted/40 p-4"
@@ -267,6 +275,12 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
                 <p className="text-sm font-bold">
                   {eligibility.existingReview ? copy.editReview : copy.writeReview}
                 </p>
+                {eligibility.existingReview?.estado === "pendente" && (
+                  <p className="rounded-lg bg-muted px-3 py-2 text-xs text-muted-foreground">{copy.pendingNote}</p>
+                )}
+                {eligibility.existingReview?.estado === "rejeitada" && (
+                  <p className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">{copy.rejectedNote}</p>
+                )}
                 <label className="block text-xs font-semibold text-muted-foreground">
                   {copy.ratingLabel}
                   <select
@@ -293,11 +307,16 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
                 </label>
                 <button
                   type="submit"
-                  className="rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground"
+                  className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                 >
                   {copy.submitReview}
                 </button>
+                <p className="text-xs text-muted-foreground">{copy.moderationNote}</p>
               </form>
+            ) : (
+              <p className="mt-4 rounded-2xl border border-border/30 bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+                {copy.loginToReview}
+              </p>
             )}
 
             {reviews.length === 0 ? (

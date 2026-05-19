@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType } from "react";
-import { Home, PawPrint, FileText, MessageCircle, Settings, Building2 } from "lucide-react";
+import { Home, PawPrint, FileText, MessageCircle, Settings, Building2, Star } from "lucide-react";
 import type { Locale } from "@/lib/i18n/config";
 
 type CanilSidebarProps = {
@@ -28,6 +28,7 @@ export function CanilSidebar({ locale }: CanilSidebarProps) {
             pets: "Meus Pets",
             requests: "Pedidos de Adocao",
             messages: "Mensagens",
+            reviews: "Avaliacoes",
             settings: "Configuracoes",
           },
         }
@@ -39,6 +40,7 @@ export function CanilSidebar({ locale }: CanilSidebarProps) {
             pets: "My Pets",
             requests: "Adoption Requests",
             messages: "Messages",
+            reviews: "Reviews",
             settings: "Settings",
           },
         };
@@ -49,6 +51,7 @@ export function CanilSidebar({ locale }: CanilSidebarProps) {
     { href: `/${locale}/canil/animais`, label: copy.links.pets, icon: PawPrint },
     { href: `/${locale}/canil/pedidos`, label: copy.links.requests, icon: FileText },
     { href: `/${locale}/canil/mensagens`, label: copy.links.messages, icon: MessageCircle },
+    { href: `/${locale}/canil/avaliacoes`, label: copy.links.reviews, icon: Star },
     { href: `/${locale}/canil/configuracoes`, label: copy.links.settings, icon: Settings },
   ];
 

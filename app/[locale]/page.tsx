@@ -150,9 +150,10 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {urgentPets.map((pet) => (
-              <article
+              <Link
                 key={pet.id}
-                className="group overflow-hidden rounded-xl bg-card transition-all hover:-translate-y-1.5 hover:shadow-lg"
+                href={`/${locale}/pets/${pet.id}`}
+                className="group block overflow-hidden rounded-xl bg-card transition-all hover:-translate-y-1.5 hover:shadow-lg"
               >
                 <div className="relative h-64">
                   <Image
@@ -179,14 +180,11 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
                       </span>
                     ))}
                   </div>
-                  <Link
-                    href={`/${locale}/pets/${pet.id}`}
-                    className="inline-flex w-full items-center justify-center rounded-xl bg-muted px-4 py-2.5 text-sm font-semibold text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground"
-                  >
+                  <span className="inline-flex w-full items-center justify-center rounded-xl bg-muted px-4 py-2.5 text-sm font-semibold text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                     {locale === "pt" ? `Conhecer ${pet.name}` : `Meet ${pet.name}`}
-                  </Link>
+                  </span>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         </div>
@@ -235,49 +233,6 @@ export default async function LocalizedHomePage({ params }: LocalizedHomePagePro
         </div>
       </section>
 
-      <footer className="mt-20 w-full border-t border-border/40 bg-muted/45">
-        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-6 py-12 text-sm leading-relaxed md:grid-cols-4 lg:px-8">
-          <div className="space-y-4">
-            <span className="text-xl font-bold text-primary">FYA</span>
-            <p className="max-w-xs text-muted-foreground">{content.footerTagline}</p>
-          </div>
-          <div>
-            <h4 className="mb-6 font-bold">{content.company}</h4>
-            <ul className="space-y-4 text-muted-foreground">
-              <li>{content.about}</li>
-              <li>{content.stories}</li>
-              <li>{content.careers}</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="mb-6 font-bold">{content.support}</h4>
-            <ul className="space-y-4 text-muted-foreground">
-              <li>{content.helpCenter}</li>
-              <li>{content.contact}</li>
-              <li>{content.privacy}</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="mb-6 font-bold">{content.sheltersTitle}</h4>
-            <p className="mb-4 text-muted-foreground">{content.sheltersDescription}</p>
-            <Link
-              href={`/${locale}/canis`}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              {content.sheltersCta}
-              <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-        </div>
-        <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-4 border-t border-border/30 px-6 py-6 text-xs text-muted-foreground/80 md:flex-row lg:px-8">
-          <p>© 2026 FYA (Found Your Animal). {content.madeWithLove}</p>
-          <div className="flex gap-6">
-            <span>Instagram</span>
-            <span>Facebook</span>
-            <span>X</span>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }

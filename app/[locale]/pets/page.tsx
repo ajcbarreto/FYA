@@ -125,31 +125,6 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
   const selectClass =
     "h-10 min-w-[140px] flex-1 rounded-lg border border-border/40 bg-background px-3 text-sm outline-none transition-all focus:ring-2 focus:ring-primary/30";
 
-  const footerCopy =
-    locale === "pt"
-      ? {
-          tagline: "Ajudamos pets a encontrar familias para sempre.",
-          discover: "Descobrir",
-          support: "Suporte",
-          discoverLinks: [
-            { label: "Encontrar pet", href: `/${locale}/pets` },
-            { label: "Diretorio de canis", href: `/${locale}/canis` },
-          ],
-          supportLinks: ["Centro de ajuda", "Contactar", "Privacidade", "Termos de servico"],
-          crafted: "© 2026 FYA (Found Your Animal). Feito com carinho.",
-        }
-      : {
-          tagline: "Helping pets find their forever families.",
-          discover: "Discover",
-          support: "Support",
-          discoverLinks: [
-            { label: "Find a pet", href: `/${locale}/pets` },
-            { label: "Shelter directory", href: `/${locale}/canis` },
-          ],
-          supportLinks: ["Help center", "Contact us", "Privacy policy", "Terms of service"],
-          crafted: "© 2026 FYA (Found Your Animal). Made with love.",
-        };
-
   return (
     <main className="mx-auto w-full max-w-7xl flex-1 px-6 pb-12 pt-8 lg:px-8">
       <header className="mb-6 space-y-4">
@@ -261,56 +236,59 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
           {pets.map((pet) => (
             <article
               key={pet.id}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-border/40 bg-card transition-all hover:-translate-y-1 hover:shadow-lg"
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/40 bg-card transition-all hover:-translate-y-1 hover:shadow-lg"
             >
-              <div className="relative aspect-square overflow-hidden">
-                <Image
-                  src={pet.imageUrl}
-                  alt={pet.name}
-                  fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <FavoriteButton
-                  animalId={pet.id}
-                  locale={locale}
-                  isFavorite={favoriteIds.has(pet.id)}
-                  redirectTo={catalogRedirectPath}
-                />
-                {pet.badge && (
-                  <span
-                    className={`absolute bottom-3 left-3 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-white ${
-                      pet.badge === "new" ? "bg-secondary" : "bg-primary"
-                    }`}
-                  >
-                    {pet.badge === "new" ? dictionary.petCatalog.tags.newArrival : dictionary.petCatalog.tags.urgent}
-                  </span>
-                )}
-              </div>
-
               <Link
                 href={`/${locale}/pets/${pet.id}`}
-                className="flex flex-1 flex-col gap-1.5 p-4"
-                aria-label={`${pet.name}`}
+                className="flex flex-1 flex-col"
+                aria-label={pet.name}
               >
-                <div className="flex items-center justify-between gap-2">
-                  <h2 className="truncate text-base font-bold">{pet.name}</h2>
-                  <span className="shrink-0 text-xs font-bold text-primary">{pet.age}</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {pet.species} • {pet.sex}
-                </p>
-                <div className="mt-auto flex flex-wrap gap-1.5 pt-2">
-                  {pet.traits.map((trait) => (
+                <div className="relative aspect-square overflow-hidden">
+                  <Image
+                    src={pet.imageUrl}
+                    alt={pet.name}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {pet.badge && (
                     <span
-                      key={trait}
-                      className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold text-muted-foreground"
+                      className={`absolute bottom-3 left-3 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-white ${
+                        pet.badge === "new" ? "bg-secondary" : "bg-primary"
+                      }`}
                     >
-                      {trait}
+                      {pet.badge === "new" ? dictionary.petCatalog.tags.newArrival : dictionary.petCatalog.tags.urgent}
                     </span>
-                  ))}
+                  )}
+                </div>
+
+                <div className="flex flex-1 flex-col gap-1.5 p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <h2 className="truncate text-base font-bold">{pet.name}</h2>
+                    <span className="shrink-0 text-xs font-bold text-primary">{pet.age}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {pet.species} • {pet.sex}
+                  </p>
+                  <div className="mt-auto flex flex-wrap gap-1.5 pt-2">
+                    {pet.traits.map((trait) => (
+                      <span
+                        key={trait}
+                        className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold text-muted-foreground"
+                      >
+                        {trait}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </Link>
+
+              <FavoriteButton
+                animalId={pet.id}
+                locale={locale}
+                isFavorite={favoriteIds.has(pet.id)}
+                redirectTo={catalogRedirectPath}
+              />
             </article>
           ))}
         </div>
@@ -352,37 +330,6 @@ export default async function PetCatalogPage({ params, searchParams }: PetCatalo
         </nav>
       )}
 
-      <footer className="mt-24 w-full border-t border-border/30 bg-muted/45">
-        <div className="grid grid-cols-1 gap-10 px-8 py-16 md:grid-cols-3">
-          <div className="space-y-4">
-            <div className="text-2xl font-bold text-primary">FYA</div>
-            <p className="text-sm text-muted-foreground">{footerCopy.tagline}</p>
-          </div>
-          <div>
-            <h4 className="mb-5 text-base font-bold text-secondary">{footerCopy.discover}</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              {footerCopy.discoverLinks.map((link) => (
-                <li key={link.label}>
-                  <Link href={link.href} className="hover:text-primary">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h4 className="mb-5 text-base font-bold text-secondary">{footerCopy.support}</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              {footerCopy.supportLinks.map((link) => (
-                <li key={link}>{link}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        <div className="border-t border-border/20 px-8 py-6 text-center text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
-          {footerCopy.crafted}
-        </div>
-      </footer>
     </main>
   );
 }
