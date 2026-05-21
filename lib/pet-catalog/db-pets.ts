@@ -11,16 +11,21 @@ export type PetCatalogItem = {
   traits: string[];
   badge?: "new" | "urgent";
   location: string;
-  shelterId: string;
+  shelterId: string | null;
   shelterName: string;
+  ownerProfileId: string | null;
+  isOwnerListed: boolean;
   description: string;
   status: string;
   imageUrl: string;
 };
 
+type RelatedRow<T> = T | T[] | null;
+
 export type AnimalRow = {
   id: string;
-  canil_id: string;
+  canil_id: string | null;
+  owner_profile_id: string | null;
   nome: string;
   especie: string;
   raca: string | null;
@@ -29,7 +34,8 @@ export type AnimalRow = {
   porte: string | null;
   status: string;
   descricao: string | null;
-  canis: { nome: string; localizacao: string } | { nome: string; localizacao: string }[] | null;
+  canis: RelatedRow<{ nome: string; localizacao: string }>;
+  owner_profile: RelatedRow<{ full_name: string | null; email: string | null }>;
 };
 
 type CatalogPetsQueryOptions = {
@@ -41,6 +47,9 @@ type CatalogPetsQueryOptions = {
   size?: string;
   status?: string;
 };
+
+const ANIMAL_SELECT =
+  "id,canil_id,owner_profile_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,canis(nome,localizacao),owner_profile:profiles!owner_profile_id(full_name,email)";
 
 function toTitleCase(value: string) {
   return value
@@ -97,17 +106,31 @@ function imageForAnimal(animal: AnimalRow) {
   return source[seed % source.length];
 }
 
-function extractShelter(canis: AnimalRow["canis"]) {
-  if (!canis) return null;
-  return Array.isArray(canis) ? canis[0] ?? null : canis;
+function extractRelation<T>(relation: RelatedRow<T>): T | null {
+  if (!relation) return null;
+  return Array.isArray(relation) ? relation[0] ?? null : relation;
+}
+
+function ownerDisplayName(
+  profile: { full_name: string | null; email: string | null } | null,
+  locale: string,
+) {
+  const fullName = profile?.full_name?.trim();
+  if (fullName) return fullName;
+  const email = profile?.email ?? "";
+  if (email.includes("@")) return email.split("@")[0];
+  return locale === "pt" ? "Particular" : "Private listing";
 }
 
 export function toCatalogItem(animal: AnimalRow, locale: string, photoOverride?: string): PetCatalogItem {
-  const shelter = extractShelter(animal.canis);
+  const shelter = extractRelation(animal.canis);
+  const ownerProfile = extractRelation(animal.owner_profile);
   const speciesText = speciesLabel(animal.especie, locale);
   const breed = animal.raca ? toTitleCase(animal.raca) : speciesText;
   const sex = sexLabel(animal.sexo, locale);
   const status = statusLabel(animal.status, locale);
+  const isOwnerListed = Boolean(animal.owner_profile_id) && !animal.canil_id;
+  const fallbackLocation = locale === "pt" ? "Localizacao n/d" : "Location n/a";
 
   return {
     id: animal.id,
@@ -117,9 +140,13 @@ export function toCatalogItem(animal: AnimalRow, locale: string, photoOverride?:
     sex,
     traits: [mapSizeTrait(animal.porte, locale), status],
     badge: badgeForStatus(animal.status),
-    location: shelter?.localizacao ?? (locale === "pt" ? "Localizacao n/d" : "Location n/a"),
+    location: shelter?.localizacao ?? fallbackLocation,
     shelterId: animal.canil_id,
-    shelterName: shelter?.nome ?? (locale === "pt" ? "Abrigo n/d" : "Shelter n/a"),
+    shelterName: isOwnerListed
+      ? ownerDisplayName(ownerProfile, locale)
+      : shelter?.nome ?? (locale === "pt" ? "Abrigo n/d" : "Shelter n/a"),
+    ownerProfileId: animal.owner_profile_id,
+    isOwnerListed,
     description: animal.descricao ?? "",
     status,
     imageUrl: photoOverride ?? imageForAnimal(animal),
@@ -142,7 +169,7 @@ async function applyPhotoOverrides(
 export async function getCatalogPets(supabase: SupabaseClient, locale: string, options: CatalogPetsQueryOptions = {}) {
   let query = supabase
     .from("animais")
-    .select("id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,canis(nome,localizacao)")
+    .select(ANIMAL_SELECT)
     .order("created_at", { ascending: false });
 
   const normalizedSearch = options.search?.trim();
@@ -220,7 +247,7 @@ export async function getCatalogPetsCount(
 export async function getAdoptedPets(supabase: SupabaseClient, locale: string, limit = 24) {
   const { data, error } = await supabase
     .from("animais")
-    .select("id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,canis(nome,localizacao)")
+    .select(ANIMAL_SELECT)
     .eq("status", "adotado")
     .order("created_at", { ascending: false })
     .limit(limit);
@@ -236,7 +263,7 @@ export async function getAdoptedPets(supabase: SupabaseClient, locale: string, l
 export async function getPetById(supabase: SupabaseClient, petId: string, locale: string) {
   const { data, error } = await supabase
     .from("animais")
-    .select("id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,canis(nome,localizacao)")
+    .select(ANIMAL_SELECT)
     .eq("id", petId)
     .maybeSingle();
 
@@ -258,7 +285,7 @@ export async function getRelatedPets(supabase: SupabaseClient, petId: string, lo
 
   const baseQuery = supabase
     .from("animais")
-    .select("id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,canis(nome,localizacao)")
+    .select(ANIMAL_SELECT)
     .neq("id", petId)
     .order("created_at", { ascending: false })
     .limit(limit);

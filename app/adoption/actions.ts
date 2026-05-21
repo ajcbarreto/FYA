@@ -7,7 +7,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getCurrentProfileRole } from "@/lib/adoption/db";
 import { parseApplicationAnswers } from "@/lib/adoption/application-form";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
-import { notifyAdopterStatusChange, notifyShelterNewRequest } from "@/lib/email/notifications";
+import { notifyAdopterStatusChange, notifyOwnerNewRequest, notifyShelterNewRequest } from "@/lib/email/notifications";
 
 const requestStatuses = ["pendente", "entrevista", "aprovado", "rejeitado", "concluido"] as const;
 
@@ -42,11 +42,15 @@ export async function submitAdoptionRequest(formData: FormData) {
 
   const { data: animal } = await supabase
     .from("animais")
-    .select("id,canil_id,nome")
+    .select("id,canil_id,owner_profile_id,nome")
     .eq("id", petId)
     .maybeSingle();
   if (!animal) {
     redirect(`/${locale}/pets/${petId}?error=pet_not_found`);
+  }
+
+  if (animal.owner_profile_id && animal.owner_profile_id === user.id) {
+    redirect(`/${locale}/pets/${petId}?error=cannot_apply_own_pet`);
   }
 
   const { data: existingRequest } = await supabase
@@ -58,11 +62,13 @@ export async function submitAdoptionRequest(formData: FormData) {
     .maybeSingle();
 
   const requestId = existingRequest?.id ?? crypto.randomUUID();
+  const isOwnerListed = !animal.canil_id && Boolean(animal.owner_profile_id);
 
   const requestPayload = {
     id: requestId,
     animal_id: petId,
-    canil_id: animal.canil_id,
+    canil_id: isOwnerListed ? null : animal.canil_id,
+    owner_profile_id: isOwnerListed ? animal.owner_profile_id : null,
     applicant_profile_id: user.id,
     status: "pendente" as const,
     mensagem_inicial: message || null,
@@ -74,19 +80,22 @@ export async function submitAdoptionRequest(formData: FormData) {
     redirect(`/${locale}/pets/${petId}?error=request_failed`);
   }
 
-  const { data: existingConversation } = await supabase
+  let conversationQuery = supabase
     .from("conversas_adocao")
     .select("id")
-    .eq("canil_id", animal.canil_id)
     .eq("applicant_profile_id", user.id)
-    .eq("animal_id", petId)
-    .maybeSingle();
+    .eq("animal_id", petId);
+  conversationQuery = isOwnerListed
+    ? conversationQuery.eq("owner_profile_id", animal.owner_profile_id as string)
+    : conversationQuery.eq("canil_id", animal.canil_id as string);
+  const { data: existingConversation } = await conversationQuery.maybeSingle();
 
   const conversationId = existingConversation?.id ?? crypto.randomUUID();
   if (!existingConversation) {
     const { error: conversationError } = await supabase.from("conversas_adocao").insert({
       id: conversationId,
-      canil_id: animal.canil_id,
+      canil_id: isOwnerListed ? null : animal.canil_id,
+      owner_profile_id: isOwnerListed ? animal.owner_profile_id : null,
       applicant_profile_id: user.id,
       animal_id: petId,
       pedido_id: requestId,
@@ -104,11 +113,19 @@ export async function submitAdoptionRequest(formData: FormData) {
     conteudo: initialMessage,
   });
 
-  await notifyShelterNewRequest(supabase, {
-    canilId: animal.canil_id,
-    animalName: animal.nome,
-    locale,
-  });
+  if (isOwnerListed) {
+    await notifyOwnerNewRequest(supabase, {
+      ownerProfileId: animal.owner_profile_id as string,
+      animalName: animal.nome,
+      locale,
+    });
+  } else {
+    await notifyShelterNewRequest(supabase, {
+      canilId: animal.canil_id as string,
+      animalName: animal.nome,
+      locale,
+    });
+  }
 
   if (messageError) {
     redirect(`/${locale}/user/pedidos?success=request_created`);
@@ -122,9 +139,12 @@ export async function updateRequestStatus(formData: FormData) {
   const requestId = String(formData.get("requestId") ?? "");
   const status = String(formData.get("status") ?? "");
   const notes = String(formData.get("notes") ?? "").trim();
+  const audience = String(formData.get("audience") ?? "canil");
+  const baseRedirect =
+    audience === "owner" ? `/${locale}/user/pedidos-recebidos` : `/${locale}/canil/pedidos`;
 
   if (!requestId || !requestStatuses.includes(status as (typeof requestStatuses)[number])) {
-    redirect(`/${locale}/canil/pedidos?error=invalid_request`);
+    redirect(`${baseRedirect}?error=invalid_request`);
   }
 
   const supabase = await createServerSupabaseClient();
@@ -133,32 +153,40 @@ export async function updateRequestStatus(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/${locale}/auth/login?next=/canil/pedidos`);
+    redirect(`/${locale}/auth/login?next=${baseRedirect.replace(`/${locale}`, "")}`);
   }
 
   const role = await getCurrentProfileRole(supabase, user.id);
-  if (role !== "canil" && role !== "admin") {
-    redirect(`/${locale}/canil/pedidos?error=unauthorized`);
+  if (audience === "owner") {
+    if (role !== "user") {
+      redirect(`${baseRedirect}?error=unauthorized`);
+    }
+  } else if (role !== "canil" && role !== "admin") {
+    redirect(`${baseRedirect}?error=unauthorized`);
   }
 
-  const { shelter } = await getShelterForUser(supabase, user.id);
-  if (!shelter && role !== "admin") {
-    redirect(`/${locale}/canil/pedidos?error=no_shelter`);
-  }
+  let query = supabase
+    .from("pedidos_adocao")
+    .update({
+      status,
+      observacoes_canil: notes || null,
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq("id", requestId);
 
-  let query = supabase.from("pedidos_adocao").update({
-    status,
-    observacoes_canil: notes || null,
-    reviewed_at: new Date().toISOString(),
-  }).eq("id", requestId);
-
-  if (shelter) {
+  if (audience === "owner") {
+    query = query.eq("owner_profile_id", user.id);
+  } else if (role !== "admin") {
+    const { shelter } = await getShelterForUser(supabase, user.id);
+    if (!shelter) {
+      redirect(`${baseRedirect}?error=no_shelter`);
+    }
     query = query.eq("canil_id", shelter.id);
   }
 
   const { data: updatedRows, error } = await query.select("applicant_profile_id,animais(nome)");
   if (error) {
-    redirect(`/${locale}/canil/pedidos?error=save_failed`);
+    redirect(`${baseRedirect}?error=save_failed`);
   }
 
   const updatedRow = updatedRows?.[0];
@@ -173,7 +201,7 @@ export async function updateRequestStatus(formData: FormData) {
     });
   }
 
-  redirect(`/${locale}/canil/pedidos?success=updated`);
+  redirect(`${baseRedirect}?success=updated`);
 }
 
 export async function sendAdoptionMessage(formData: FormData) {

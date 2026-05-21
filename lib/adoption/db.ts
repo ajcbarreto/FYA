@@ -4,7 +4,8 @@ import type { UserRole } from "@/lib/supabase/types";
 export type AdoptionRequestRow = {
   id: string;
   animal_id: string;
-  canil_id: string;
+  canil_id: string | null;
+  owner_profile_id: string | null;
   applicant_profile_id: string;
   status: "pendente" | "entrevista" | "aprovado" | "rejeitado" | "concluido";
   mensagem_inicial: string | null;
@@ -19,13 +20,15 @@ export type AdoptionRequestRow = {
 
 type ConversationRow = {
   id: string;
-  canil_id: string;
+  canil_id: string | null;
+  owner_profile_id: string | null;
   applicant_profile_id: string;
   animal_id: string | null;
   pedido_id: string | null;
   created_at: string;
   updated_at: string;
   canis: { nome: string; owner_profile_id: string | null } | { nome: string; owner_profile_id: string | null }[] | null;
+  owner: { id: string; full_name: string | null; email: string } | { id: string; full_name: string | null; email: string }[] | null;
   applicant: { id: string; full_name: string | null; email: string } | { id: string; full_name: string | null; email: string }[] | null;
   animais: { nome: string } | { nome: string }[] | null;
 };
@@ -66,10 +69,13 @@ export async function getCurrentProfileRole(supabase: SupabaseClient, userId: st
   return (profile?.role as UserRole | undefined) ?? null;
 }
 
+const REQUEST_SELECT =
+  "id,animal_id,canil_id,owner_profile_id,applicant_profile_id,status,mensagem_inicial,observacoes_canil,respostas,created_at,reviewed_at,animais(nome,especie,raca),canis(nome,localizacao),profiles!pedidos_adocao_applicant_profile_id_fkey(full_name,email)";
+
 export async function getAdoptionRequestsForCanil(supabase: SupabaseClient, canilId: string) {
   const { data, error } = await supabase
     .from("pedidos_adocao")
-    .select("id,animal_id,canil_id,applicant_profile_id,status,mensagem_inicial,observacoes_canil,respostas,created_at,reviewed_at,animais(nome,especie,raca),canis(nome,localizacao),profiles!pedidos_adocao_applicant_profile_id_fkey(full_name,email)")
+    .select(REQUEST_SELECT)
     .eq("canil_id", canilId)
     .order("created_at", { ascending: false });
 
@@ -83,10 +89,27 @@ export async function getAdoptionRequestsForCanil(supabase: SupabaseClient, cani
   return data as AdoptionRequestRow[];
 }
 
+export async function getAdoptionRequestsForOwner(supabase: SupabaseClient, userId: string) {
+  const { data, error } = await supabase
+    .from("pedidos_adocao")
+    .select(REQUEST_SELECT)
+    .eq("owner_profile_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error || !data) {
+    if (error) {
+      console.error("[getAdoptionRequestsForOwner] Supabase error:", error.message);
+    }
+    return [];
+  }
+
+  return data as AdoptionRequestRow[];
+}
+
 export async function getAdoptionRequestsForUser(supabase: SupabaseClient, userId: string) {
   const { data, error } = await supabase
     .from("pedidos_adocao")
-    .select("id,animal_id,canil_id,applicant_profile_id,status,mensagem_inicial,observacoes_canil,respostas,created_at,reviewed_at,animais(nome,especie,raca),canis(nome,localizacao),profiles!pedidos_adocao_applicant_profile_id_fkey(full_name,email)")
+    .select(REQUEST_SELECT)
     .eq("applicant_profile_id", userId)
     .order("created_at", { ascending: false });
 
@@ -100,10 +123,13 @@ export async function getAdoptionRequestsForUser(supabase: SupabaseClient, userI
   return data as AdoptionRequestRow[];
 }
 
+const CONVERSATION_SELECT =
+  "id,canil_id,owner_profile_id,applicant_profile_id,animal_id,pedido_id,created_at,updated_at,canis(nome,owner_profile_id),owner:profiles!conversas_adocao_owner_profile_id_fkey(id,full_name,email),applicant:profiles!conversas_adocao_applicant_profile_id_fkey(id,full_name,email),animais(nome)";
+
 export async function getConversationsForCanil(supabase: SupabaseClient, canilId: string) {
   const { data, error } = await supabase
     .from("conversas_adocao")
-    .select("id,canil_id,applicant_profile_id,animal_id,pedido_id,created_at,updated_at,canis(nome,owner_profile_id),applicant:profiles!conversas_adocao_applicant_profile_id_fkey(id,full_name,email),animais(nome)")
+    .select(CONVERSATION_SELECT)
     .eq("canil_id", canilId)
     .order("updated_at", { ascending: false });
 
@@ -117,10 +143,27 @@ export async function getConversationsForCanil(supabase: SupabaseClient, canilId
   return data as ConversationRow[];
 }
 
+export async function getConversationsForOwner(supabase: SupabaseClient, userId: string) {
+  const { data, error } = await supabase
+    .from("conversas_adocao")
+    .select(CONVERSATION_SELECT)
+    .eq("owner_profile_id", userId)
+    .order("updated_at", { ascending: false });
+
+  if (error || !data) {
+    if (error) {
+      console.error("[getConversationsForOwner] Supabase error:", error.message);
+    }
+    return [];
+  }
+
+  return data as ConversationRow[];
+}
+
 export async function getConversationsForUser(supabase: SupabaseClient, userId: string) {
   const { data, error } = await supabase
     .from("conversas_adocao")
-    .select("id,canil_id,applicant_profile_id,animal_id,pedido_id,created_at,updated_at,canis(nome,owner_profile_id),applicant:profiles!conversas_adocao_applicant_profile_id_fkey(id,full_name,email),animais(nome)")
+    .select(CONVERSATION_SELECT)
     .eq("applicant_profile_id", userId)
     .order("updated_at", { ascending: false });
 
@@ -154,23 +197,29 @@ export async function getMessagesByConversationId(supabase: SupabaseClient, conv
 export function mapConversationListItem(conversation: ConversationRow, locale: string) {
   const applicant = firstFromRelation(conversation.applicant);
   const shelter = firstFromRelation(conversation.canis);
+  const owner = firstFromRelation(conversation.owner);
   const animal = firstFromRelation(conversation.animais);
+  const adopterFallback = locale === "pt" ? "Adotante" : "Adopter";
+  const ownerFallback = locale === "pt" ? "Particular" : "Private owner";
   const contactName = getDisplayName(
     applicant?.full_name ?? null,
     applicant?.email ?? "contact@fya.local",
-    locale === "pt" ? "Adotante" : "Adopter",
+    adopterFallback,
   );
+  const canilName = shelter?.nome
+    ?? (owner ? getDisplayName(owner.full_name, owner.email, ownerFallback) : ownerFallback);
 
   return {
     id: conversation.id,
     updatedAt: conversation.updated_at,
     animalName: animal?.nome ?? (locale === "pt" ? "Animal" : "Pet"),
-    canilName: shelter?.nome ?? "FYA Shelter",
+    canilName,
     applicantName: contactName,
     applicantId: conversation.applicant_profile_id,
     animalId: conversation.animal_id,
     pedidoId: conversation.pedido_id,
-    canilOwnerId: shelter?.owner_profile_id ?? null,
+    canilOwnerId: shelter?.owner_profile_id ?? conversation.owner_profile_id,
+    isOwnerListed: Boolean(conversation.owner_profile_id) && !conversation.canil_id,
   };
 }
 

@@ -87,7 +87,9 @@ export async function Navbar({ locale }: NavbarProps) {
     mobileLinks.push(
       { href: `/${locale}/user`, label: dictionary.nav.userDashboard },
       { href: `/${locale}/user/favoritos`, label: dictionary.nav.userFavorites },
+      { href: `/${locale}/user/animais`, label: dictionary.sidebar.myPets },
       { href: `/${locale}/user/pedidos`, label: dictionary.nav.userRequests },
+      { href: `/${locale}/user/pedidos-recebidos`, label: dictionary.sidebar.receivedRequests },
       { href: `/${locale}/user/mensagens`, label: dictionary.nav.userMessages },
     );
   } else if (role === "canil") {

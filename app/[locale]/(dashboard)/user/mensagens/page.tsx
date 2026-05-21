@@ -4,7 +4,12 @@ import { ArrowLeft } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getConversationsForUser, getMessagesByConversationId, mapConversationListItem } from "@/lib/adoption/db";
+import {
+  getConversationsForOwner,
+  getConversationsForUser,
+  getMessagesByConversationId,
+  mapConversationListItem,
+} from "@/lib/adoption/db";
 import { ChatThread } from "@/components/chat-thread";
 import { ToastFeedback } from "@/components/toast-feedback";
 
@@ -31,8 +36,22 @@ export default async function UserMessagesPage({ params, searchParams }: UserMes
     redirect(`/${locale}/auth/login?next=/user/mensagens`);
   }
 
-  const conversationRows = await getConversationsForUser(supabase, user.id);
-  const conversations = conversationRows.map((row) => mapConversationListItem(row, locale));
+  const [applicantConversations, ownerConversations] = await Promise.all([
+    getConversationsForUser(supabase, user.id),
+    getConversationsForOwner(supabase, user.id),
+  ]);
+  const seenIds = new Set<string>();
+  const conversations = [...applicantConversations, ...ownerConversations]
+    .filter((row) => {
+      if (seenIds.has(row.id)) return false;
+      seenIds.add(row.id);
+      return true;
+    })
+    .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+    .map((row) => ({
+      ...mapConversationListItem(row, locale),
+      isMine: row.applicant_profile_id === user.id,
+    }));
   const visibleConversations = query
     ? conversations.filter((conversation) =>
         [conversation.canilName, conversation.animalName, conversation.applicantName].some((value) =>

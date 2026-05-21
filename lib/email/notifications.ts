@@ -38,6 +38,40 @@ export async function notifyShelterNewRequest(
   });
 }
 
+// Notifica o dono particular de um animal de que recebeu um novo pedido.
+export async function notifyOwnerNewRequest(
+  supabase: SupabaseClient,
+  options: { ownerProfileId: string; animalName: string; locale: string },
+) {
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("email")
+    .eq("id", options.ownerProfileId)
+    .maybeSingle();
+
+  const to = profile?.email ?? (await getProfileEmail(options.ownerProfileId));
+  if (!to) return;
+
+  const isPt = options.locale === "pt";
+  const subject = isPt
+    ? `Novo pedido de adopcao — ${options.animalName}`
+    : `New adoption request — ${options.animalName}`;
+  const body = isPt
+    ? `Recebeste um novo pedido para <strong>${options.animalName}</strong>. Entra na FYA para rever a candidatura e responder ao adotante.`
+    : `You received a new request for <strong>${options.animalName}</strong>. Sign in to FYA to review the application and reply to the adopter.`;
+
+  await sendEmail({
+    to,
+    subject,
+    html: emailLayout(
+      subject,
+      body,
+      isPt ? "Ver pedidos recebidos" : "View received requests",
+      appUrl(`/${options.locale}/user/pedidos-recebidos`),
+    ),
+  });
+}
+
 // Notifica o adotante de que o estado do seu pedido mudou.
 export async function notifyAdopterStatusChange(
   options: { applicantProfileId: string; animalName: string; status: AdoptionRequestRow["status"]; locale: string },

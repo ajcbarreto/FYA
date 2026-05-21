@@ -87,7 +87,7 @@ export function scoreAnimal(animal: AnimalRow, profile: MatchProfile) {
 }
 
 const ANIMAL_SELECT =
-  "id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,canis(nome,localizacao)";
+  "id,canil_id,owner_profile_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,canis(nome,localizacao),owner_profile:profiles!owner_profile_id(full_name,email)";
 
 export async function rankMatches(
   supabase: SupabaseClient,

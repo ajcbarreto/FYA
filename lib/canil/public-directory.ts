@@ -11,6 +11,10 @@ export type PublicShelter = {
   email_contacto: string | null;
   verificado: boolean;
   created_at: string;
+  iban: string | null;
+  mbway: string | null;
+  donation_link: string | null;
+  donation_message: string | null;
 };
 
 type ShelterAnimalCountRow = {
@@ -45,7 +49,8 @@ export async function countAnimalsByShelter(supabase: SupabaseClient, shelterIds
   const { data, error } = await supabase
     .from("animais")
     .select("canil_id")
-    .in("canil_id", shelterIds);
+    .in("canil_id", shelterIds)
+    .not("canil_id", "is", null);
 
   if (error || !data) {
     if (error) console.error("[countAnimalsByShelter] Supabase error:", error.message);
@@ -54,6 +59,7 @@ export async function countAnimalsByShelter(supabase: SupabaseClient, shelterIds
 
   const result = new Map<string, number>();
   for (const row of data as ShelterAnimalCountRow[]) {
+    if (!row.canil_id) continue;
     result.set(row.canil_id, (result.get(row.canil_id) ?? 0) + 1);
   }
   return result;
@@ -62,7 +68,9 @@ export async function countAnimalsByShelter(supabase: SupabaseClient, shelterIds
 export async function getPublicShelterById(supabase: SupabaseClient, shelterId: string) {
   const { data, error } = await supabase
     .from("canis")
-    .select("id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at")
+    .select(
+      "id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at,iban,mbway,donation_link,donation_message",
+    )
     .eq("id", shelterId)
     .maybeSingle();
 
@@ -81,7 +89,9 @@ export async function getAnimalsForPublicShelter(
 ): Promise<PetCatalogItem[]> {
   const { data, error } = await supabase
     .from("animais")
-    .select("id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,canis(nome,localizacao)")
+    .select(
+      "id,canil_id,owner_profile_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,canis(nome,localizacao),owner_profile:profiles!owner_profile_id(full_name,email)",
+    )
     .eq("canil_id", shelterId)
     .order("created_at", { ascending: false });
 

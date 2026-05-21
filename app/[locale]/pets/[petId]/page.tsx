@@ -24,6 +24,8 @@ import { listAnimalPhotos } from "@/lib/canil/animal-photos";
 import { FavoriteButton } from "@/components/favorite-button";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { submitAdoptionRequest } from "@/app/adoption/actions";
+import { resolveUserRole } from "@/lib/auth/role";
+import { LogIn } from "lucide-react";
 
 type PetDetailsPageProps = {
   params: Promise<{ locale: string; petId: string }>;
@@ -86,12 +88,14 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [pet, relatedPets, favoriteIds, animalPhotos] = await Promise.all([
+  const [pet, relatedPets, favoriteIds, animalPhotos, role] = await Promise.all([
     getPetById(supabase, petId, locale),
     getRelatedPets(supabase, petId, locale),
     user ? getFavoriteAnimalIds(supabase, user.id) : Promise.resolve(new Set<string>()),
     listAnimalPhotos(supabase, petId),
+    user ? resolveUserRole(supabase, user) : Promise.resolve(null),
   ]);
+  const canApply = Boolean(user) && role === "user";
 
   if (!pet) {
     notFound();
@@ -260,6 +264,7 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
               </div>
             </div>
 
+            {canApply ? (
             <form action={submitAdoptionRequest} className="space-y-4 pt-2">
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="petId" value={pet.id} />
@@ -378,6 +383,24 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
                 {dictionary.petDetails.applyCta}
               </button>
             </form>
+            ) : !user ? (
+              <div className="rounded-2xl border border-dashed border-border/40 bg-muted/30 p-5 text-center">
+                <p className="text-sm font-bold">{t.loginToApplyTitle}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{t.loginToApplyText}</p>
+                <Link
+                  href={`/${locale}/auth/login?next=/pets/${pet.id}`}
+                  className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                >
+                  <LogIn className="h-4 w-4" />
+                  {t.loginToApplyCta}
+                </Link>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-border/40 bg-muted/30 p-5 text-center">
+                <p className="text-sm font-bold">{t.notAdopterTitle}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{t.notAdopterText}</p>
+              </div>
+            )}
             <FavoriteButton
               animalId={pet.id}
               locale={locale}
@@ -396,7 +419,9 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
               <div className="h-14 w-14 overflow-hidden rounded-full bg-white shadow-inner" />
               <div>
                 <h4 className="font-bold">{pet.shelterName}</h4>
-                <p className="text-sm opacity-85">{t.certifiedShelter}</p>
+                <p className="text-sm opacity-85">
+                  {pet.isOwnerListed ? (locale === "pt" ? "Anuncio particular" : "Private listing") : t.certifiedShelter}
+                </p>
               </div>
             </div>
             <div className="space-y-3 text-sm">
@@ -404,18 +429,22 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
                 <MapPin className="h-4 w-4" />
                 {pet.location}
               </p>
-              <p className="inline-flex items-center gap-2">
-                <House className="h-4 w-4" />
-                {t.visitHours}
-              </p>
+              {!pet.isOwnerListed && (
+                <p className="inline-flex items-center gap-2">
+                  <House className="h-4 w-4" />
+                  {t.visitHours}
+                </p>
+              )}
             </div>
             <div className="h-36 rounded-3xl bg-white/12" />
-            <Link
-              href={`/${locale}/canis/${pet.shelterId}`}
-              className="block text-center text-sm font-bold underline underline-offset-4"
-            >
-              {t.viewShelterProfile}
-            </Link>
+            {pet.shelterId && (
+              <Link
+                href={`/${locale}/canis/${pet.shelterId}`}
+                className="block text-center text-sm font-bold underline underline-offset-4"
+              >
+                {t.viewShelterProfile}
+              </Link>
+            )}
           </article>
 
           <article className="rounded-3xl border border-border/30 bg-muted/45 p-6">

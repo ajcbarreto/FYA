@@ -119,6 +119,63 @@ export default async function CanilSettingsPage({ params, searchParams }: CanilS
             />
           </div>
 
+          <fieldset className="space-y-4 rounded-2xl border border-border/30 p-5">
+            <legend className="px-1 text-sm font-bold">{copy.donationsTitle}</legend>
+            <p className="text-xs text-muted-foreground">{copy.donationsHint}</p>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <label htmlFor="iban" className="text-sm font-semibold">
+                  {copy.labelIban}
+                </label>
+                <input
+                  id="iban"
+                  name="iban"
+                  defaultValue={shelter?.iban ?? ""}
+                  placeholder={copy.placeholderIban}
+                  className="h-11 w-full rounded-xl border border-border/25 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="mbway" className="text-sm font-semibold">
+                  {copy.labelMbway}
+                </label>
+                <input
+                  id="mbway"
+                  name="mbway"
+                  defaultValue={shelter?.mbway ?? ""}
+                  placeholder={copy.placeholderMbway}
+                  className="h-11 w-full rounded-xl border border-border/25 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="donation_link" className="text-sm font-semibold">
+                {copy.labelDonationLink}
+              </label>
+              <input
+                id="donation_link"
+                name="donation_link"
+                type="url"
+                defaultValue={shelter?.donation_link ?? ""}
+                placeholder={copy.placeholderDonationLink}
+                className="h-11 w-full rounded-xl border border-border/25 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="donation_message" className="text-sm font-semibold">
+                {copy.labelDonationMessage}
+              </label>
+              <textarea
+                id="donation_message"
+                name="donation_message"
+                defaultValue={shelter?.donation_message ?? ""}
+                placeholder={copy.placeholderDonationMessage}
+                rows={3}
+                className="w-full rounded-xl border border-border/25 bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+          </fieldset>
+
           <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground">
             {copy.save}
           </button>

@@ -6,6 +6,7 @@ import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getDisplayName } from "@/lib/adoption/db";
+import { resolveUserRole } from "@/lib/auth/role";
 
 function getLocaleFromForm(formData: FormData) {
   const localeValue = String(formData.get("locale") ?? defaultLocale);
@@ -30,6 +31,11 @@ export async function submitShelterReview(formData: FormData) {
 
   if (!user) {
     redirect(`/${locale}/auth/login?next=/canis/${shelterId}`);
+  }
+
+  const role = await resolveUserRole(supabase, user);
+  if (role !== "user") {
+    redirect(`${redirectBase}?error=only_adopters_can_review`);
   }
 
   const { data: profile } = await supabase

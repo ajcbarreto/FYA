@@ -244,6 +244,11 @@ type Dictionary = {
     badgeYoung: string;
     badgeAdult: string;
     initialGreeting: string;
+    loginToApplyTitle: string;
+    loginToApplyText: string;
+    loginToApplyCta: string;
+    notAdopterTitle: string;
+    notAdopterText: string;
   };
   admin: {
     title: string;
@@ -415,7 +420,16 @@ type Dictionary = {
       review_pending: string;
       invalid_review: string;
       review_failed: string;
+      only_adopters_can_review: string;
     };
+    notAdopterReview: string;
+    donateTitle: string;
+    donateText: string;
+    donateLoginCta: string;
+    donateNoInfo: string;
+    donateIban: string;
+    donateMbway: string;
+    donateExternalLink: string;
   };
   userSettings: {
     title: string;
@@ -509,6 +523,8 @@ type Dictionary = {
     overview: string;
     shelters: string;
     users: string;
+    myPets: string;
+    receivedRequests: string;
   };
   adoptionAnswers: {
     noAnswers: string;
@@ -653,6 +669,16 @@ type Dictionary = {
     placeholderTelefone: string;
     placeholderEmail: string;
     placeholderMissao: string;
+    donationsTitle: string;
+    donationsHint: string;
+    labelIban: string;
+    placeholderIban: string;
+    labelMbway: string;
+    placeholderMbway: string;
+    labelDonationLink: string;
+    placeholderDonationLink: string;
+    labelDonationMessage: string;
+    placeholderDonationMessage: string;
     save: string;
     success: string;
     errorMessages: Record<string, string>;
@@ -756,6 +782,26 @@ type Dictionary = {
     colActions: string;
     empty: string;
     messages: Record<string, string>;
+  };
+  userPets: {
+    title: string;
+    subtitle: string;
+    noAnimals: string;
+    sidebarLabel: string;
+    publishHint: string;
+  };
+  userNewAnimal: {
+    title: string;
+    subtitle: string;
+  };
+  userEditAnimal: {
+    subtitle: string;
+  };
+  userReceivedRequests: {
+    title: string;
+    subtitle: string;
+    empty: string;
+    sidebarLabel: string;
   };
 };
 
@@ -1012,6 +1058,12 @@ const dictionaries: Record<Locale, Dictionary> = {
       badgeYoung: "Jovem",
       badgeAdult: "Adulto",
       initialGreeting: "Ola! Tenho interesse neste animal.",
+      loginToApplyTitle: "Inicia sessao para te candidatares",
+      loginToApplyText: "Cria uma conta de adotante ou entra para enviar a tua candidatura ao canil.",
+      loginToApplyCta: "Entrar para candidatar",
+      notAdopterTitle: "So adotantes podem candidatar-se",
+      notAdopterText:
+        "A tua conta nao e do tipo adotante. Usa uma conta de adotante para enviares pedidos de adocao.",
     },
     admin: {
       title: "Painel de administracao",
@@ -1200,7 +1252,17 @@ const dictionaries: Record<Locale, Dictionary> = {
         review_pending: "Avaliacao enviada. Vai ser revista pelo canil antes de aparecer.",
         invalid_review: "Escolhe uma classificacao valida.",
         review_failed: "Nao foi possivel guardar a avaliacao.",
+        only_adopters_can_review: "So adotantes podem avaliar canis.",
       },
+      notAdopterReview: "So contas de adotante podem deixar avaliacoes.",
+      donateTitle: "Apoiar este canil",
+      donateText:
+        "Contribui para os cuidados diarios dos animais. As doacoes vao diretamente para o canil.",
+      donateLoginCta: "Entrar para apoiar",
+      donateNoInfo: "Este canil ainda nao partilhou dados para receber doacoes.",
+      donateIban: "IBAN",
+      donateMbway: "MBWay",
+      donateExternalLink: "Doar online",
     },
     userSettings: {
       title: "Configuracoes da Conta",
@@ -1295,6 +1357,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       overview: "Visao geral",
       shelters: "Canis",
       users: "Utilizadores",
+      myPets: "Meus animais",
+      receivedRequests: "Pedidos recebidos",
     },
     adoptionAnswers: {
       noAnswers: "Sem questionario estruturado para este pedido.",
@@ -1472,6 +1536,17 @@ const dictionaries: Record<Locale, Dictionary> = {
       placeholderTelefone: "+351 900 000 000",
       placeholderEmail: "contato@canil.pt",
       placeholderMissao: "Descreve brevemente a missao do canil.",
+      donationsTitle: "Doacoes",
+      donationsHint:
+        "Estes dados aparecem na pagina publica do canil apenas para utilizadores autenticados. Preenche pelo menos um dos campos para permitir doacoes.",
+      labelIban: "IBAN",
+      placeholderIban: "PT50 0000 0000 0000 0000 0000 0",
+      labelMbway: "MBWay",
+      placeholderMbway: "+351 9XX XXX XXX",
+      labelDonationLink: "Link de doacao online",
+      placeholderDonationLink: "https://...",
+      labelDonationMessage: "Mensagem para adotantes",
+      placeholderDonationMessage: "Como serao usadas as doacoes?",
       save: "Guardar configuracoes",
       success: "Configuracoes guardadas com sucesso.",
       errorMessages: {
@@ -1615,6 +1690,26 @@ const dictionaries: Record<Locale, Dictionary> = {
         invalid_shelter: "Canil invalido.",
         verification_failed: "Nao foi possivel atualizar a verificacao.",
       },
+    },
+    userPets: {
+      title: "Os meus animais",
+      subtitle: "Animais que estas a publicar para adocao como particular.",
+      noAnimals: "Ainda nao publicaste nenhum animal. Cria a primeira ficha em alguns minutos.",
+      sidebarLabel: "Meus animais",
+      publishHint: "Animais particulares aparecem no catalogo publico como anuncios privados.",
+    },
+    userNewAnimal: {
+      title: "Publicar novo animal",
+      subtitle: "Adiciona um animal teu ao catalogo de adopcao da FYA.",
+    },
+    userEditAnimal: {
+      subtitle: "Gere fotos e dados do teu animal.",
+    },
+    userReceivedRequests: {
+      title: "Pedidos recebidos",
+      subtitle: "Candidaturas para os animais que publicaste.",
+      empty: "Ainda nao recebeste pedidos. Quando chegarem, vao aparecer aqui.",
+      sidebarLabel: "Pedidos recebidos",
     },
   },
   en: {
@@ -1869,6 +1964,12 @@ const dictionaries: Record<Locale, Dictionary> = {
       badgeYoung: "Young",
       badgeAdult: "Adult",
       initialGreeting: "Hi! I am interested in this pet.",
+      loginToApplyTitle: "Sign in to apply",
+      loginToApplyText: "Create an adopter account or sign in to send your application to the shelter.",
+      loginToApplyCta: "Sign in to apply",
+      notAdopterTitle: "Only adopters can apply",
+      notAdopterText:
+        "Your account is not an adopter account. Use an adopter account to send adoption requests.",
     },
     admin: {
       title: "Admin panel",
@@ -2057,7 +2158,16 @@ const dictionaries: Record<Locale, Dictionary> = {
         review_pending: "Review sent. The shelter will review it before it appears.",
         invalid_review: "Pick a valid rating.",
         review_failed: "Could not save the review.",
+        only_adopters_can_review: "Only adopters can review shelters.",
       },
+      notAdopterReview: "Only adopter accounts can leave reviews.",
+      donateTitle: "Support this shelter",
+      donateText: "Help fund the daily care of these animals. Donations go directly to the shelter.",
+      donateLoginCta: "Sign in to support",
+      donateNoInfo: "This shelter has not shared donation details yet.",
+      donateIban: "IBAN",
+      donateMbway: "MBWay",
+      donateExternalLink: "Donate online",
     },
     userSettings: {
       title: "Account Settings",
@@ -2152,6 +2262,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       overview: "Overview",
       shelters: "Shelters",
       users: "Users",
+      myPets: "My pets",
+      receivedRequests: "Received requests",
     },
     adoptionAnswers: {
       noAnswers: "No structured questionnaire for this request.",
@@ -2329,6 +2441,17 @@ const dictionaries: Record<Locale, Dictionary> = {
       placeholderTelefone: "+351 900 000 000",
       placeholderEmail: "contact@shelter.org",
       placeholderMissao: "Describe your shelter mission and adoption process.",
+      donationsTitle: "Donations",
+      donationsHint:
+        "These details appear on the shelter's public page for signed-in users only. Fill in at least one field to accept donations.",
+      labelIban: "IBAN",
+      placeholderIban: "PT50 0000 0000 0000 0000 0000 0",
+      labelMbway: "MBWay",
+      placeholderMbway: "+351 9XX XXX XXX",
+      labelDonationLink: "Online donation link",
+      placeholderDonationLink: "https://...",
+      labelDonationMessage: "Message to adopters",
+      placeholderDonationMessage: "How will donations be used?",
       save: "Save settings",
       success: "Settings saved successfully.",
       errorMessages: {
@@ -2472,6 +2595,26 @@ const dictionaries: Record<Locale, Dictionary> = {
         invalid_shelter: "Invalid shelter.",
         verification_failed: "Could not update verification.",
       },
+    },
+    userPets: {
+      title: "My pets",
+      subtitle: "Pets you are listing for adoption as a private owner.",
+      noAnimals: "You haven't listed any pets yet. Create your first listing in a few minutes.",
+      sidebarLabel: "My pets",
+      publishHint: "Private listings appear on the public catalog as private adverts.",
+    },
+    userNewAnimal: {
+      title: "List a new pet",
+      subtitle: "Add your pet to the FYA adoption catalog.",
+    },
+    userEditAnimal: {
+      subtitle: "Manage photos and details for your pet.",
+    },
+    userReceivedRequests: {
+      title: "Received requests",
+      subtitle: "Applications for the pets you have listed.",
+      empty: "You haven't received requests yet. New ones will appear here.",
+      sidebarLabel: "Received requests",
     },
   },
 };
