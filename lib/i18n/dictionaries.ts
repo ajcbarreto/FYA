@@ -654,7 +654,11 @@ type Dictionary = {
     openRequests: string;
     messages: string;
     emptyActivity: string;
-    tasks: string[];
+    actionPendingRequests: (count: number) => string;
+    actionReviewsToModerate: (count: number) => string;
+    actionMissingPhotos: (count: number) => string;
+    actionProfileIncomplete: string;
+    actionAllClear: string;
   };
   canilSettingsPage: {
     title: string;
@@ -1517,11 +1521,20 @@ const dictionaries: Record<Locale, Dictionary> = {
       openRequests: "Abrir pedidos de adocao",
       messages: "Ir para mensagens",
       emptyActivity: "Ainda nao ha atividade registada para este canil.",
-      tasks: [
-        "Responder aos novos pedidos pendentes",
-        "Atualizar fotos dos animais com mais visualizacoes",
-        "Validar disponibilidade para visitas desta semana",
-      ],
+      actionPendingRequests: (count) =>
+        count === 1
+          ? "1 pedido a aguardar resposta"
+          : `${count} pedidos a aguardar resposta`,
+      actionReviewsToModerate: (count) =>
+        count === 1
+          ? "1 avaliacao por moderar"
+          : `${count} avaliacoes por moderar`,
+      actionMissingPhotos: (count) =>
+        count === 1
+          ? "1 animal sem foto principal"
+          : `${count} animais sem foto principal`,
+      actionProfileIncomplete: "Completa o perfil do canil (telefone, missao ou email).",
+      actionAllClear: "Tudo em dia. Sem acoes pendentes neste momento.",
     },
     canilSettingsPage: {
       title: "Configuracoes do Canil",
@@ -2422,11 +2435,14 @@ const dictionaries: Record<Locale, Dictionary> = {
       openRequests: "Open adoption requests",
       messages: "Go to messages",
       emptyActivity: "There is no recorded activity for this shelter yet.",
-      tasks: [
-        "Reply to new pending requests",
-        "Refresh photos for the most viewed pets",
-        "Confirm this week's in-person visit availability",
-      ],
+      actionPendingRequests: (count) =>
+        count === 1 ? "1 request awaiting response" : `${count} requests awaiting response`,
+      actionReviewsToModerate: (count) =>
+        count === 1 ? "1 review pending moderation" : `${count} reviews pending moderation`,
+      actionMissingPhotos: (count) =>
+        count === 1 ? "1 pet missing a primary photo" : `${count} pets missing a primary photo`,
+      actionProfileIncomplete: "Complete the shelter profile (phone, mission, or contact email).",
+      actionAllClear: "All clear. No pending actions right now.",
     },
     canilSettingsPage: {
       title: "Shelter Settings",

@@ -9,15 +9,18 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 
 type CanilSidebarProps = {
   locale: Locale;
+  pendingRequestsCount?: number;
+  pendingReviewsCount?: number;
 };
 
 type NavItem = {
   href: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
+  badge?: number;
 };
 
-export function CanilSidebar({ locale }: CanilSidebarProps) {
+export function CanilSidebar({ locale, pendingRequestsCount = 0, pendingReviewsCount = 0 }: CanilSidebarProps) {
   const pathname = usePathname();
   const t = getDictionary(locale).sidebar;
 
@@ -25,9 +28,19 @@ export function CanilSidebar({ locale }: CanilSidebarProps) {
     { href: `/${locale}/canil`, label: t.dashboard, icon: Home },
     { href: `/${locale}/canil/perfil`, label: t.shelterPage, icon: Building2 },
     { href: `/${locale}/canil/animais`, label: t.pets, icon: PawPrint },
-    { href: `/${locale}/canil/pedidos`, label: t.adoptionRequests, icon: FileText },
+    {
+      href: `/${locale}/canil/pedidos`,
+      label: t.adoptionRequests,
+      icon: FileText,
+      badge: pendingRequestsCount > 0 ? pendingRequestsCount : undefined,
+    },
     { href: `/${locale}/canil/mensagens`, label: t.messages, icon: MessageCircle },
-    { href: `/${locale}/canil/avaliacoes`, label: t.reviews, icon: Star },
+    {
+      href: `/${locale}/canil/avaliacoes`,
+      label: t.reviews,
+      icon: Star,
+      badge: pendingReviewsCount > 0 ? pendingReviewsCount : undefined,
+    },
     { href: `/${locale}/canil/configuracoes`, label: t.settings, icon: Settings },
   ];
 
@@ -52,6 +65,17 @@ export function CanilSidebar({ locale }: CanilSidebarProps) {
             >
               <Icon className="h-4 w-4" />
               <span className="font-semibold">{item.label}</span>
+              {item.badge !== undefined && (
+                <span
+                  className={`ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold ${
+                    active
+                      ? "bg-primary-foreground/20 text-primary-foreground"
+                      : "bg-primary text-primary-foreground"
+                  }`}
+                >
+                  {item.badge > 9 ? "9+" : item.badge}
+                </span>
+              )}
             </Link>
           );
         })}

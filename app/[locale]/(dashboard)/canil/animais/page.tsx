@@ -7,6 +7,8 @@ import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser, localizeAnimalStatus, localizeSpecies } from "@/lib/canil/shelter-data";
 import { updateAnimalStatus } from "@/app/[locale]/(dashboard)/canil/actions";
 import { ToastFeedback } from "@/components/toast-feedback";
+import { PageHeader } from "@/components/page-header";
+import { StatCard } from "@/components/stat-card";
 
 type CanilPetsPageProps = {
   params: Promise<{ locale: string }>;
@@ -30,7 +32,7 @@ export default async function CanilPetsPage({ params, searchParams }: CanilPetsP
     redirect(`/${locale}/auth/login?next=/canil/animais`);
   }
 
-  const { shelter, animals } = await getShelterForUser(supabase, user.id);
+  const { animals } = await getShelterForUser(supabase, user.id);
   const copy = getDictionary(locale).canilPets;
 
   const summary = {
@@ -46,35 +48,26 @@ export default async function CanilPetsPage({ params, searchParams }: CanilPetsP
 
   return (
     <main className="space-y-6">
-      <header className="flex flex-col gap-4 rounded-3xl border border-border/20 bg-card p-8 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
-        </div>
-        <Link
-          href={`/${locale}/canil/animais/novo`}
-          className="inline-flex w-fit items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground"
-        >
-          <Plus className="h-4 w-4" />
-          {copy.newPet}
-        </Link>
-      </header>
+      <PageHeader
+        title={copy.title}
+        subtitle={copy.subtitle}
+        actions={
+          <Link
+            href={`/${locale}/canil/animais/novo`}
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            <Plus className="h-4 w-4" />
+            {copy.newPet}
+          </Link>
+        }
+      />
 
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <article className="rounded-2xl border border-border/20 bg-card p-5">
-          <p className="text-sm text-muted-foreground">{copy.statusOptions.disponivel}</p>
-          <p className="mt-1 text-3xl font-bold text-secondary">{summary.available}</p>
-        </article>
-        <article className="rounded-2xl border border-border/20 bg-card p-5">
-          <p className="text-sm text-muted-foreground">{copy.statusOptions.reservado}</p>
-          <p className="mt-1 text-3xl font-bold text-primary">{summary.pending}</p>
-        </article>
-        <article className="rounded-2xl border border-border/20 bg-card p-5">
-          <p className="text-sm text-muted-foreground">{copy.statusOptions.adotado}</p>
-          <p className="mt-1 text-3xl font-bold">{summary.adopted}</p>
-        </article>
+        <StatCard label={copy.statusOptions.disponivel} value={summary.available} tone="secondary" />
+        <StatCard label={copy.statusOptions.reservado} value={summary.pending} tone="primary" />
+        <StatCard label={copy.statusOptions.adotado} value={summary.adopted} />
       </section>
 
       <section className="overflow-hidden rounded-3xl border border-border/20 bg-card">
@@ -141,7 +134,6 @@ export default async function CanilPetsPage({ params, searchParams }: CanilPetsP
         )}
       </section>
 
-      <p className="text-xs text-muted-foreground">{shelter?.nome ?? "FYA Shelter"}</p>
     </main>
   );
 }
