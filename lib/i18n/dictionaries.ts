@@ -724,6 +724,18 @@ type Dictionary = {
     actionMissingPhotos: (count: number) => string;
     actionProfileIncomplete: string;
     actionAllClear: string;
+    onboarding: {
+      title: string;
+      subtitle: string;
+      progress: (done: number, total: number) => string;
+      steps: {
+        profile: string;
+        firstPet: string;
+        firstPhoto: string;
+        donations: string;
+        verification: string;
+      };
+    };
   };
   canilSettingsPage: {
     title: string;
@@ -753,6 +765,45 @@ type Dictionary = {
     visitHoursHint: string;
     save: string;
     success: string;
+    errorMessages: Record<string, string>;
+  };
+  animalHealth: {
+    sectionTitle: string;
+    addTitle: string;
+    typeLabel: string;
+    dateLabel: string;
+    descriptionLabel: string;
+    descriptionPlaceholder: string;
+    submitAdd: string;
+    deleteAction: string;
+    empty: string;
+    publicSummary: (count: number) => string;
+    types: {
+      vacina: string;
+      desparasitacao: string;
+      cirurgia: string;
+      consulta: string;
+      peso: string;
+      outro: string;
+    };
+    successMessages: Record<string, string>;
+    errorMessages: Record<string, string>;
+  };
+  responseTemplates: {
+    sectionTitle: string;
+    sectionSubtitle: string;
+    addTitle: string;
+    labelTitulo: string;
+    placeholderTitulo: string;
+    labelConteudo: string;
+    placeholderConteudo: string;
+    submitAdd: string;
+    listTitle: string;
+    empty: string;
+    deleteAction: string;
+    insertButton: string;
+    insertMenuTitle: string;
+    successMessages: Record<string, string>;
     errorMessages: Record<string, string>;
   };
   canilReviewsPage: {
@@ -1782,6 +1833,18 @@ const dictionaries: Record<Locale, Dictionary> = {
           : `${count} animais sem foto principal`,
       actionProfileIncomplete: "Completa o perfil do canil (telefone, missao ou email).",
       actionAllClear: "Tudo em dia. Sem acoes pendentes neste momento.",
+      onboarding: {
+        title: "Primeiros passos",
+        subtitle: "Completa este checklist para preparares o teu canil na FYA.",
+        progress: (done, total) => `${done}/${total} concluido`,
+        steps: {
+          profile: "Completar perfil (missao, telefone, horario)",
+          firstPet: "Publicar o primeiro animal",
+          firstPhoto: "Adicionar foto principal a um animal",
+          donations: "Configurar dados para receber doacoes",
+          verification: "Aguardar verificacao da equipa",
+        },
+      },
     },
     canilSettingsPage: {
       title: "Configuracoes do Canil",
@@ -1815,6 +1878,62 @@ const dictionaries: Record<Locale, Dictionary> = {
       errorMessages: {
         invalid_data: "Preenche pelo menos nome e localizacao.",
         save_failed: "Nao foi possivel guardar. Tenta novamente.",
+        no_shelter: "Nao foi encontrado um canil associado a esta conta.",
+      },
+    },
+    animalHealth: {
+      sectionTitle: "Historico medico",
+      addTitle: "Registar evento",
+      typeLabel: "Tipo",
+      dateLabel: "Data",
+      descriptionLabel: "Descricao",
+      descriptionPlaceholder: "Ex: vacina antirrabica, lote 1234",
+      submitAdd: "Adicionar",
+      deleteAction: "Apagar",
+      empty: "Sem registos medicos.",
+      publicSummary: (count) =>
+        count === 1 ? "1 registo medico" : `${count} registos medicos`,
+      types: {
+        vacina: "Vacina",
+        desparasitacao: "Desparasitacao",
+        cirurgia: "Cirurgia",
+        consulta: "Consulta",
+        peso: "Peso",
+        outro: "Outro",
+      },
+      successMessages: {
+        health_added: "Registo medico adicionado.",
+        health_deleted: "Registo medico apagado.",
+      },
+      errorMessages: {
+        invalid_health: "Dados invalidos para registo medico.",
+        health_failed: "Nao foi possivel guardar o registo.",
+        not_authorized: "Nao tens permissao.",
+      },
+    },
+    responseTemplates: {
+      sectionTitle: "Respostas-modelo",
+      sectionSubtitle:
+        "Guarda respostas que usas frequentemente no chat com adotantes. Aparecem num menu rapido.",
+      addTitle: "Adicionar nova",
+      labelTitulo: "Titulo curto",
+      placeholderTitulo: "Ex: Pedido de visita",
+      labelConteudo: "Conteudo",
+      placeholderConteudo: "Ola! Obrigado pelo interesse...",
+      submitAdd: "Guardar resposta",
+      listTitle: "Respostas guardadas",
+      empty: "Ainda nao guardaste nenhuma resposta-modelo.",
+      deleteAction: "Apagar",
+      insertButton: "Modelos",
+      insertMenuTitle: "Inserir resposta-modelo",
+      successMessages: {
+        template_created: "Resposta-modelo guardada.",
+        template_deleted: "Resposta-modelo apagada.",
+      },
+      errorMessages: {
+        invalid_template: "Preenche titulo e conteudo.",
+        template_failed: "Nao foi possivel guardar a resposta-modelo.",
+        not_authorized: "Nao tens permissao.",
         no_shelter: "Nao foi encontrado um canil associado a esta conta.",
       },
     },
@@ -2878,6 +2997,18 @@ const dictionaries: Record<Locale, Dictionary> = {
         count === 1 ? "1 pet missing a primary photo" : `${count} pets missing a primary photo`,
       actionProfileIncomplete: "Complete the shelter profile (phone, mission, or contact email).",
       actionAllClear: "All clear. No pending actions right now.",
+      onboarding: {
+        title: "Getting started",
+        subtitle: "Complete this checklist to set up your shelter on FYA.",
+        progress: (done, total) => `${done}/${total} done`,
+        steps: {
+          profile: "Complete profile (mission, phone, visit hours)",
+          firstPet: "Publish your first pet",
+          firstPhoto: "Add a primary photo to a pet",
+          donations: "Set up donation details",
+          verification: "Wait for team verification",
+        },
+      },
     },
     canilSettingsPage: {
       title: "Shelter Settings",
@@ -2911,6 +3042,60 @@ const dictionaries: Record<Locale, Dictionary> = {
       errorMessages: {
         invalid_data: "Please provide at least name and location.",
         save_failed: "Could not save changes. Try again.",
+        no_shelter: "No shelter is linked to this account.",
+      },
+    },
+    animalHealth: {
+      sectionTitle: "Medical history",
+      addTitle: "Add event",
+      typeLabel: "Type",
+      dateLabel: "Date",
+      descriptionLabel: "Description",
+      descriptionPlaceholder: "e.g. rabies vaccine, lot 1234",
+      submitAdd: "Add",
+      deleteAction: "Delete",
+      empty: "No medical records.",
+      publicSummary: (count) => (count === 1 ? "1 medical record" : `${count} medical records`),
+      types: {
+        vacina: "Vaccine",
+        desparasitacao: "Deworming",
+        cirurgia: "Surgery",
+        consulta: "Visit",
+        peso: "Weight",
+        outro: "Other",
+      },
+      successMessages: {
+        health_added: "Medical record added.",
+        health_deleted: "Medical record deleted.",
+      },
+      errorMessages: {
+        invalid_health: "Invalid medical record data.",
+        health_failed: "Could not save the record.",
+        not_authorized: "Not allowed.",
+      },
+    },
+    responseTemplates: {
+      sectionTitle: "Canned responses",
+      sectionSubtitle: "Save replies you use often in chat with adopters. They appear in a quick menu.",
+      addTitle: "Add new",
+      labelTitulo: "Short title",
+      placeholderTitulo: "e.g. Visit request",
+      labelConteudo: "Content",
+      placeholderConteudo: "Hi! Thanks for your interest...",
+      submitAdd: "Save response",
+      listTitle: "Saved responses",
+      empty: "You haven't saved any canned response yet.",
+      deleteAction: "Delete",
+      insertButton: "Templates",
+      insertMenuTitle: "Insert canned response",
+      successMessages: {
+        template_created: "Response saved.",
+        template_deleted: "Response deleted.",
+      },
+      errorMessages: {
+        invalid_template: "Provide a title and content.",
+        template_failed: "Could not save the response.",
+        not_authorized: "Not allowed.",
         no_shelter: "No shelter is linked to this account.",
       },
     },

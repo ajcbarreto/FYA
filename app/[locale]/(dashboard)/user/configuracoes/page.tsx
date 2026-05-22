@@ -1,15 +1,20 @@
 import { notFound, redirect } from "next/navigation";
-import { isLocale } from "@/lib/i18n/config";
+import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { listTemplatesForOwner } from "@/lib/adoption/response-templates";
 import { PageHeader } from "@/components/page-header";
+import { ResponseTemplatesEditor } from "@/components/response-templates-editor";
+import { ToastFeedback } from "@/components/toast-feedback";
 
 type UserSettingsPageProps = {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ success?: string; error?: string }>;
 };
 
-export default async function UserSettingsPage({ params }: UserSettingsPageProps) {
+export default async function UserSettingsPage({ params, searchParams }: UserSettingsPageProps) {
   const { locale } = await params;
+  const { success, error } = await searchParams;
   if (!isLocale(locale)) {
     notFound();
   }
@@ -23,13 +28,21 @@ export default async function UserSettingsPage({ params }: UserSettingsPageProps
     redirect(`/${locale}/auth/login?next=/user/configuracoes`);
   }
 
-  const { data: profile } = await supabase.from("profiles").select("full_name,email").eq("id", user.id).single();
+  const { data: profile } = await supabase.from("profiles").select("full_name,email,role").eq("id", user.id).single();
   const displayName = profile?.full_name ?? user.user_metadata.full_name ?? user.email ?? "User";
-  const t = getDictionary(locale).userSettings;
+  const dict = getDictionary(locale);
+  const t = dict.userSettings;
+  const templateCopy = dict.responseTemplates;
+  const templates = profile?.role === "user" ? await listTemplatesForOwner(supabase, user.id) : [];
+  const feedback =
+    (success && templateCopy.successMessages[success])
+    || (error && templateCopy.errorMessages[error])
+    || null;
 
   return (
     <main className="space-y-6">
       <PageHeader title={t.title} subtitle={t.subtitle} />
+      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       <section className="rounded-3xl border border-border/20 bg-card p-6">
         <dl className="space-y-4 text-sm">
@@ -47,6 +60,10 @@ export default async function UserSettingsPage({ params }: UserSettingsPageProps
           </div>
         </dl>
       </section>
+
+      {profile?.role === "user" && (
+        <ResponseTemplatesEditor locale={locale as Locale} context="user" templates={templates} />
+      )}
     </main>
   );
 }

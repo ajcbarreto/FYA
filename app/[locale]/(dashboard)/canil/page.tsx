@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { CheckCircle2, MessageCircle } from "lucide-react";
+import { Check, CheckCircle2, Circle, MessageCircle, Sparkles } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
@@ -74,6 +74,45 @@ export default async function CanilDashboardPage({ params }: CanilDashboardPageP
   const profileIncomplete = Boolean(
     shelter && (!shelter.telefone || !shelter.missao || !shelter.email_contacto),
   );
+  const hasVisitHours = Boolean(shelter?.horario_visitas);
+  const hasDonationInfo = Boolean(shelter?.iban || shelter?.mbway || shelter?.donation_link);
+
+  const onboardingSteps = shelter
+    ? [
+        {
+          id: "profile",
+          label: copy.onboarding.steps.profile,
+          done: !profileIncomplete && hasVisitHours,
+          href: `/${locale}/canil/configuracoes`,
+        },
+        {
+          id: "firstPet",
+          label: copy.onboarding.steps.firstPet,
+          done: animals.length > 0,
+          href: `/${locale}/canil/animais/novo`,
+        },
+        {
+          id: "firstPhoto",
+          label: copy.onboarding.steps.firstPhoto,
+          done: animals.length > 0 && animalsWithPrimaryPhoto.size > 0,
+          href: `/${locale}/canil/animais`,
+        },
+        {
+          id: "donations",
+          label: copy.onboarding.steps.donations,
+          done: hasDonationInfo,
+          href: `/${locale}/canil/configuracoes`,
+        },
+        {
+          id: "verification",
+          label: copy.onboarding.steps.verification,
+          done: Boolean(shelter.verificado),
+          href: null as string | null,
+        },
+      ]
+    : [];
+  const onboardingDone = onboardingSteps.filter((step) => step.done).length;
+  const showOnboarding = onboardingSteps.length > 0 && onboardingDone < onboardingSteps.length;
 
   const actionItems: ActionItem[] = [];
   if (pendingRequestsCount > 0) {
@@ -132,6 +171,59 @@ export default async function CanilDashboardPage({ params }: CanilDashboardPageP
         <StatCard label={copy.cardPending} value={stats.pending} />
         <StatCard label={copy.cardAdopted} value={stats.adopted} tone="primary" />
       </section>
+
+      {showOnboarding && (
+        <section className="rounded-2xl border border-primary/25 bg-primary/5 p-6">
+          <header className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <h2 className="text-lg font-bold">{copy.onboarding.title}</h2>
+            </div>
+            <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-bold text-primary">
+              {copy.onboarding.progress(onboardingDone, onboardingSteps.length)}
+            </span>
+          </header>
+          <p className="mt-2 text-sm text-muted-foreground">{copy.onboarding.subtitle}</p>
+          <ul className="mt-4 space-y-2">
+            {onboardingSteps.map((step) => {
+              const baseClass =
+                "flex items-center justify-between rounded-xl border border-border/25 bg-card px-3 py-2.5 text-sm transition-colors";
+              const inner = (
+                <span className="flex items-center gap-2">
+                  <span
+                    className={`inline-flex h-5 w-5 items-center justify-center rounded-full ${
+                      step.done ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {step.done ? <Check className="h-3 w-3" /> : <Circle className="h-2.5 w-2.5" />}
+                  </span>
+                  <span className={step.done ? "line-through opacity-70" : ""}>{step.label}</span>
+                </span>
+              );
+              if (step.done || !step.href) {
+                return (
+                  <li key={step.id} className={baseClass}>
+                    {inner}
+                  </li>
+                );
+              }
+              return (
+                <li key={step.id}>
+                  <Link
+                    href={step.href}
+                    className={`${baseClass} hover:border-primary/40 hover:bg-muted/60`}
+                  >
+                    {inner}
+                    <span aria-hidden className="text-muted-foreground">
+                      ›
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <article className="rounded-2xl border border-border/25 bg-card p-6 xl:col-span-2">

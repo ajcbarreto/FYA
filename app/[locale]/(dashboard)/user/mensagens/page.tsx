@@ -17,6 +17,7 @@ import { PageHeader } from "@/components/page-header";
 import { formatRelativeTime } from "@/lib/format/time";
 import { ReportFlag } from "@/components/report-flag";
 import type { Locale } from "@/lib/i18n/config";
+import { listTemplatesForOwner } from "@/lib/adoption/response-templates";
 
 type UserMessagesPageProps = {
   params: Promise<{ locale: string }>;
@@ -72,6 +73,10 @@ export default async function UserMessagesPage({ params, searchParams }: UserMes
     supabase,
     conversations.map((conversation) => conversation.id),
   );
+  // So mostramos templates quando ha pelo menos uma conversa onde o utilizador
+  // esta a actuar como dono (owner). Caso contrario nao faz sentido.
+  const hasOwnerSide = conversations.some((conversation) => !conversation.isMine);
+  const templates = hasOwnerSide ? await listTemplatesForOwner(supabase, user.id) : [];
 
   const copy = getDictionary(locale).userMessages;
   const feedback =
@@ -191,10 +196,13 @@ export default async function UserMessagesPage({ params, searchParams }: UserMes
                   conteudo: message.conteudo,
                   created_at: message.created_at,
                 }))}
+                templates={activeConversation.isMine ? [] : templates}
                 copy={{
                   empty: copy.noConversations,
                   inputPlaceholder: copy.inputPlaceholder,
                   send: copy.send,
+                  templatesButton: getDictionary(locale).responseTemplates.insertButton,
+                  templatesMenuTitle: getDictionary(locale).responseTemplates.insertMenuTitle,
                 }}
               />
               {activeConversation && (

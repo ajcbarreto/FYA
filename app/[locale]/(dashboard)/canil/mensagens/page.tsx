@@ -19,6 +19,7 @@ import { PageHeader } from "@/components/page-header";
 import { formatRelativeTime } from "@/lib/format/time";
 import { ReportFlag } from "@/components/report-flag";
 import type { Locale } from "@/lib/i18n/config";
+import { listTemplatesForCanil } from "@/lib/adoption/response-templates";
 
 type CanilMessagesPageProps = {
   params: Promise<{ locale: string }>;
@@ -53,6 +54,7 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
   }
 
   const conversationRows = await getConversationsForCanil(supabase, shelter.id);
+  const templates = await listTemplatesForCanil(supabase, shelter.id);
   const conversations = conversationRows.map((row) => mapConversationListItem(row, locale));
   const latestByConversation = await getLatestMessagesByConversationIds(
     supabase,
@@ -185,10 +187,13 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
                   conteudo: message.conteudo,
                   created_at: message.created_at,
                 }))}
+                templates={templates}
                 copy={{
                   empty: copy.noConversations,
                   inputPlaceholder: copy.inputPlaceholder,
                   send: copy.send,
+                  templatesButton: getDictionary(locale).responseTemplates.insertButton,
+                  templatesMenuTitle: getDictionary(locale).responseTemplates.insertMenuTitle,
                 }}
               />
             </>

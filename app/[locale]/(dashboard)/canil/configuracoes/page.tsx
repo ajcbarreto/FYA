@@ -1,11 +1,13 @@
 import { notFound, redirect } from "next/navigation";
-import { isLocale } from "@/lib/i18n/config";
+import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
+import { listTemplatesForCanil } from "@/lib/adoption/response-templates";
 import { updateShelterSettings } from "@/app/[locale]/(dashboard)/canil/actions";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { PageHeader } from "@/components/page-header";
+import { ResponseTemplatesEditor } from "@/components/response-templates-editor";
 
 type CanilSettingsPageProps = {
   params: Promise<{ locale: string }>;
@@ -30,13 +32,20 @@ export default async function CanilSettingsPage({ params, searchParams }: CanilS
   }
 
   const { shelter } = await getShelterForUser(supabase, user.id);
-  const copy = getDictionary(locale).canilSettingsPage;
+  const dict = getDictionary(locale);
+  const copy = dict.canilSettingsPage;
+  const templateCopy = dict.responseTemplates;
+  const templates = shelter ? await listTemplatesForCanil(supabase, shelter.id) : [];
   const feedback =
     success === "saved"
       ? copy.success
-      : error && copy.errorMessages[error]
-        ? copy.errorMessages[error]
-        : null;
+      : success && templateCopy.successMessages[success]
+        ? templateCopy.successMessages[success]
+        : error && copy.errorMessages[error]
+          ? copy.errorMessages[error]
+          : error && templateCopy.errorMessages[error]
+            ? templateCopy.errorMessages[error]
+            : null;
 
   return (
     <main className="space-y-6">
@@ -193,6 +202,10 @@ export default async function CanilSettingsPage({ params, searchParams }: CanilS
           </button>
         </form>
       </section>
+
+      {shelter && (
+        <ResponseTemplatesEditor locale={locale as Locale} context="canil" templates={templates} />
+      )}
     </main>
   );
 }

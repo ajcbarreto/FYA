@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { MessageSquareText } from "lucide-react";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser-client";
 import { sendAdoptionMessage } from "@/app/adoption/actions";
 import type { Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import type { ResponseTemplate } from "@/lib/adoption/response-templates";
 
 export type ChatMessage = {
   id: string;
@@ -22,10 +24,13 @@ type ChatThreadProps = {
   audience: "user" | "canil";
   locale: string;
   initialMessages: ChatMessage[];
+  templates?: ResponseTemplate[];
   copy: {
     empty: string;
     inputPlaceholder: string;
     send: string;
+    templatesButton?: string;
+    templatesMenuTitle?: string;
   };
 };
 
@@ -51,11 +56,24 @@ export function ChatThread({
   audience,
   locale,
   initialMessages,
+  templates,
   copy,
 }: ChatThreadProps) {
   const [messages, setMessages] = useState<ChatMessage[]>(() => initialMessages);
   const listRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const templatesDetailsRef = useRef<HTMLDetailsElement | null>(null);
   const supabase = useMemo(() => createBrowserSupabaseClient(), []);
+
+  function insertTemplate(text: string) {
+    const input = inputRef.current;
+    if (!input) return;
+    input.value = input.value ? `${input.value}\n${text}` : text;
+    input.focus();
+    if (templatesDetailsRef.current) {
+      templatesDetailsRef.current.open = false;
+    }
+  }
 
   useEffect(() => {
     if (!conversationId) return;
@@ -165,7 +183,35 @@ export function ChatThread({
         <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="audience" value={audience} />
         <input type="hidden" name="conversationId" value={conversationId} />
+        {templates && templates.length > 0 && (
+          <details ref={templatesDetailsRef} className="relative">
+            <summary className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-md bg-muted px-3 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground">
+              <MessageSquareText className="h-3.5 w-3.5" />
+              {copy.templatesButton ?? "Templates"}
+            </summary>
+            <div className="absolute bottom-full left-0 z-20 mb-2 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-border/40 bg-card shadow-lg">
+              <p className="border-b border-border/25 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                {copy.templatesMenuTitle ?? copy.templatesButton ?? "Templates"}
+              </p>
+              <ul className="max-h-72 overflow-y-auto py-1">
+                {templates.map((template) => (
+                  <li key={template.id}>
+                    <button
+                      type="button"
+                      onClick={() => insertTemplate(template.conteudo)}
+                      className="block w-full px-3 py-2 text-left text-xs transition-colors hover:bg-muted/60"
+                    >
+                      <span className="block font-semibold">{template.titulo}</span>
+                      <span className="mt-0.5 line-clamp-2 text-muted-foreground">{template.conteudo}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </details>
+        )}
         <input
+          ref={inputRef}
           type="text"
           name="message"
           placeholder={copy.inputPlaceholder}

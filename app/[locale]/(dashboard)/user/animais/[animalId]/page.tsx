@@ -2,13 +2,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, Star, Trash2, Upload } from "lucide-react";
-import { isLocale } from "@/lib/i18n/config";
+import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { listAnimalPhotos } from "@/lib/canil/animal-photos";
+import { listHealthEvents } from "@/lib/canil/animal-health";
 import { AnimalForm } from "@/components/animal-form";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { PageHeader } from "@/components/page-header";
+import { AnimalHealthEditor } from "@/components/animal-health-editor";
 import {
   deleteUserAnimal,
   deleteUserAnimalPhoto,
@@ -67,12 +69,16 @@ export default async function UserAnimalEditPage({ params, searchParams }: UserA
   }
 
   const photos = await listAnimalPhotos(supabase, animalId);
+  const healthEvents = await listHealthEvents(supabase, animalId);
   const dict = getDictionary(locale);
   const editCopy = dict.canilEditAnimal;
+  const healthCopy = dict.animalHealth;
   const copy = { ...editCopy, title: animal.nome, subtitle: dict.userEditAnimal.subtitle };
   const feedback =
     (success && editCopy.messages[success]) ||
+    (success && healthCopy.successMessages[success]) ||
     (error && editCopy.messages[error]) ||
+    (error && healthCopy.errorMessages[error]) ||
     null;
 
   return (
@@ -205,6 +211,13 @@ export default async function UserAnimalEditPage({ params, searchParams }: UserA
           </div>
         )}
       </section>
+
+      <AnimalHealthEditor
+        locale={locale as Locale}
+        scope="user"
+        animalId={animal.id}
+        events={healthEvents}
+      />
 
       <section className="rounded-3xl border border-destructive/30 bg-destructive/5 p-6">
         <h2 className="text-lg font-bold text-destructive">{copy.dangerTitle}</h2>

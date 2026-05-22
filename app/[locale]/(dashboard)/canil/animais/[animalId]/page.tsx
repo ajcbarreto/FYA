@@ -2,14 +2,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, Star, Trash2, Upload } from "lucide-react";
-import { isLocale } from "@/lib/i18n/config";
+import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 import { listAnimalPhotos } from "@/lib/canil/animal-photos";
+import { listHealthEvents } from "@/lib/canil/animal-health";
 import { AnimalForm } from "@/components/animal-form";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { PageHeader } from "@/components/page-header";
+import { AnimalHealthEditor } from "@/components/animal-health-editor";
 import {
   deleteAnimal,
   deleteAnimalPhoto,
@@ -74,10 +76,15 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
   }
 
   const photos = await listAnimalPhotos(supabase, animalId);
-  const copy = { ...getDictionary(locale).canilEditAnimal, title: animal.nome };
+  const healthEvents = await listHealthEvents(supabase, animalId);
+  const dict = getDictionary(locale);
+  const copy = { ...dict.canilEditAnimal, title: animal.nome };
+  const healthCopy = dict.animalHealth;
   const feedback =
     (success && copy.messages[success]) ||
+    (success && healthCopy.successMessages[success]) ||
     (error && copy.messages[error]) ||
+    (error && healthCopy.errorMessages[error]) ||
     null;
 
   return (
@@ -210,6 +217,13 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
           </div>
         )}
       </section>
+
+      <AnimalHealthEditor
+        locale={locale as Locale}
+        scope="canil"
+        animalId={animal.id}
+        events={healthEvents}
+      />
 
       <section className="rounded-3xl border border-destructive/30 bg-destructive/5 p-6">
         <h2 className="text-lg font-bold text-destructive">{copy.dangerTitle}</h2>

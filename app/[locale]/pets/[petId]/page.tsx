@@ -21,12 +21,14 @@ import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getPetById, getRelatedPets } from "@/lib/pet-catalog/db-pets";
 import { getFavoriteAnimalIds } from "@/lib/favorites/db";
 import { listAnimalPhotos } from "@/lib/canil/animal-photos";
+import { listHealthEvents } from "@/lib/canil/animal-health";
 import { FavoriteButton } from "@/components/favorite-button";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { submitAdoptionRequest } from "@/app/adoption/actions";
 import { resolveUserRole } from "@/lib/auth/role";
 import { LogIn } from "lucide-react";
 import { ReportFlag } from "@/components/report-flag";
+import { AnimalHealthTimeline } from "@/components/animal-health-editor";
 import type { Locale } from "@/lib/i18n/config";
 
 type PetDetailsPageProps = {
@@ -90,12 +92,13 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [pet, relatedPets, favoriteIds, animalPhotos, role] = await Promise.all([
+  const [pet, relatedPets, favoriteIds, animalPhotos, role, healthEvents] = await Promise.all([
     getPetById(supabase, petId, locale),
     getRelatedPets(supabase, petId, locale),
     user ? getFavoriteAnimalIds(supabase, user.id) : Promise.resolve(new Set<string>()),
     listAnimalPhotos(supabase, petId),
     user ? resolveUserRole(supabase, user) : Promise.resolve(null),
+    listHealthEvents(supabase, petId),
   ]);
   const canApply = Boolean(user) && role === "user";
 
@@ -233,6 +236,20 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
                   </div>
                 </div>
               </div>
+
+              {healthEvents.length > 0 && (
+                <details className="mt-6 rounded-2xl bg-background/60 p-4 text-sm">
+                  <summary className="cursor-pointer font-bold text-primary">
+                    {dictionary.animalHealth.sectionTitle} ·{" "}
+                    <span className="font-medium text-muted-foreground">
+                      {dictionary.animalHealth.publicSummary(healthEvents.length)}
+                    </span>
+                  </summary>
+                  <div className="mt-3">
+                    <AnimalHealthTimeline locale={locale as Locale} events={healthEvents} />
+                  </div>
+                </details>
+              )}
             </section>
           </div>
         </section>
