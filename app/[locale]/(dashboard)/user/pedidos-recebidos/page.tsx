@@ -13,6 +13,7 @@ import { getVisitsByPedido } from "@/lib/adoption/visits";
 import { AdoptionAnswers } from "@/components/adoption-answers";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { VisitPanel } from "@/components/visit-panel";
+import { PageHeader } from "@/components/page-header";
 
 type UserReceivedRequestsPageProps = {
   params: Promise<{ locale: string }>;
@@ -54,10 +55,7 @@ export default async function UserReceivedRequestsPage({
 
   return (
     <main className="space-y-6">
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{t.subtitle}</p>
-      </header>
+      <PageHeader title={t.title} subtitle={t.subtitle} />
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       <section className="overflow-hidden rounded-3xl border border-border/20 bg-card">

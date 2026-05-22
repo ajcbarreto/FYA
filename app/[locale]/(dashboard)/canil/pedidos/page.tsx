@@ -9,6 +9,7 @@ import { getVisitsByPedido } from "@/lib/adoption/visits";
 import { AdoptionAnswers } from "@/components/adoption-answers";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { VisitPanel } from "@/components/visit-panel";
+import { PageHeader } from "@/components/page-header";
 
 type CanilRequestsPageProps = {
   params: Promise<{ locale: string }>;
@@ -50,10 +51,7 @@ export default async function CanilRequestsPage({ params, searchParams }: CanilR
 
   return (
     <main className="space-y-6">
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
-      </header>
+      <PageHeader title={copy.title} subtitle={copy.subtitle} />
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       <section className="overflow-hidden rounded-3xl border border-border/20 bg-card">
@@ -138,7 +136,7 @@ export default async function CanilRequestsPage({ params, searchParams }: CanilR
         )}
       </section>
 
-      <p className="rounded-2xl bg-muted px-4 py-3 text-xs text-muted-foreground">{copy.hint}</p>
+      <p className="rounded-xl bg-muted/60 px-4 py-3 text-xs text-muted-foreground">{copy.hint}</p>
     </main>
   );
 }

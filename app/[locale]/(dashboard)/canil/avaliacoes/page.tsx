@@ -8,6 +8,7 @@ import { getReviewsForModeration, reviewAuthorName, type ReviewEstado } from "@/
 import { moderateReview } from "@/app/canil/reviews/actions";
 import { StarRating } from "@/components/star-rating";
 import { ToastFeedback } from "@/components/toast-feedback";
+import { PageHeader } from "@/components/page-header";
 
 type CanilReviewsPageProps = {
   params: Promise<{ locale: string }>;
@@ -53,11 +54,8 @@ export default async function CanilReviewsPage({ params, searchParams }: CanilRe
 
   return (
     <main className="space-y-6">
+      <PageHeader title={copy.title} subtitle={copy.subtitle} />
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
-      <header className="rounded-2xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
-      </header>
 
       {!shelter ? (
         <p className="rounded-2xl border border-border/20 bg-card px-6 py-8 text-sm text-muted-foreground">

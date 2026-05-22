@@ -449,6 +449,8 @@ type Dictionary = {
     reminderText: string;
     chatWith: string;
     success: string;
+    youPrefix: string;
+    noPreview: string;
     errorMessages: {
       invalid_message: string;
       send_failed: string;
@@ -631,6 +633,8 @@ type Dictionary = {
     withShelter: string;
     backToList: string;
     success: string;
+    youPrefix: string;
+    noPreview: string;
     errorMessages: Record<string, string>;
   };
   userFavorites: {
@@ -1287,6 +1291,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       reminderText: "Confirmar compatibilidade com outros animais durante a visita presencial.",
       chatWith: "Conversa com",
       success: "Mensagem enviada.",
+      youPrefix: "Tu:",
+      noPreview: "Sem mensagens ainda.",
       errorMessages: {
         invalid_message: "Mensagem invalida.",
         send_failed: "Nao foi possivel enviar a mensagem.",
@@ -1495,6 +1501,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       withShelter: "Conversa com",
       backToList: "Conversas",
       success: "Mensagem enviada.",
+      youPrefix: "Tu:",
+      noPreview: "Sem mensagens ainda.",
       errorMessages: {
         invalid_message: "Mensagem invalida.",
         send_failed: "Nao foi possivel enviar a mensagem.",
@@ -2201,6 +2209,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       reminderText: "Confirm compatibility with other pets during the in-person visit.",
       chatWith: "Chat with",
       success: "Message sent.",
+      youPrefix: "You:",
+      noPreview: "No messages yet.",
       errorMessages: {
         invalid_message: "Invalid message.",
         send_failed: "Could not send message.",
@@ -2409,6 +2419,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       withShelter: "Chat with",
       backToList: "Conversations",
       success: "Message sent.",
+      youPrefix: "You:",
+      noPreview: "No messages yet.",
       errorMessages: {
         invalid_message: "Invalid message.",
         send_failed: "Could not send message.",

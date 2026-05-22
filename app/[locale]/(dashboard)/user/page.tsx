@@ -6,6 +6,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAdoptionRequestsForUser, getConversationsForUser } from "@/lib/adoption/db";
 import { getFavoriteAnimalIds } from "@/lib/favorites/db";
+import { PageHeader } from "@/components/page-header";
 
 type UserDashboardPageProps = {
   params: Promise<{ locale: string }>;
@@ -44,10 +45,7 @@ export default async function UserDashboardPage({ params }: UserDashboardPagePro
 
   return (
     <main className="space-y-6">
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
-      </header>
+      <PageHeader title={copy.title} subtitle={copy.subtitle} />
 
       <section className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
         <article className="rounded-2xl border border-border/20 bg-card p-5">

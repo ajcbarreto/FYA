@@ -5,6 +5,7 @@ import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAdminMetrics } from "@/lib/admin/metrics";
+import { PageHeader } from "@/components/page-header";
 
 type AdminDashboardPageProps = {
   params: Promise<{ locale: string }>;
@@ -50,10 +51,7 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
 
   return (
     <main className="space-y-6">
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
-      </header>
+      <PageHeader title={copy.title} subtitle={copy.subtitle} />
 
       <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {cards.map((card) => {

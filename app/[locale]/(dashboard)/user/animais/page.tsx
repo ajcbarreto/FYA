@@ -7,6 +7,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { localizeAnimalStatus, localizeSpecies } from "@/lib/canil/shelter-data";
 import { updateUserAnimalStatus } from "@/app/[locale]/(dashboard)/user/animais/actions";
 import { ToastFeedback } from "@/components/toast-feedback";
+import { PageHeader } from "@/components/page-header";
 
 type UserPetsPageProps = {
   params: Promise<{ locale: string }>;
@@ -55,19 +56,19 @@ export default async function UserPetsPage({ params, searchParams }: UserPetsPag
 
   return (
     <main className="space-y-6">
-      <header className="flex flex-col gap-4 rounded-3xl border border-border/20 bg-card p-8 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">{t.subtitle}</p>
-        </div>
-        <Link
-          href={`/${locale}/user/animais/novo`}
-          className="inline-flex w-fit items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground"
-        >
-          <Plus className="h-4 w-4" />
-          {canilT.newPet}
-        </Link>
-      </header>
+      <PageHeader
+        title={t.title}
+        subtitle={t.subtitle}
+        actions={
+          <Link
+            href={`/${locale}/user/animais/novo`}
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            <Plus className="h-4 w-4" />
+            {canilT.newPet}
+          </Link>
+        }
+      />
 
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 

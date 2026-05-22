@@ -6,6 +6,7 @@ import { getAdoptionRequestsForUser, getRowAnimal, getRowCanil, localizeRequestS
 import { getVisitsByPedido } from "@/lib/adoption/visits";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { VisitPanel } from "@/components/visit-panel";
+import { PageHeader } from "@/components/page-header";
 
 type UserRequestsPageProps = {
   params: Promise<{ locale: string }>;
@@ -42,10 +43,7 @@ export default async function UserRequestsPage({ params, searchParams }: UserReq
 
   return (
     <main className="space-y-6">
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
-      </header>
+      <PageHeader title={copy.title} subtitle={copy.subtitle} />
 
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 

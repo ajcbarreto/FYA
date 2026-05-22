@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { PageHeader } from "@/components/page-header";
 
 type UserSettingsPageProps = {
   params: Promise<{ locale: string }>;
@@ -28,10 +29,7 @@ export default async function UserSettingsPage({ params }: UserSettingsPageProps
 
   return (
     <main className="space-y-6">
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{t.subtitle}</p>
-      </header>
+      <PageHeader title={t.title} subtitle={t.subtitle} />
 
       <section className="rounded-3xl border border-border/20 bg-card p-6">
         <dl className="space-y-4 text-sm">

@@ -177,6 +177,43 @@ export async function getConversationsForUser(supabase: SupabaseClient, userId: 
   return data as ConversationRow[];
 }
 
+// Devolve a ultima mensagem de cada conversa, indexada pelo id da conversa.
+// Util para listas de conversas que querem mostrar preview da ultima troca.
+export async function getLatestMessagesByConversationIds(
+  supabase: SupabaseClient,
+  conversationIds: string[],
+) {
+  const result = new Map<string, { conteudo: string; created_at: string; sender_profile_id: string }>();
+  if (conversationIds.length === 0) return result;
+
+  const { data, error } = await supabase
+    .from("mensagens_adocao")
+    .select("conversa_id,conteudo,created_at,sender_profile_id")
+    .in("conversa_id", conversationIds)
+    .order("created_at", { ascending: false });
+
+  if (error || !data) {
+    if (error) console.error("[getLatestMessagesByConversationIds] Supabase error:", error.message);
+    return result;
+  }
+
+  for (const row of data as Array<{
+    conversa_id: string;
+    conteudo: string;
+    created_at: string;
+    sender_profile_id: string;
+  }>) {
+    if (!result.has(row.conversa_id)) {
+      result.set(row.conversa_id, {
+        conteudo: row.conteudo,
+        created_at: row.created_at,
+        sender_profile_id: row.sender_profile_id,
+      });
+    }
+  }
+  return result;
+}
+
 export async function getMessagesByConversationId(supabase: SupabaseClient, conversationId: string) {
   const { data, error } = await supabase
     .from("mensagens_adocao")

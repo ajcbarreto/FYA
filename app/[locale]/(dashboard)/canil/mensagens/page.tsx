@@ -8,17 +8,24 @@ import { getShelterForUser } from "@/lib/canil/shelter-data";
 import {
   getApplicationAnswersForConversation,
   getConversationsForCanil,
+  getLatestMessagesByConversationIds,
   getMessagesByConversationId,
   mapConversationListItem,
 } from "@/lib/adoption/db";
 import { ChatThread } from "@/components/chat-thread";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { AdoptionAnswers } from "@/components/adoption-answers";
+import { PageHeader } from "@/components/page-header";
+import { formatRelativeTime } from "@/lib/format/time";
 
 type CanilMessagesPageProps = {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{ conversation?: string; q?: string; success?: string; error?: string }>;
 };
+
+function initialFor(name: string) {
+  return (name.trim().charAt(0) || "?").toUpperCase();
+}
 
 export default async function CanilMessagesPage({ params, searchParams }: CanilMessagesPageProps) {
   const { locale } = await params;
@@ -45,6 +52,10 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
 
   const conversationRows = await getConversationsForCanil(supabase, shelter.id);
   const conversations = conversationRows.map((row) => mapConversationListItem(row, locale));
+  const latestByConversation = await getLatestMessagesByConversationIds(
+    supabase,
+    conversations.map((conversation) => conversation.id),
+  );
   const visibleConversations = query
     ? conversations.filter((conversation) =>
         [conversation.canilName, conversation.animalName, conversation.applicantName].some((value) =>
@@ -74,56 +85,65 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
 
   return (
     <main className="space-y-6">
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
-      </header>
+      <PageHeader title={copy.title} />
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
         <article
-          className={`rounded-2xl border border-border/20 bg-card p-4 xl:col-span-4 xl:block ${
+          className={`rounded-2xl border border-border/25 bg-card p-3 xl:col-span-4 xl:block ${
             selectedConversationId ? "hidden" : "block"
           }`}
         >
-          <form method="get" className="mb-4">
+          <form method="get" className="mb-3 px-1">
             <input
               type="search"
               name="q"
               defaultValue={q ?? ""}
               placeholder={copy.searchPlaceholder}
-              className="h-11 w-full rounded-lg border border-border/40 bg-background px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+              className="h-10 w-full rounded-lg border border-border/40 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
             />
           </form>
-          <div className="space-y-1.5">
+          <ul className="space-y-1">
             {visibleConversations.length === 0 ? (
-              <p className="px-2 py-4 text-sm text-muted-foreground">{copy.noConversations}</p>
+              <li className="px-2 py-4 text-sm text-muted-foreground">{copy.noConversations}</li>
             ) : (
-              visibleConversations.map((conversation) => (
-                <a
-                  key={conversation.id}
-                  href={`/${locale}/canil/mensagens?conversation=${conversation.id}`}
-                  className={`block w-full rounded-lg px-4 py-3 text-left transition-colors ${
-                    activeConversation?.id === conversation.id ? "bg-muted" : "hover:bg-muted/60"
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="font-semibold">{conversation.applicantName}</p>
-                    <span className="text-xs text-muted-foreground">
-                      {new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(
-                        new Date(conversation.updatedAt),
-                      )}
-                    </span>
-                  </div>
-                  <p className="mt-0.5 text-xs text-primary">{conversation.animalName}</p>
-                  <p className="mt-1 truncate text-sm text-muted-foreground">{conversation.canilName}</p>
-                </a>
-              ))
+              visibleConversations.map((conversation) => {
+                const isActive = activeConversation?.id === conversation.id;
+                const latest = latestByConversation.get(conversation.id);
+                const preview = latest
+                  ? `${latest.sender_profile_id === user.id ? `${copy.youPrefix} ` : ""}${latest.conteudo}`
+                  : copy.noPreview;
+                return (
+                  <li key={conversation.id}>
+                    <Link
+                      href={`/${locale}/canil/mensagens?conversation=${conversation.id}`}
+                      className={`flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${
+                        isActive ? "bg-primary/10" : "hover:bg-muted/60"
+                      }`}
+                    >
+                      <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary">
+                        {initialFor(conversation.applicantName)}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-baseline justify-between gap-2">
+                          <span className="truncate text-sm font-semibold">{conversation.applicantName}</span>
+                          <span className="shrink-0 text-[11px] text-muted-foreground">
+                            {formatRelativeTime(latest?.created_at ?? conversation.updatedAt, locale)}
+                          </span>
+                        </span>
+                        <span className="block truncate text-xs text-primary">{conversation.animalName}</span>
+                        <span className="mt-0.5 block truncate text-xs text-muted-foreground">{preview}</span>
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })
             )}
-          </div>
+          </ul>
         </article>
 
         <article
-          className={`flex-col rounded-2xl border border-border/20 bg-card p-4 sm:p-6 xl:col-span-5 xl:flex ${
+          className={`flex-col rounded-2xl border border-border/25 bg-card p-4 sm:p-6 xl:col-span-5 xl:flex ${
             selectedConversationId ? "flex" : "hidden"
           }`}
         >
@@ -150,7 +170,7 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
                 conversationId={activeConversation.id}
                 currentUserId={user.id}
                 currentUserInitial={(activeConversation.canilName || user.email || "?").charAt(0).toUpperCase()}
-                otherPartyInitial={(activeConversation.applicantName || "?").charAt(0).toUpperCase()}
+                otherPartyInitial={initialFor(activeConversation.applicantName)}
                 audience="canil"
                 locale={locale}
                 initialMessages={messages.map((message) => ({
@@ -173,16 +193,16 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
         </article>
 
         <article
-          className={`rounded-2xl border border-border/20 bg-card p-6 xl:col-span-3 xl:block ${
+          className={`rounded-2xl border border-border/25 bg-card p-6 xl:col-span-3 xl:block ${
             selectedConversationId ? "block" : "hidden"
           }`}
         >
           <h2 className="text-lg font-bold">{activeConversation?.applicantName ?? "-"}</h2>
-          <p className="mt-4 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{copy.adopterInfo}</p>
+          <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{copy.adopterInfo}</p>
           {activeConversation ? (
             <div className="mt-3 space-y-3">
               {application?.mensagemInicial && (
-                <p className="rounded-xl bg-muted px-3 py-2 text-sm italic text-muted-foreground">
+                <p className="rounded-xl bg-muted/60 px-3 py-2 text-sm italic text-muted-foreground">
                   {application.mensagemInicial}
                 </p>
               )}
@@ -192,7 +212,7 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
             <p className="mt-3 text-sm text-muted-foreground">{copy.noConversations}</p>
           )}
 
-          <p className="mt-6 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{copy.reminder}</p>
+          <p className="mt-6 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{copy.reminder}</p>
           <p className="mt-2 text-sm text-muted-foreground">{copy.reminderText}</p>
         </article>
       </section>

@@ -6,6 +6,7 @@ import { getPetCatalogFiltersConfig } from "@/lib/pet-catalog/filter-config";
 import { getPlatformSettings } from "@/lib/admin/platform-settings";
 import { updatePetCatalogFilters, updatePlatformSettings } from "@/app/[locale]/(admin)/admin/actions";
 import { ToastFeedback } from "@/components/toast-feedback";
+import { PageHeader } from "@/components/page-header";
 
 type AdminSettingsPageProps = {
   params: Promise<{ locale: string }>;
@@ -40,10 +41,7 @@ export default async function AdminSettingsPage({ params, searchParams }: AdminS
   return (
     <main className="space-y-6">
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
-      </header>
+      <PageHeader title={copy.title} subtitle={copy.subtitle} />
 
       <section className="rounded-3xl border border-border/20 bg-card p-6">
         <h2 className="text-lg font-bold">{copy.platformTitle}</h2>

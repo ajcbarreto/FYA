@@ -5,6 +5,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { toggleShelterVerification } from "@/app/[locale]/(admin)/admin/actions";
 import { ToastFeedback } from "@/components/toast-feedback";
+import { PageHeader } from "@/components/page-header";
 
 type AdminSheltersPageProps = {
   params: Promise<{ locale: string }>;
@@ -42,10 +43,7 @@ export default async function AdminSheltersPage({ params, searchParams }: AdminS
   return (
     <main className="space-y-6">
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
-      </header>
+      <PageHeader title={copy.title} subtitle={copy.subtitle} />
 
       <section className="overflow-hidden rounded-3xl border border-border/20 bg-card">
         {shelters.length === 0 ? (
