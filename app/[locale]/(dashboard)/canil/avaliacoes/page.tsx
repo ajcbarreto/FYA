@@ -9,6 +9,7 @@ import { moderateReview } from "@/app/canil/reviews/actions";
 import { StarRating } from "@/components/star-rating";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { PageHeader } from "@/components/page-header";
+import { PageEmpty } from "@/components/page-empty";
 
 type CanilReviewsPageProps = {
   params: Promise<{ locale: string }>;
@@ -76,9 +77,7 @@ export default async function CanilReviewsPage({ params, searchParams }: CanilRe
               )}
             </div>
             {pending.length === 0 ? (
-              <p className="rounded-2xl border border-border/25 bg-card px-6 py-8 text-sm text-muted-foreground">
-                {copy.emptyPending}
-              </p>
+  <PageEmpty title={copy.emptyPending} icon={MessageSquareText} />
             ) : (
               <ul className="space-y-3">
                 {pending.map((review) => (
@@ -127,9 +126,7 @@ export default async function CanilReviewsPage({ params, searchParams }: CanilRe
               {copy.historyTitle}
             </h2>
             {moderated.length === 0 ? (
-              <p className="rounded-2xl border border-border/25 bg-card px-6 py-8 text-sm text-muted-foreground">
-                {copy.emptyHistory}
-              </p>
+  <PageEmpty title={copy.emptyHistory} icon={MessageSquareText} />
             ) : (
               <ul className="space-y-3">
                 {moderated.map((review) => (

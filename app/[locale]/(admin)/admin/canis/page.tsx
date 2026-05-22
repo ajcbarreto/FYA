@@ -6,6 +6,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { toggleShelterVerification } from "@/app/[locale]/(admin)/admin/actions";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { PageHeader } from "@/components/page-header";
+import { PageEmpty } from "@/components/page-empty";
 
 type AdminSheltersPageProps = {
   params: Promise<{ locale: string }>;
@@ -46,9 +47,7 @@ export default async function AdminSheltersPage({ params, searchParams }: AdminS
       <PageHeader title={copy.title} subtitle={copy.subtitle} />
 
       {shelters.length === 0 ? (
-        <p className="rounded-2xl border border-border/25 bg-card px-6 py-8 text-sm text-muted-foreground">
-          {copy.empty}
-        </p>
+        <PageEmpty title={copy.empty} icon={Building2} />
       ) : (
         <ul className="space-y-3">
           {shelters.map((shelter) => {

@@ -9,6 +9,8 @@ import { updateAnimalStatus } from "@/app/[locale]/(dashboard)/canil/actions";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { PageHeader } from "@/components/page-header";
 import { StatCard } from "@/components/stat-card";
+import { PageEmpty } from "@/components/page-empty";
+import { PawPrint } from "lucide-react";
 
 type CanilPetsPageProps = {
   params: Promise<{ locale: string }>;
@@ -70,10 +72,22 @@ export default async function CanilPetsPage({ params, searchParams }: CanilPetsP
         <StatCard label={copy.statusOptions.adotado} value={summary.adopted} />
       </section>
 
-      <section className="overflow-hidden rounded-3xl border border-border/20 bg-card">
-        {animals.length === 0 ? (
-          <p className="px-6 py-8 text-sm text-muted-foreground">{copy.noAnimals}</p>
-        ) : (
+      {animals.length === 0 ? (
+        <PageEmpty
+          title={copy.noAnimals}
+          icon={PawPrint}
+          action={
+            <Link
+              href={`/${locale}/canil/animais/novo`}
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus className="h-4 w-4" />
+              {copy.newPet}
+            </Link>
+          }
+        />
+      ) : (
+        <section className="overflow-hidden rounded-3xl border border-border/20 bg-card">
           <div className="overflow-x-auto stacked-table">
             <table className="w-full min-w-[760px] text-left">
               <thead className="bg-muted text-xs uppercase tracking-[0.14em] text-muted-foreground">
@@ -131,8 +145,8 @@ export default async function CanilPetsPage({ params, searchParams }: CanilPetsP
               </tbody>
             </table>
           </div>
-        )}
-      </section>
+        </section>
+      )}
 
     </main>
   );

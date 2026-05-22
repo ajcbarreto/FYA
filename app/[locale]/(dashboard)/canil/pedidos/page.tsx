@@ -5,8 +5,10 @@ import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 import { getAdoptionRequestsForCanil } from "@/lib/adoption/db";
 import { getVisitsByPedido } from "@/lib/adoption/visits";
+import { Inbox } from "lucide-react";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { PageHeader } from "@/components/page-header";
+import { PageEmpty } from "@/components/page-empty";
 import { RequestCard } from "@/components/request-card";
 
 type CanilRequestsPageProps = {
@@ -53,9 +55,7 @@ export default async function CanilRequestsPage({ params, searchParams }: CanilR
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       {requests.length === 0 ? (
-        <p className="rounded-2xl border border-border/25 bg-card px-6 py-8 text-sm text-muted-foreground">
-          {copy.empty}
-        </p>
+        <PageEmpty title={copy.empty} icon={Inbox} />
       ) : (
         <div className="space-y-3">
           {requests.map((request) => (

@@ -5,7 +5,9 @@ import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAdoptionRequestsForOwner } from "@/lib/adoption/db";
 import { getVisitsByPedido } from "@/lib/adoption/visits";
 import { ToastFeedback } from "@/components/toast-feedback";
+import { Inbox } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
+import { PageEmpty } from "@/components/page-empty";
 import { RequestCard } from "@/components/request-card";
 
 type UserReceivedRequestsPageProps = {
@@ -52,9 +54,7 @@ export default async function UserReceivedRequestsPage({
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       {requests.length === 0 ? (
-        <p className="rounded-2xl border border-border/25 bg-card px-6 py-8 text-sm text-muted-foreground">
-          {t.empty}
-        </p>
+        <PageEmpty title={t.empty} icon={Inbox} />
       ) : (
         <div className="space-y-3">
           {requests.map((request) => (

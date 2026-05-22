@@ -2,12 +2,13 @@ import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { Check } from "lucide-react";
+import { Check, Send } from "lucide-react";
 import { getAdoptionRequestsForUser, getRowAnimal, getRowCanil, localizeRequestStatus } from "@/lib/adoption/db";
 import { getVisitsByPedido } from "@/lib/adoption/visits";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { VisitPanel } from "@/components/visit-panel";
 import { PageHeader } from "@/components/page-header";
+import { PageEmpty } from "@/components/page-empty";
 
 type UserRequestsPageProps = {
   params: Promise<{ locale: string }>;
@@ -49,9 +50,7 @@ export default async function UserRequestsPage({ params, searchParams }: UserReq
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       {requests.length === 0 ? (
-        <p className="rounded-2xl border border-border/25 bg-card px-6 py-8 text-sm text-muted-foreground">
-          {copy.empty}
-        </p>
+        <PageEmpty title={copy.empty} icon={Send} />
       ) : (
         <ul className="space-y-3">
           {requests.map((request) => {
