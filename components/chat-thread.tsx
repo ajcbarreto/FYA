@@ -94,7 +94,7 @@ export function ChatThread({
     <div className="flex min-h-0 flex-1 flex-col">
       <div
         ref={listRef}
-        className="flex max-h-[55vh] min-h-[280px] flex-1 flex-col gap-1 overflow-y-auto py-4 pr-1"
+        className="flex max-h-[55vh] min-h-[280px] flex-1 flex-col overflow-y-auto py-4 pr-1"
       >
         {messages.length === 0 ? (
           <p className="text-sm text-muted-foreground">{copy.empty}</p>
@@ -102,14 +102,18 @@ export function ChatThread({
           messages.map((message, index) => {
             const isMine = message.sender_profile_id === currentUserId;
             const previous = messages[index - 1];
+            const next = messages[index + 1];
             const showDay =
               !previous || dayKey(new Date(previous.created_at)) !== dayKey(new Date(message.created_at));
+            const isFirstOfRun =
+              showDay || !previous || previous.sender_profile_id !== message.sender_profile_id;
+            const isLastOfRun = !next || next.sender_profile_id !== message.sender_profile_id;
             const time = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(
               new Date(message.created_at),
             );
 
             return (
-              <div key={message.id}>
+              <div key={message.id} className={isFirstOfRun ? "mt-3 first:mt-0" : "mt-0.5"}>
                 {showDay && (
                   <div className="my-3 flex justify-center">
                     <span className="rounded-full bg-muted px-3 py-1 text-[11px] font-semibold text-muted-foreground">
@@ -118,24 +122,34 @@ export function ChatThread({
                   </div>
                 )}
                 <div className={`flex items-end gap-2 ${isMine ? "flex-row-reverse" : "flex-row"}`}>
-                  <span
-                    className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
-                      isMine ? "bg-primary/15 text-primary" : "bg-secondary/15 text-secondary"
-                    }`}
-                  >
-                    {isMine ? currentUserInitial : otherPartyInitial}
-                  </span>
+                  {isLastOfRun ? (
+                    <span
+                      className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
+                        isMine ? "bg-primary/15 text-primary" : "bg-secondary/15 text-secondary"
+                      }`}
+                    >
+                      {isMine ? currentUserInitial : otherPartyInitial}
+                    </span>
+                  ) : (
+                    <span className="h-7 w-7 shrink-0" aria-hidden />
+                  )}
                   <div
-                    className={`max-w-[78%] rounded-2xl px-4 py-2.5 text-sm ${
+                    className={`group/message max-w-[78%] rounded-2xl px-3.5 py-2 text-sm ${
                       isMine
-                        ? "rounded-br-md bg-primary text-primary-foreground"
-                        : "rounded-bl-md bg-muted text-foreground"
+                        ? `${isLastOfRun ? "rounded-br-md" : ""} bg-primary text-primary-foreground`
+                        : `${isLastOfRun ? "rounded-bl-md" : ""} bg-muted text-foreground`
                     }`}
                   >
-                    <p className="whitespace-pre-wrap break-words">{message.conteudo}</p>
-                    <p className={`mt-1 text-[10px] ${isMine ? "text-primary-foreground/75" : "text-muted-foreground"}`}>
-                      {time}
-                    </p>
+                    <p className="whitespace-pre-wrap break-words leading-snug">{message.conteudo}</p>
+                    {isLastOfRun && (
+                      <p
+                        className={`mt-1 text-[10px] ${
+                          isMine ? "text-primary-foreground/70" : "text-muted-foreground"
+                        }`}
+                      >
+                        {time}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

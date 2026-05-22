@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Building2, HeartHandshake, PawPrint, ClipboardList, ShieldAlert, UserPlus, Users, ArrowRight } from "lucide-react";
+import { Building2, ClipboardList, Users, ArrowRight } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAdminMetrics } from "@/lib/admin/metrics";
 import { PageHeader } from "@/components/page-header";
+import { StatCard } from "@/components/stat-card";
 
 type AdminDashboardPageProps = {
   params: Promise<{ locale: string }>;
@@ -23,15 +24,15 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
 
   const copy = getDictionary(locale).adminDashboard;
 
-  const cards = [
-    { label: copy.cardAdoptions, value: metrics.adoptionsCompleted, icon: HeartHandshake, accent: "text-secondary" },
-    { label: copy.cardPending, value: metrics.pendingRequests, icon: ClipboardList, accent: "text-primary" },
-    { label: copy.cardSheltersPending, value: metrics.sheltersPending, icon: ShieldAlert, accent: "text-destructive" },
-    { label: copy.cardNewUsers, value: metrics.newUsersThisWeek, icon: UserPlus, accent: "text-primary" },
-    { label: copy.cardShelters, value: metrics.sheltersTotal, icon: Building2, accent: "text-foreground" },
-    { label: copy.cardUsers, value: metrics.usersTotal, icon: Users, accent: "text-foreground" },
-    { label: copy.cardAnimals, value: metrics.animalsTotal, icon: PawPrint, accent: "text-foreground" },
-    { label: copy.cardAvailable, value: metrics.animalsAvailable, icon: PawPrint, accent: "text-secondary" },
+  const cards: Array<{ label: string; value: number; tone?: "default" | "primary" | "secondary" | "destructive" }> = [
+    { label: copy.cardAdoptions, value: metrics.adoptionsCompleted, tone: "secondary" },
+    { label: copy.cardPending, value: metrics.pendingRequests, tone: "primary" },
+    { label: copy.cardSheltersPending, value: metrics.sheltersPending, tone: "destructive" },
+    { label: copy.cardNewUsers, value: metrics.newUsersThisWeek, tone: "primary" },
+    { label: copy.cardShelters, value: metrics.sheltersTotal },
+    { label: copy.cardUsers, value: metrics.usersTotal },
+    { label: copy.cardAnimals, value: metrics.animalsTotal },
+    { label: copy.cardAvailable, value: metrics.animalsAvailable, tone: "secondary" },
   ];
 
   const attentionItems = [
@@ -54,36 +55,34 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
       <PageHeader title={copy.title} subtitle={copy.subtitle} />
 
       <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {cards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <article key={card.label} className="rounded-2xl border border-border/20 bg-card p-5">
-              <div className="mb-3 inline-flex rounded-full bg-muted p-2.5 text-primary">
-                <Icon className="h-4 w-4" />
-              </div>
-              <p className="text-xs text-muted-foreground">{card.label}</p>
-              <p className={`mt-1 text-3xl font-bold ${card.accent}`}>{card.value}</p>
-            </article>
-          );
-        })}
+        {cards.map((card) => (
+          <StatCard key={card.label} label={card.label} value={card.value} tone={card.tone} />
+        ))}
       </section>
 
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <article className="rounded-3xl border border-border/20 bg-card p-6">
+        <article className="rounded-2xl border border-border/25 bg-card p-6">
           <h2 className="text-lg font-bold">{copy.attentionTitle}</h2>
           {attentionItems.length === 0 ? (
-            <p className="mt-3 rounded-2xl bg-muted px-4 py-3 text-sm text-muted-foreground">{copy.allClear}</p>
+            <p className="mt-4 inline-flex items-center gap-2 rounded-xl bg-secondary/10 px-3 py-2 text-sm font-semibold text-secondary">
+              {copy.allClear}
+            </p>
           ) : (
-            <ul className="mt-3 space-y-2">
+            <ul className="mt-4 space-y-2">
               {attentionItems.map((item) => (
-                <li key={item.text} className="rounded-2xl border border-border/20 px-4 py-3 text-sm">
+                <li key={item.text}>
                   {item.href ? (
-                    <Link href={item.href} className="flex items-center justify-between gap-3 font-medium hover:text-primary">
+                    <Link
+                      href={item.href}
+                      className="flex items-center justify-between gap-3 rounded-xl border border-border/25 px-3 py-2.5 text-sm font-medium transition-colors hover:border-primary/40 hover:bg-muted/60"
+                    >
                       {item.text}
-                      <ArrowRight className="h-4 w-4 shrink-0" />
+                      <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
                     </Link>
                   ) : (
-                    <span className="font-medium">{item.text}</span>
+                    <span className="block rounded-xl border border-border/25 px-3 py-2.5 text-sm font-medium">
+                      {item.text}
+                    </span>
                   )}
                 </li>
               ))}
@@ -91,16 +90,16 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
           )}
         </article>
 
-        <article className="rounded-3xl border border-border/20 bg-card p-6">
+        <article className="rounded-2xl border border-border/25 bg-card p-6">
           <h2 className="text-lg font-bold">{copy.quickTitle}</h2>
-          <div className="mt-3 space-y-2">
+          <div className="mt-4 space-y-2">
             {quickLinks.map((link) => {
               const Icon = link.icon;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="flex items-center gap-3 rounded-2xl border border-border/20 px-4 py-3 text-sm font-semibold hover:bg-muted"
+                  className="flex items-center gap-3 rounded-xl border border-border/25 px-3 py-2.5 text-sm font-semibold transition-colors hover:border-primary/40 hover:bg-muted/60"
                 >
                   <Icon className="h-4 w-4 text-primary" />
                   {link.label}
