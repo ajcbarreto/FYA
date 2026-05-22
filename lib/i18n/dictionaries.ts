@@ -551,6 +551,13 @@ type Dictionary = {
     empty: string;
     visitsLabel: string;
     noShelterNotes: string;
+    statusLabels: {
+      pendente: string;
+      entrevista: string;
+      aprovado: string;
+      concluido: string;
+      rejeitado: string;
+    };
     successMessages: Record<string, string>;
     errorMessages: Record<string, string>;
   };
@@ -1393,6 +1400,13 @@ const dictionaries: Record<Locale, Dictionary> = {
       empty: "Ainda nao tens pedidos. Visita o catalogo e candidata-te a um pet.",
       visitsLabel: "Visitas",
       noShelterNotes: "Sem notas do canil.",
+      statusLabels: {
+        pendente: "Pendente",
+        entrevista: "Entrevista",
+        aprovado: "Aprovado",
+        concluido: "Concluido",
+        rejeitado: "Rejeitado",
+      },
       successMessages: {
         request_created: "Candidatura enviada com sucesso.",
         visit_proposed: "Visita proposta. Aguarda confirmacao do canil.",
@@ -2311,6 +2325,13 @@ const dictionaries: Record<Locale, Dictionary> = {
       empty: "You have not submitted requests yet. Visit the pet catalog to apply.",
       visitsLabel: "Visits",
       noShelterNotes: "No notes from shelter.",
+      statusLabels: {
+        pendente: "Pending",
+        entrevista: "Interview",
+        aprovado: "Approved",
+        concluido: "Completed",
+        rejeitado: "Rejected",
+      },
       successMessages: {
         request_created: "Application submitted successfully.",
         visit_proposed: "Visit proposed. Waiting for the shelter to confirm.",

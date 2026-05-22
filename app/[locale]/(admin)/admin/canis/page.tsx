@@ -45,72 +45,66 @@ export default async function AdminSheltersPage({ params, searchParams }: AdminS
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
       <PageHeader title={copy.title} subtitle={copy.subtitle} />
 
-      <section className="overflow-hidden rounded-3xl border border-border/20 bg-card">
-        {shelters.length === 0 ? (
-          <p className="px-6 py-8 text-sm text-muted-foreground">{copy.empty}</p>
-        ) : (
-          <div className="overflow-x-auto stacked-table">
-            <table className="w-full min-w-[680px] text-left">
-              <thead className="bg-muted text-xs uppercase tracking-[0.14em] text-muted-foreground">
-                <tr>
-                  <th className="px-6 py-4 font-bold">{copy.colName}</th>
-                  <th className="px-6 py-4 font-bold">{copy.colJoined}</th>
-                  <th className="px-6 py-4 font-bold">{copy.colStatus}</th>
-                  <th className="px-6 py-4 font-bold">{copy.colActions}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {shelters.map((shelter) => (
-                  <tr key={shelter.id} className="border-t border-border/15">
-                    <td className="px-6 py-4">
-                      <p className="flex items-center gap-2 font-semibold">
-                        <Building2 className="h-4 w-4 text-primary" />
-                        {shelter.nome}
-                      </p>
-                      <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-muted-foreground">
-                        <MapPin className="h-3 w-3" />
-                        {shelter.localizacao}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">
-                      {new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short", year: "numeric" }).format(
-                        new Date(shelter.created_at),
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${
-                          shelter.verificado ? "bg-secondary/15 text-secondary" : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {shelter.verificado ? <BadgeCheck className="h-3 w-3" /> : <ShieldOff className="h-3 w-3" />}
-                        {shelter.verificado ? copy.verified : copy.pending}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <form action={toggleShelterVerification}>
-                        <input type="hidden" name="locale" value={locale} />
-                        <input type="hidden" name="shelterId" value={shelter.id} />
-                        <input type="hidden" name="verify" value={shelter.verificado ? "false" : "true"} />
-                        <button
-                          type="submit"
-                          className={`rounded-full px-4 py-1.5 text-xs font-bold ${
-                            shelter.verificado
-                              ? "bg-muted text-muted-foreground hover:text-destructive"
-                              : "bg-primary text-primary-foreground"
-                          }`}
-                        >
-                          {shelter.verificado ? copy.unverify : copy.verify}
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+      {shelters.length === 0 ? (
+        <p className="rounded-2xl border border-border/25 bg-card px-6 py-8 text-sm text-muted-foreground">
+          {copy.empty}
+        </p>
+      ) : (
+        <ul className="space-y-3">
+          {shelters.map((shelter) => {
+            const joined = new Intl.DateTimeFormat(locale, {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            }).format(new Date(shelter.created_at));
+            return (
+              <li
+                key={shelter.id}
+                className="flex flex-col gap-3 rounded-2xl border border-border/25 bg-card p-5 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="flex items-start gap-3">
+                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Building2 className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold">{shelter.nome}</p>
+                    <p className="mt-0.5 inline-flex items-center gap-1 truncate text-xs text-muted-foreground">
+                      <MapPin className="h-3 w-3" />
+                      {shelter.localizacao}
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">{joined}</p>
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center gap-3">
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${
+                      shelter.verificado ? "bg-secondary/15 text-secondary" : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {shelter.verificado ? <BadgeCheck className="h-3 w-3" /> : <ShieldOff className="h-3 w-3" />}
+                    {shelter.verificado ? copy.verified : copy.pending}
+                  </span>
+                  <form action={toggleShelterVerification}>
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="shelterId" value={shelter.id} />
+                    <input type="hidden" name="verify" value={shelter.verificado ? "false" : "true"} />
+                    <button
+                      type="submit"
+                      className={`h-9 rounded-full px-4 text-xs font-semibold transition-colors ${
+                        shelter.verificado
+                          ? "bg-muted text-muted-foreground hover:text-destructive"
+                          : "bg-primary text-primary-foreground hover:bg-primary/90"
+                      }`}
+                    >
+                      {shelter.verificado ? copy.unverify : copy.verify}
+                    </button>
+                  </form>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </main>
   );
 }

@@ -58,42 +58,46 @@ export default async function CanilReviewsPage({ params, searchParams }: CanilRe
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       {!shelter ? (
-        <p className="rounded-2xl border border-border/20 bg-card px-6 py-8 text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-border/25 bg-card px-6 py-8 text-sm text-muted-foreground">
           {copy.noShelter}
         </p>
       ) : (
         <>
-          <section className="rounded-2xl border border-border/20 bg-card p-6">
-            <h2 className="inline-flex items-center gap-2 text-lg font-bold">
-              <MessageSquareText className="h-5 w-5 text-primary" />
-              {copy.pendingTitle}
+          <section className="space-y-3">
+            <div className="flex items-center gap-2">
+              <MessageSquareText className="h-4 w-4 text-primary" />
+              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                {copy.pendingTitle}
+              </h2>
               {pending.length > 0 && (
-                <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-primary-foreground">
+                <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">
                   {pending.length}
                 </span>
               )}
-            </h2>
+            </div>
             {pending.length === 0 ? (
-              <p className="mt-4 text-sm text-muted-foreground">{copy.emptyPending}</p>
+              <p className="rounded-2xl border border-border/25 bg-card px-6 py-8 text-sm text-muted-foreground">
+                {copy.emptyPending}
+              </p>
             ) : (
-              <ul className="mt-4 space-y-3">
+              <ul className="space-y-3">
                 {pending.map((review) => (
-                  <li key={review.id} className="rounded-xl border border-border/20 p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
+                  <li key={review.id} className="rounded-2xl border border-border/25 bg-card p-5">
+                    <header className="flex flex-wrap items-center justify-between gap-2">
                       <p className="font-semibold">{reviewAuthorName(review, locale)}</p>
                       <StarRating value={review.rating} />
-                    </div>
+                    </header>
                     {review.comentario && (
                       <p className="mt-2 text-sm text-muted-foreground">{review.comentario}</p>
                     )}
-                    <div className="mt-3 flex gap-2">
+                    <div className="mt-4 flex flex-wrap gap-2 border-t border-border/15 pt-4">
                       <form action={moderateReview}>
                         <input type="hidden" name="locale" value={locale} />
                         <input type="hidden" name="reviewId" value={review.id} />
                         <input type="hidden" name="decision" value="aprovada" />
                         <button
                           type="submit"
-                          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                          className="inline-flex h-9 items-center gap-1.5 rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                         >
                           <Check className="h-3.5 w-3.5" />
                           {copy.approve}
@@ -105,7 +109,7 @@ export default async function CanilReviewsPage({ params, searchParams }: CanilRe
                         <input type="hidden" name="decision" value="rejeitada" />
                         <button
                           type="submit"
-                          className="inline-flex items-center gap-1.5 rounded-lg bg-muted px-4 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-destructive"
+                          className="inline-flex h-9 items-center gap-1.5 rounded-full bg-muted px-4 text-xs font-semibold text-muted-foreground transition-colors hover:text-destructive"
                         >
                           <X className="h-3.5 w-3.5" />
                           {copy.reject}
@@ -118,23 +122,27 @@ export default async function CanilReviewsPage({ params, searchParams }: CanilRe
             )}
           </section>
 
-          <section className="rounded-2xl border border-border/20 bg-card p-6">
-            <h2 className="text-lg font-bold">{copy.historyTitle}</h2>
+          <section className="space-y-3">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+              {copy.historyTitle}
+            </h2>
             {moderated.length === 0 ? (
-              <p className="mt-4 text-sm text-muted-foreground">{copy.emptyHistory}</p>
+              <p className="rounded-2xl border border-border/25 bg-card px-6 py-8 text-sm text-muted-foreground">
+                {copy.emptyHistory}
+              </p>
             ) : (
-              <ul className="mt-4 space-y-3">
+              <ul className="space-y-3">
                 {moderated.map((review) => (
-                  <li key={review.id} className="rounded-xl border border-border/20 p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
+                  <li key={review.id} className="rounded-2xl border border-border/25 bg-card p-5">
+                    <header className="flex flex-wrap items-center justify-between gap-2">
                       <p className="font-semibold">{reviewAuthorName(review, locale)}</p>
                       <span className="flex items-center gap-2">
                         <StarRating value={review.rating} />
-                        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${estadoClass(review.estado)}`}>
+                        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${estadoClass(review.estado)}`}>
                           {estadoLabel[review.estado]}
                         </span>
                       </span>
-                    </div>
+                    </header>
                     {review.comentario && (
                       <p className="mt-2 text-sm text-muted-foreground">{review.comentario}</p>
                     )}

@@ -1,3 +1,4 @@
+import { Check } from "lucide-react";
 import { AdoptionAnswers } from "@/components/adoption-answers";
 import { VisitPanel } from "@/components/visit-panel";
 import type { AdoptionRequestRow } from "@/lib/adoption/db";
@@ -23,6 +24,68 @@ type RequestCardProps = {
     };
   };
 };
+
+type StatusCopy = RequestCardProps["copy"]["statuses"];
+
+// Mini stepper horizontal com os 4 estados positivos do fluxo. "Rejeitado"
+// e um estado terminal off-flow e e mostrado num banner proprio.
+function StatusTimeline({ status, statuses }: { status: string; statuses: StatusCopy }) {
+  if (status === "rejeitado") {
+    return (
+      <p className="mt-3 inline-flex items-center gap-2 rounded-xl bg-destructive/10 px-3 py-1.5 text-xs font-semibold text-destructive">
+        {statuses.rejeitado}
+      </p>
+    );
+  }
+
+  const steps = [
+    { key: "pendente", label: statuses.pendente },
+    { key: "entrevista", label: statuses.entrevista },
+    { key: "aprovado", label: statuses.aprovado },
+    { key: "concluido", label: statuses.concluido },
+  ];
+  const currentIndex = Math.max(
+    0,
+    steps.findIndex((step) => step.key === status),
+  );
+
+  return (
+    <ol className="mt-3 flex items-stretch gap-1 text-[10px] font-semibold">
+      {steps.map((step, index) => {
+        const done = index < currentIndex;
+        const current = index === currentIndex;
+        const isLast = index === steps.length - 1;
+        return (
+          <li key={step.key} className="flex flex-1 flex-col items-stretch">
+            <div className="flex items-center gap-1">
+              <span
+                className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] ${
+                  done
+                    ? "bg-secondary text-secondary-foreground"
+                    : current
+                      ? "bg-primary text-primary-foreground ring-4 ring-primary/15"
+                      : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {done ? <Check className="h-2.5 w-2.5" /> : index + 1}
+              </span>
+              {!isLast && (
+                <span className={`h-px flex-1 ${done ? "bg-secondary" : "bg-border/40"}`} aria-hidden />
+              )}
+            </div>
+            <span
+              className={`mt-1 truncate ${
+                done ? "text-secondary" : current ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              {step.label}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
 
 function statusToneClass(status: string) {
   switch (status) {
@@ -63,6 +126,8 @@ export function RequestCard({ request, visits, locale, audience, copy }: Request
           {localizeRequestStatus(request.status, locale)}
         </span>
       </header>
+
+      <StatusTimeline status={request.status} statuses={copy.statuses} />
 
       <details className="mt-3 text-xs text-muted-foreground">
         <summary className="cursor-pointer font-semibold text-primary">{copy.questionnaireVisits}</summary>
