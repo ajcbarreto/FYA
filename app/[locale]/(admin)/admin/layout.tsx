@@ -30,9 +30,15 @@ export default async function AdminLayout({ children, params }: AdminLayoutProps
     redirect(`/${locale}`);
   }
 
+  const [pendingAnimalsResult, openDenunciasResult] = await Promise.all([
+    supabase.from("animais").select("id", { count: "exact", head: true }).eq("estado_moderacao", "pendente"),
+    supabase.from("denuncias").select("id", { count: "exact", head: true }).eq("estado", "aberta"),
+  ]);
+  const moderationQueueCount = (pendingAnimalsResult.count ?? 0) + (openDenunciasResult.count ?? 0);
+
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-8 lg:flex-row lg:px-8">
-      <AdminSidebar locale={locale as Locale} />
+      <AdminSidebar locale={locale as Locale} moderationQueueCount={moderationQueueCount} />
       <div className="min-w-0 flex-1">{children}</div>
     </div>
   );

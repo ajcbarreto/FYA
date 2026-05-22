@@ -60,6 +60,7 @@ export async function updateShelterSettings(formData: FormData) {
   const mbway = String(formData.get("mbway") ?? "").trim();
   const donationLink = String(formData.get("donation_link") ?? "").trim();
   const donationMessage = String(formData.get("donation_message") ?? "").trim();
+  const horarioVisitas = String(formData.get("horario_visitas") ?? "").trim();
 
   if (!nome || !localizacao) {
     redirect(`/${locale}/canil/configuracoes?error=invalid_data`);
@@ -90,6 +91,7 @@ export async function updateShelterSettings(formData: FormData) {
     mbway: mbway || null,
     donation_link: donationLink || null,
     donation_message: donationMessage || null,
+    horario_visitas: horarioVisitas || null,
   };
 
   const { error } = await supabase.from("canis").update(payload).eq("id", shelter.id);

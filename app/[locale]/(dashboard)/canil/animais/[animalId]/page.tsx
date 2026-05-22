@@ -47,7 +47,9 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
 
   const { data: animal } = await supabase
     .from("animais")
-    .select("id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao")
+    .select(
+      "id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,taxa_adocao,peso_kg,vacinado,microchip,esterilizado",
+    )
     .eq("id", animalId)
     .maybeSingle<{
       id: string;
@@ -60,6 +62,11 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
       porte: string | null;
       status: string;
       descricao: string | null;
+      taxa_adocao: number | string | null;
+      peso_kg: number | string | null;
+      vacinado: boolean | null;
+      microchip: boolean | null;
+      esterilizado: boolean | null;
     }>();
 
   if (!animal || animal.canil_id !== shelter.id) {
@@ -103,6 +110,21 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
             porte: animal.porte,
             status: animal.status,
             descricao: animal.descricao,
+            taxa_adocao:
+              animal.taxa_adocao === null || animal.taxa_adocao === undefined
+                ? null
+                : typeof animal.taxa_adocao === "number"
+                  ? animal.taxa_adocao
+                  : Number.parseFloat(animal.taxa_adocao),
+            peso_kg:
+              animal.peso_kg === null || animal.peso_kg === undefined
+                ? null
+                : typeof animal.peso_kg === "number"
+                  ? animal.peso_kg
+                  : Number.parseFloat(animal.peso_kg),
+            vacinado: animal.vacinado,
+            microchip: animal.microchip,
+            esterilizado: animal.esterilizado,
           }}
         />
       </section>
@@ -116,6 +138,7 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
           <input
             type="file"
             name="photo"
+            multiple
             accept="image/jpeg,image/png,image/webp"
             required
             className="flex-1 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-primary file:px-4 file:py-2 file:text-xs file:font-bold file:text-primary-foreground"

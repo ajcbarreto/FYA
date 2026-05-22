@@ -27,7 +27,18 @@ type AnimalInput = {
   porte: string | null;
   status: string;
   descricao: string | null;
+  taxa_adocao: number | null;
+  peso_kg: number | null;
+  vacinado: boolean;
+  microchip: boolean;
+  esterilizado: boolean;
 };
+
+function parseDecimal(raw: string) {
+  if (!raw) return null;
+  const value = Number.parseFloat(raw.replace(",", "."));
+  return Number.isFinite(value) && value >= 0 ? value : null;
+}
 
 function parseAnimalInput(formData: FormData): AnimalInput | null {
   const nome = String(formData.get("nome") ?? "").trim();
@@ -38,6 +49,8 @@ function parseAnimalInput(formData: FormData): AnimalInput | null {
   const statusRaw = String(formData.get("status") ?? "disponivel").trim().toLowerCase();
   const idadeRaw = String(formData.get("idade_anos") ?? "").trim();
   const descricaoRaw = String(formData.get("descricao") ?? "").trim();
+  const taxaRaw = String(formData.get("taxa_adocao") ?? "").trim();
+  const pesoRaw = String(formData.get("peso_kg") ?? "").trim();
 
   if (!nome || !ALLOWED_SPECIES.includes(especie) || !ALLOWED_STATUS.includes(statusRaw)) {
     return null;
@@ -53,6 +66,11 @@ function parseAnimalInput(formData: FormData): AnimalInput | null {
     porte: ALLOWED_SIZE.includes(porteRaw) ? porteRaw : null,
     status: statusRaw,
     descricao: descricaoRaw || null,
+    taxa_adocao: parseDecimal(taxaRaw),
+    peso_kg: parseDecimal(pesoRaw),
+    vacinado: formData.get("vacinado") === "true",
+    microchip: formData.get("microchip") === "true",
+    esterilizado: formData.get("esterilizado") === "true",
   };
 }
 
@@ -215,13 +233,15 @@ export async function updateUserAnimalStatus(formData: FormData) {
 export async function uploadUserAnimalPhoto(formData: FormData) {
   const locale = getLocaleFromForm(formData);
   const animalId = String(formData.get("animalId") ?? "").trim();
-  const file = formData.get("photo");
+  const files = formData
+    .getAll("photo")
+    .filter((entry): entry is File => entry instanceof File && entry.size > 0);
   const redirectBase = `/${locale}/user/animais/${animalId}`;
 
-  if (!animalId || !(file instanceof File) || file.size === 0) {
+  if (!animalId || files.length === 0) {
     redirect(`${redirectBase}?error=invalid_data`);
   }
-  if ((file as File).size > MAX_PHOTO_BYTES) {
+  if (files.some((file) => file.size > MAX_PHOTO_BYTES)) {
     redirect(`${redirectBase}?error=photo_too_large`);
   }
 
@@ -234,34 +254,44 @@ export async function uploadUserAnimalPhoto(formData: FormData) {
   const ownership = await ensureUserOwnsAnimal(supabase, user.id, animalId);
   if (!ownership) redirect(`${redirectBase}?error=not_authorized`);
 
-  const storagePath = buildPhotoStoragePath(animalId, (file as File).name);
-  const { error: uploadError } = await supabase.storage
-    .from(ANIMAL_PHOTOS_BUCKET)
-    .upload(storagePath, file as File, {
-      cacheControl: "3600",
-      upsert: false,
-      contentType: (file as File).type || undefined,
-    });
-
-  if (uploadError) {
-    console.error("[uploadUserAnimalPhoto] storage error:", uploadError.message);
-    redirect(`${redirectBase}?error=upload_failed`);
-  }
-
-  const { data: publicUrlData } = supabase.storage.from(ANIMAL_PHOTOS_BUCKET).getPublicUrl(storagePath);
-
   const { count: existingCount } = await supabase
     .from("animal_fotos")
     .select("id", { count: "exact", head: true })
     .eq("animal_id", animalId);
 
-  const { error: insertError } = await supabase.from("animal_fotos").insert({
-    animal_id: animalId,
-    storage_path: storagePath,
-    public_url: publicUrlData?.publicUrl ?? null,
-    is_primary: (existingCount ?? 0) === 0,
-    uploaded_by: user.id,
-  });
+  let primaryAssigned = (existingCount ?? 0) > 0;
+  let insertError: { message: string } | null = null;
+
+  for (const file of files) {
+    const storagePath = buildPhotoStoragePath(animalId, file.name);
+    const { error: uploadError } = await supabase.storage
+      .from(ANIMAL_PHOTOS_BUCKET)
+      .upload(storagePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: file.type || undefined,
+      });
+
+    if (uploadError) {
+      console.error("[uploadUserAnimalPhoto] storage error:", uploadError.message);
+      continue;
+    }
+
+    const { data: publicUrlData } = supabase.storage.from(ANIMAL_PHOTOS_BUCKET).getPublicUrl(storagePath);
+    const { error } = await supabase.from("animal_fotos").insert({
+      animal_id: animalId,
+      storage_path: storagePath,
+      public_url: publicUrlData?.publicUrl ?? null,
+      is_primary: !primaryAssigned,
+      uploaded_by: user.id,
+    });
+
+    if (error) {
+      insertError = error;
+    } else {
+      primaryAssigned = true;
+    }
+  }
 
   if (insertError) {
     console.error("[uploadUserAnimalPhoto] insert error:", insertError.message);

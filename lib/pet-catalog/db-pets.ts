@@ -18,6 +18,12 @@ export type PetCatalogItem = {
   description: string;
   status: string;
   imageUrl: string;
+  fee: number | null;
+  weight: number | null;
+  vaccinated: boolean;
+  microchip: boolean;
+  sterilized: boolean;
+  visitHours: string | null;
 };
 
 type RelatedRow<T> = T | T[] | null;
@@ -34,7 +40,12 @@ export type AnimalRow = {
   porte: string | null;
   status: string;
   descricao: string | null;
-  canis: RelatedRow<{ nome: string; localizacao: string }>;
+  taxa_adocao: number | string | null;
+  peso_kg: number | string | null;
+  vacinado: boolean | null;
+  microchip: boolean | null;
+  esterilizado: boolean | null;
+  canis: RelatedRow<{ nome: string; localizacao: string; horario_visitas: string | null }>;
   owner_profile: RelatedRow<{ full_name: string | null; email: string | null }>;
 };
 
@@ -49,7 +60,7 @@ type CatalogPetsQueryOptions = {
 };
 
 const ANIMAL_SELECT =
-  "id,canil_id,owner_profile_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,canis(nome,localizacao),owner_profile:profiles!owner_profile_id(full_name,email)";
+  "id,canil_id,owner_profile_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,taxa_adocao,peso_kg,vacinado,microchip,esterilizado,canis(nome,localizacao,horario_visitas),owner_profile:profiles!owner_profile_id(full_name,email)";
 
 function toTitleCase(value: string) {
   return value
@@ -132,6 +143,17 @@ export function toCatalogItem(animal: AnimalRow, locale: string, photoOverride?:
   const isOwnerListed = Boolean(animal.owner_profile_id) && !animal.canil_id;
   const fallbackLocation = locale === "pt" ? "Localizacao n/d" : "Location n/a";
 
+  const fee = animal.taxa_adocao === null || animal.taxa_adocao === undefined
+    ? null
+    : typeof animal.taxa_adocao === "number"
+      ? animal.taxa_adocao
+      : Number.parseFloat(animal.taxa_adocao);
+  const weight = animal.peso_kg === null || animal.peso_kg === undefined
+    ? null
+    : typeof animal.peso_kg === "number"
+      ? animal.peso_kg
+      : Number.parseFloat(animal.peso_kg);
+
   return {
     id: animal.id,
     name: animal.nome,
@@ -150,6 +172,12 @@ export function toCatalogItem(animal: AnimalRow, locale: string, photoOverride?:
     description: animal.descricao ?? "",
     status,
     imageUrl: photoOverride ?? imageForAnimal(animal),
+    fee: Number.isFinite(fee) ? (fee as number) : null,
+    weight: Number.isFinite(weight) ? (weight as number) : null,
+    vaccinated: Boolean(animal.vacinado),
+    microchip: Boolean(animal.microchip),
+    sterilized: Boolean(animal.esterilizado),
+    visitHours: shelter?.horario_visitas ?? null,
   };
 }
 
@@ -170,6 +198,7 @@ export async function getCatalogPets(supabase: SupabaseClient, locale: string, o
   let query = supabase
     .from("animais")
     .select(ANIMAL_SELECT)
+    .eq("estado_moderacao", "aprovado")
     .order("created_at", { ascending: false });
 
   const normalizedSearch = options.search?.trim();
@@ -214,7 +243,10 @@ export async function getCatalogPetsCount(
   supabase: SupabaseClient,
   options: Pick<CatalogPetsQueryOptions, "search" | "species" | "sex" | "size" | "status"> = {},
 ) {
-  let query = supabase.from("animais").select("id", { count: "exact", head: true });
+  let query = supabase
+    .from("animais")
+    .select("id", { count: "exact", head: true })
+    .eq("estado_moderacao", "aprovado");
   const normalizedSearch = options.search?.trim();
   if (normalizedSearch) {
     const escaped = normalizedSearch.replaceAll("%", "\\%").replaceAll("_", "\\_");
@@ -249,6 +281,7 @@ export async function getAdoptedPets(supabase: SupabaseClient, locale: string, l
     .from("animais")
     .select(ANIMAL_SELECT)
     .eq("status", "adotado")
+    .eq("estado_moderacao", "aprovado")
     .order("created_at", { ascending: false })
     .limit(limit);
 
@@ -265,6 +298,7 @@ export async function getPetById(supabase: SupabaseClient, petId: string, locale
     .from("animais")
     .select(ANIMAL_SELECT)
     .eq("id", petId)
+    .eq("estado_moderacao", "aprovado")
     .maybeSingle();
 
   if (error || !data) {
@@ -287,6 +321,7 @@ export async function getRelatedPets(supabase: SupabaseClient, petId: string, lo
     .from("animais")
     .select(ANIMAL_SELECT)
     .neq("id", petId)
+    .eq("estado_moderacao", "aprovado")
     .order("created_at", { ascending: false })
     .limit(limit);
 

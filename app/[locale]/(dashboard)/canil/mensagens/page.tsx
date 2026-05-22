@@ -17,6 +17,8 @@ import { ToastFeedback } from "@/components/toast-feedback";
 import { AdoptionAnswers } from "@/components/adoption-answers";
 import { PageHeader } from "@/components/page-header";
 import { formatRelativeTime } from "@/lib/format/time";
+import { ReportFlag } from "@/components/report-flag";
+import type { Locale } from "@/lib/i18n/config";
 
 type CanilMessagesPageProps = {
   params: Promise<{ locale: string }>;
@@ -79,14 +81,17 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
   const feedback =
     success === "message_sent"
       ? copy.success
-      : error && copy.errorMessages[error as keyof typeof copy.errorMessages]
-        ? copy.errorMessages[error as keyof typeof copy.errorMessages]
-        : null;
+      : success && copy.successMessages[success]
+        ? copy.successMessages[success]
+        : error && copy.errorMessages[error]
+          ? copy.errorMessages[error]
+          : null;
+  const feedbackVariant = success ? ("success" as const) : ("error" as const);
 
   return (
     <main className="space-y-6">
       <PageHeader title={copy.title} />
-      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
+      <ToastFeedback message={feedback} variant={feedbackVariant} />
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
         <article
@@ -214,6 +219,18 @@ export default async function CanilMessagesPage({ params, searchParams }: CanilM
 
           <p className="mt-6 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{copy.reminder}</p>
           <p className="mt-2 text-sm text-muted-foreground">{copy.reminderText}</p>
+
+          {activeConversation && (
+            <div className="mt-6 border-t border-border/15 pt-4">
+              <ReportFlag
+                locale={locale as Locale}
+                targetType="conversa"
+                targetId={activeConversation.id}
+                redirectTo={`/${locale}/canil/mensagens?conversation=${activeConversation.id}`}
+                authenticated
+              />
+            </div>
+          )}
         </article>
       </section>
     </main>

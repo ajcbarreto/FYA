@@ -5,7 +5,8 @@ import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 import { getAdoptionRequestsForCanil } from "@/lib/adoption/db";
 import { getVisitsByPedido } from "@/lib/adoption/visits";
-import { Inbox } from "lucide-react";
+import Link from "next/link";
+import { Download, Inbox } from "lucide-react";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { PageHeader } from "@/components/page-header";
 import { PageEmpty } from "@/components/page-empty";
@@ -51,7 +52,22 @@ export default async function CanilRequestsPage({ params, searchParams }: CanilR
 
   return (
     <main className="space-y-6">
-      <PageHeader title={copy.title} subtitle={copy.subtitle} />
+      <PageHeader
+        title={copy.title}
+        subtitle={copy.subtitle}
+        actions={
+          requests.length > 0 && (
+            <Link
+              href={`/${locale}/canil/pedidos/export`}
+              prefetch={false}
+              className="inline-flex items-center gap-2 rounded-full border border-border/40 bg-card px-4 py-2 text-xs font-semibold transition-colors hover:bg-muted"
+            >
+              <Download className="h-3.5 w-3.5" />
+              {copy.exportCsv}
+            </Link>
+          )
+        }
+      />
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       {requests.length === 0 ? (

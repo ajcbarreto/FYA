@@ -52,7 +52,7 @@ export default async function ShelterProfilePage({ params }: ShelterProfilePageP
     ? await supabase
         .from("animais")
         .select(
-          "id,canil_id,owner_profile_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,canis(nome,localizacao),owner_profile:profiles!owner_profile_id(full_name,email)",
+          "id,canil_id,owner_profile_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,taxa_adocao,peso_kg,vacinado,microchip,esterilizado,canis(nome,localizacao,horario_visitas),owner_profile:profiles!owner_profile_id(full_name,email)",
         )
         .eq("canil_id", shelter.id)
         .order("created_at", { ascending: false })

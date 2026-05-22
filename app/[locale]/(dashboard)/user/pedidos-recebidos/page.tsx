@@ -5,7 +5,8 @@ import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAdoptionRequestsForOwner } from "@/lib/adoption/db";
 import { getVisitsByPedido } from "@/lib/adoption/visits";
 import { ToastFeedback } from "@/components/toast-feedback";
-import { Inbox } from "lucide-react";
+import Link from "next/link";
+import { Download, Inbox } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { PageEmpty } from "@/components/page-empty";
 import { RequestCard } from "@/components/request-card";
@@ -50,7 +51,22 @@ export default async function UserReceivedRequestsPage({
 
   return (
     <main className="space-y-6">
-      <PageHeader title={t.title} subtitle={t.subtitle} />
+      <PageHeader
+        title={t.title}
+        subtitle={t.subtitle}
+        actions={
+          requests.length > 0 && (
+            <Link
+              href={`/${locale}/user/pedidos-recebidos/export`}
+              prefetch={false}
+              className="inline-flex items-center gap-2 rounded-full border border-border/40 bg-card px-4 py-2 text-xs font-semibold transition-colors hover:bg-muted"
+            >
+              <Download className="h-3.5 w-3.5" />
+              {sharedCopy.exportCsv}
+            </Link>
+          )
+        }
+      />
       <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
 
       {requests.length === 0 ? (

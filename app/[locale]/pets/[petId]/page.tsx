@@ -26,6 +26,8 @@ import { ToastFeedback } from "@/components/toast-feedback";
 import { submitAdoptionRequest } from "@/app/adoption/actions";
 import { resolveUserRole } from "@/lib/auth/role";
 import { LogIn } from "lucide-react";
+import { ReportFlag } from "@/components/report-flag";
+import type { Locale } from "@/lib/i18n/config";
 
 type PetDetailsPageProps = {
   params: Promise<{ locale: string; petId: string }>;
@@ -101,20 +103,18 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
     notFound();
   }
   const isFavorite = favoriteIds.has(pet.id);
-  const healthStatus = [t.vaccinationsUpToDate, pet.status];
   const personality = pet.traits;
   const realPhotos = animalPhotos
     .map((photo) => photo.public_url)
     .filter((value): value is string => Boolean(value));
   const galleryImages = realPhotos.length > 0 ? realPhotos.slice(0, 4) : [pet.imageUrl];
   const subtitle = t.subtitle(pet.shelterName);
-  const traitsText = pet.traits.join(" ").toLowerCase();
-  const weight =
-    traitsText.includes("pequeno") || traitsText.includes("small")
-      ? t.weightSmall
-      : traitsText.includes("grande") || traitsText.includes("large")
-        ? t.weightLarge
-        : t.weightMedium;
+  const weight = pet.weight !== null ? t.weightAmount(pet.weight) : t.weightUnknown;
+  const feeText = pet.fee !== null ? t.feeAmount(pet.fee) : t.feeUnknown;
+  const vaccinationText = pet.vaccinated ? t.yes : t.toConfirm;
+  const microchipText = pet.microchip ? t.yes : t.no;
+  const sterilizedText = pet.sterilized ? t.yes : t.no;
+  const visitsText = pet.visitHours ?? t.visitsArrange;
   const feedbackMap = t.adoptionFeedback;
   const feedback =
     (success && feedbackMap[success as keyof typeof feedbackMap]) ||
@@ -208,14 +208,14 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
                   <Syringe className="h-5 w-5 text-primary" />
                   <div>
                     <p className="font-bold">{t.vaccinationLabel}</p>
-                    <p className="text-sm text-muted-foreground">{healthStatus[0]}</p>
+                    <p className="text-sm text-muted-foreground">{vaccinationText}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Scissors className="h-5 w-5 text-primary" />
                   <div>
-                    <p className="font-bold">{t.groomingLabel}</p>
-                    <p className="text-sm text-muted-foreground">{t.groomingValue}</p>
+                    <p className="font-bold">{t.microchipLabel}</p>
+                    <p className="text-sm text-muted-foreground">{microchipText}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -228,8 +228,8 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
                 <div className="flex items-start gap-3">
                   <Activity className="h-5 w-5 text-primary" />
                   <div>
-                    <p className="font-bold">{t.medicalConditionsLabel}</p>
-                    <p className="text-sm text-muted-foreground">{t.medicalConditionsValue}</p>
+                    <p className="font-bold">{t.sterilizedLabel}</p>
+                    <p className="text-sm text-muted-foreground">{sterilizedText}</p>
                   </div>
                 </div>
               </div>
@@ -432,7 +432,7 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
               {!pet.isOwnerListed && (
                 <p className="inline-flex items-center gap-2">
                   <House className="h-4 w-4" />
-                  {t.visitHours}
+                  {visitsText}
                 </p>
               )}
             </div>
@@ -450,10 +450,20 @@ export default async function PetDetailsPage({ params, searchParams }: PetDetail
           <article className="rounded-3xl border border-border/30 bg-muted/45 p-6">
             <p className="inline-flex items-center gap-2 font-bold text-primary">
               <Stethoscope className="h-4 w-4" />
-              {t.adoptionFee}
+              {feeText}
             </p>
             <p className="mt-2 text-xs text-muted-foreground">{t.adoptionFeeHint}</p>
           </article>
+
+          <div className="flex justify-end">
+            <ReportFlag
+              locale={locale as Locale}
+              targetType="animal"
+              targetId={pet.id}
+              redirectTo={`/${locale}/pets/${pet.id}`}
+              authenticated={Boolean(user)}
+            />
+          </div>
         </aside>
       </div>
 

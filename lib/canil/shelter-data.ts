@@ -15,6 +15,7 @@ export type ShelterRecord = {
   mbway: string | null;
   donation_link: string | null;
   donation_message: string | null;
+  horario_visitas: string | null;
 };
 
 export type ShelterAnimalRecord = {
@@ -36,7 +37,7 @@ export async function getShelterForUser(supabase: SupabaseClient, userId: string
   // um canil sem registo proprio nao deve ver dados de terceiros.
   const { data: ownedShelter } = await supabase
     .from("canis")
-    .select("id,owner_profile_id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at,iban,mbway,donation_link,donation_message")
+    .select("id,owner_profile_id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at,iban,mbway,donation_link,donation_message,horario_visitas")
     .eq("owner_profile_id", userId)
     .maybeSingle();
 

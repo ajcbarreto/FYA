@@ -117,6 +117,20 @@ export default async function CanilSettingsPage({ params, searchParams }: CanilS
             />
           </div>
 
+          <div className="space-y-2">
+            <label htmlFor="horario_visitas" className="text-sm font-semibold">
+              {copy.labelVisitHours}
+            </label>
+            <input
+              id="horario_visitas"
+              name="horario_visitas"
+              defaultValue={shelter?.horario_visitas ?? ""}
+              placeholder={copy.placeholderVisitHours}
+              className="h-11 w-full rounded-xl border border-border/25 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+            />
+            <p className="text-[11px] text-muted-foreground">{copy.visitHoursHint}</p>
+          </div>
+
           <fieldset className="space-y-4 rounded-2xl border border-border/30 p-5">
             <legend className="px-1 text-sm font-bold">{copy.donationsTitle}</legend>
             <p className="text-xs text-muted-foreground">{copy.donationsHint}</p>

@@ -15,6 +15,8 @@ import { ChatThread } from "@/components/chat-thread";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { PageHeader } from "@/components/page-header";
 import { formatRelativeTime } from "@/lib/format/time";
+import { ReportFlag } from "@/components/report-flag";
+import type { Locale } from "@/lib/i18n/config";
 
 type UserMessagesPageProps = {
   params: Promise<{ locale: string }>;
@@ -75,14 +77,17 @@ export default async function UserMessagesPage({ params, searchParams }: UserMes
   const feedback =
     success === "message_sent"
       ? copy.success
-      : error && copy.errorMessages[error]
-        ? copy.errorMessages[error]
-        : null;
+      : success && copy.successMessages[success]
+        ? copy.successMessages[success]
+        : error && copy.errorMessages[error]
+          ? copy.errorMessages[error]
+          : null;
+  const feedbackVariant = success ? ("success" as const) : ("error" as const);
 
   return (
     <main className="space-y-6">
       <PageHeader title={copy.title} />
-      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
+      <ToastFeedback message={feedback} variant={feedbackVariant} />
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
         <article
@@ -192,6 +197,17 @@ export default async function UserMessagesPage({ params, searchParams }: UserMes
                   send: copy.send,
                 }}
               />
+              {activeConversation && (
+                <div className="mt-4 flex justify-end">
+                  <ReportFlag
+                    locale={locale as Locale}
+                    targetType="conversa"
+                    targetId={activeConversation.id}
+                    redirectTo={`/${locale}/user/mensagens?conversation=${activeConversation.id}`}
+                    authenticated
+                  />
+                </div>
+              )}
             </>
           ) : (
             <p className="text-sm text-muted-foreground">{copy.noConversations}</p>

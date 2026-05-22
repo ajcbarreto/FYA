@@ -196,6 +196,10 @@ type Dictionary = {
       request_failed: string;
       conversation_failed: string;
       invalid_pet: string;
+      cannot_apply_own_pet: string;
+      report_sent: string;
+      report_failed: string;
+      invalid_report: string;
     };
     storyHeading: (name: string) => string;
     noDescription: string;
@@ -206,6 +210,16 @@ type Dictionary = {
     currentStatusLabel: string;
     medicalConditionsLabel: string;
     medicalConditionsValue: string;
+    microchipLabel: string;
+    sterilizedLabel: string;
+    yes: string;
+    no: string;
+    toConfirm: string;
+    feeAmount: (amount: number) => string;
+    feeUnknown: string;
+    weightAmount: (kg: number) => string;
+    weightUnknown: string;
+    visitsArrange: string;
     keyStatsTitle: string;
     breedLabel: string;
     ageLabel: string;
@@ -326,6 +340,22 @@ type Dictionary = {
     notFoundTitle: string;
     notFoundDescription: string;
   };
+  legal: {
+    privacyTitle: string;
+    privacySubtitle: string;
+    privacyDisclaimer: string;
+    privacyLastUpdated: string;
+    privacySections: { heading: string; body: string }[];
+    termsTitle: string;
+    termsSubtitle: string;
+    termsLastUpdated: string;
+    termsSections: { heading: string; body: string }[];
+    privacyLinkLabel: string;
+    termsLinkLabel: string;
+    cookieBannerText: string;
+    cookieBannerAccept: string;
+    cookieBannerLearnMore: string;
+  };
   match: {
     eyebrow: string;
     title: string;
@@ -375,6 +405,14 @@ type Dictionary = {
     statusReserved: string;
     statusInTreatment: string;
     statusAdopted: string;
+    healthSection: string;
+    feeLabel: string;
+    feeHelper: string;
+    weightLabel: string;
+    weightHelper: string;
+    vaccinatedLabel: string;
+    microchipLabel: string;
+    sterilizedLabel: string;
   };
   visitPanel: {
     title: string;
@@ -423,6 +461,22 @@ type Dictionary = {
       only_adopters_can_review: string;
     };
     notAdopterReview: string;
+    reportTitle: string;
+    reportSubtitle: string;
+    reportReason: string;
+    reportDescription: string;
+    reportDescriptionPlaceholder: string;
+    reportSubmit: string;
+    reportLoginRequired: string;
+    reportSent: string;
+    reportReasons: {
+      conteudo_inapropriado: string;
+      animal_nao_pertence: string;
+      spam: string;
+      comunicacao_abusiva: string;
+      fraude: string;
+      outro: string;
+    };
     donateTitle: string;
     donateText: string;
     donateLoginCta: string;
@@ -451,10 +505,8 @@ type Dictionary = {
     success: string;
     youPrefix: string;
     noPreview: string;
-    errorMessages: {
-      invalid_message: string;
-      send_failed: string;
-    };
+    errorMessages: Record<string, string>;
+    successMessages: Record<string, string>;
   };
   canilPets: {
     title: string;
@@ -580,6 +632,7 @@ type Dictionary = {
     notePlaceholder: string;
     save: string;
     questionnaireVisits: string;
+    exportCsv: string;
     successMessages: Record<string, string>;
     errorMessages: Record<string, string>;
   };
@@ -643,6 +696,7 @@ type Dictionary = {
     youPrefix: string;
     noPreview: string;
     errorMessages: Record<string, string>;
+    successMessages: Record<string, string>;
   };
   userFavorites: {
     title: string;
@@ -694,6 +748,9 @@ type Dictionary = {
     placeholderDonationLink: string;
     labelDonationMessage: string;
     placeholderDonationMessage: string;
+    labelVisitHours: string;
+    placeholderVisitHours: string;
+    visitHoursHint: string;
     save: string;
     success: string;
     errorMessages: Record<string, string>;
@@ -797,6 +854,27 @@ type Dictionary = {
     colActions: string;
     empty: string;
     messages: Record<string, string>;
+  };
+  adminModeracao: {
+    title: string;
+    subtitle: string;
+    pendingAnimalsTitle: string;
+    emptyAnimals: string;
+    approve: string;
+    reject: string;
+    denunciasTitle: string;
+    emptyDenuncias: string;
+    motivo: string;
+    descricao: string;
+    reporter: string;
+    resolveNote: string;
+    resolveNotePlaceholder: string;
+    hideTarget: string;
+    markIgnored: string;
+    markResolved: string;
+    openTarget: string;
+    messages: Record<string, string>;
+    sidebarLabel: string;
   };
   userPets: {
     title: string;
@@ -1025,6 +1103,10 @@ const dictionaries: Record<Locale, Dictionary> = {
         request_failed: "Nao foi possivel enviar a candidatura.",
         conversation_failed: "A candidatura foi criada, mas nao foi possivel iniciar conversa.",
         invalid_pet: "Animal invalido.",
+        cannot_apply_own_pet: "Nao podes candidatar-te a um animal teu.",
+        report_sent: "Denuncia enviada. Vai ser revista pela equipa.",
+        report_failed: "Nao foi possivel enviar a denuncia.",
+        invalid_report: "Dados da denuncia invalidos.",
       },
       storyHeading: (name) => `${name} e a sua historia`,
       noDescription: "Sem descricao disponivel para este animal.",
@@ -1032,6 +1114,17 @@ const dictionaries: Record<Locale, Dictionary> = {
       vaccinationLabel: "Vacinacao",
       groomingLabel: "Cuidados de pelo",
       groomingValue: "Escovagem regular recomendada.",
+      microchipLabel: "Microchip",
+      sterilizedLabel: "Esterilizado",
+      yes: "Sim",
+      no: "Nao",
+      toConfirm: "A confirmar",
+      feeAmount: (amount) =>
+        new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(amount),
+      feeUnknown: "Taxa a definir com o canil",
+      weightAmount: (kg) => `${kg} kg`,
+      weightUnknown: "Peso n/d",
+      visitsArrange: "Visitas: combinar com o canil",
       currentStatusLabel: "Estado atual",
       medicalConditionsLabel: "Condicoes medicas",
       medicalConditionsValue: "Sem condicoes criticas registadas.",
@@ -1162,6 +1255,103 @@ const dictionaries: Record<Locale, Dictionary> = {
       notFoundDescription:
         "A pagina que procuras nao existe ou foi movida. Verifica o endereco ou volta ao inicio.",
     },
+    legal: {
+      privacyTitle: "Politica de Privacidade",
+      privacySubtitle:
+        "Como tratamos os dados pessoais que recolhemos quando usas a FYA (Found Your Animal).",
+      privacyDisclaimer:
+        "Este texto e um modelo de referencia. Antes de uma operacao real, deve ser revisto por um jurista.",
+      privacyLastUpdated: "Ultima atualizacao: 2025-12",
+      privacySections: [
+        {
+          heading: "1. Quem somos",
+          body:
+            "A FYA (Found Your Animal) opera uma plataforma para ligar adotantes a canis e particulares responsaveis em Portugal. Os pedidos de informacao sobre dados pessoais podem ser dirigidos para contato@fya.local.",
+        },
+        {
+          heading: "2. Dados que recolhemos",
+          body:
+            "Quando crias conta guardamos email e nome. Quando interages, guardamos mensagens trocadas, candidaturas de adopcao, favoritos, avaliacoes que escreves e fotos que carregas. Para canis e particulares com animais publicados, guardamos os dados que publicas (foto, descricao, taxa, contactos).",
+        },
+        {
+          heading: "3. Base legal e finalidade",
+          body:
+            "Tratamos os dados com base no consentimento (criacao de conta) e no cumprimento do servico que pediste (intermediar pedidos de adopcao). Nao vendemos dados a terceiros.",
+        },
+        {
+          heading: "4. Conservacao",
+          body:
+            "Mantemos os dados enquanto a conta estiver activa. Apos pedido de eliminacao, anonimizamos avaliacoes e mensagens e apagamos identificadores em ate 30 dias.",
+        },
+        {
+          heading: "5. Os teus direitos",
+          body:
+            "Tens direito de acesso, retificacao, eliminacao, oposicao, portabilidade e a apresentar reclamacao a CNPD (www.cnpd.pt). Para exercer estes direitos, escreve para contato@fya.local.",
+        },
+        {
+          heading: "6. Cookies",
+          body:
+            "Usamos apenas cookies funcionais (sessao Supabase). Nao usamos cookies de analise nem de publicidade neste momento.",
+        },
+        {
+          heading: "7. Alteracoes",
+          body:
+            "Podemos atualizar esta politica. Quando o fizermos, atualizamos a data no topo da pagina e, se houver mudancas substanciais, avisamos por email.",
+        },
+      ],
+      termsTitle: "Termos e Condicoes",
+      termsSubtitle:
+        "Regras de uso da plataforma FYA (Found Your Animal). Ao criar conta aceitas estes termos.",
+      termsLastUpdated: "Ultima atualizacao: 2025-12",
+      termsSections: [
+        {
+          heading: "1. Aceitacao",
+          body:
+            "Ao usar a FYA aceitas estes termos e a politica de privacidade. Se nao concordas, nao uses o servico.",
+        },
+        {
+          heading: "2. Servico",
+          body:
+            "A FYA disponibiliza ferramentas para canis, particulares e adotantes interagirem em torno da adopcao de animais. Nao somos parte no contrato de adopcao e nao garantimos o resultado de qualquer interaccao.",
+        },
+        {
+          heading: "3. Conta e responsabilidade",
+          body:
+            "Es responsavel por manter as credenciais seguras e por toda a actividade na tua conta. Comprometes-te a fornecer informacao verdadeira e atualizada, especialmente sobre animais publicados.",
+        },
+        {
+          heading: "4. Comportamento aceitavel",
+          body:
+            "Nao podes publicar conteudo falso, abusivo, ilegal ou que infrinja direitos de terceiros. Animais publicados devem ser efectivamente teus ou do canil que representas. A FYA pode esconder ou remover conteudos e contas que violem estes termos.",
+        },
+        {
+          heading: "5. Conteudo gerado",
+          body:
+            "Mantens a propriedade do conteudo que carregas. Concedes a FYA uma licenca limitada para mostrar esse conteudo na plataforma com o objetivo de promover a adopcao.",
+        },
+        {
+          heading: "6. Limitacao de responsabilidade",
+          body:
+            "Na maxima medida permitida por lei, a FYA nao e responsavel por danos resultantes do uso ou impossibilidade de uso do servico, nem por interacoes com terceiros conhecidos atraves da plataforma.",
+        },
+        {
+          heading: "7. Terminacao",
+          body:
+            "Podes eliminar a tua conta a qualquer momento. Podemos suspender ou eliminar contas que violem estes termos.",
+        },
+        {
+          heading: "8. Lei aplicavel",
+          body:
+            "Estes termos sao regidos pela lei portuguesa. Para litigios e competente o foro de Lisboa, salvo disposicao legal imperativa.",
+        },
+      ],
+      privacyLinkLabel: "Privacidade",
+      termsLinkLabel: "Termos",
+      cookieBannerText:
+        "Usamos apenas cookies funcionais necessarios para iniciar sessao. Nao ha cookies de analise.",
+      cookieBannerAccept: "OK, entendido",
+      cookieBannerLearnMore: "Saber mais",
+    },
     match: {
       eyebrow: "Encontra o teu match",
       title: "Qual e o animal certo para ti?",
@@ -1220,6 +1410,14 @@ const dictionaries: Record<Locale, Dictionary> = {
       statusReserved: "Reservado",
       statusInTreatment: "Em tratamento",
       statusAdopted: "Adotado",
+      healthSection: "Saude e logistica",
+      feeLabel: "Taxa de adocao (€)",
+      feeHelper: "Deixa vazio se for a definir caso a caso.",
+      weightLabel: "Peso (kg)",
+      weightHelper: "Aproximado.",
+      vaccinatedLabel: "Vacinacao em dia",
+      microchipLabel: "Tem microchip",
+      sterilizedLabel: "Esterilizado",
     },
     visitPanel: {
       title: "Visitas",
@@ -1270,6 +1468,22 @@ const dictionaries: Record<Locale, Dictionary> = {
         only_adopters_can_review: "So adotantes podem avaliar canis.",
       },
       notAdopterReview: "So contas de adotante podem deixar avaliacoes.",
+      reportTitle: "Denunciar",
+      reportSubtitle: "Diz-nos o que se passa para a equipa rever.",
+      reportReason: "Motivo",
+      reportDescription: "Detalhes (opcional)",
+      reportDescriptionPlaceholder: "Descreve o que viste...",
+      reportSubmit: "Enviar denuncia",
+      reportLoginRequired: "Tens de iniciar sessao para denunciar.",
+      reportSent: "Denuncia enviada. Vai ser revista pela equipa.",
+      reportReasons: {
+        conteudo_inapropriado: "Conteudo inapropriado",
+        animal_nao_pertence: "Animal nao pertence a quem publica",
+        spam: "Spam ou anuncio repetido",
+        comunicacao_abusiva: "Comunicacao abusiva",
+        fraude: "Suspeita de fraude",
+        outro: "Outro motivo",
+      },
       donateTitle: "Apoiar este canil",
       donateText:
         "Contribui para os cuidados diarios dos animais. As doacoes vao diretamente para o canil.",
@@ -1303,6 +1517,11 @@ const dictionaries: Record<Locale, Dictionary> = {
       errorMessages: {
         invalid_message: "Mensagem invalida.",
         send_failed: "Nao foi possivel enviar a mensagem.",
+        report_failed: "Nao foi possivel enviar a denuncia.",
+        invalid_report: "Dados da denuncia invalidos.",
+      },
+      successMessages: {
+        report_sent: "Denuncia enviada. Vai ser revista pela equipa.",
       },
     },
     canilPets: {
@@ -1439,6 +1658,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       notePlaceholder: "Observacoes para o adotante (opcional)",
       save: "Guardar",
       questionnaireVisits: "Questionario e visitas",
+      exportCsv: "Exportar CSV",
       successMessages: {
         updated: "Pedido atualizado com sucesso.",
         visit_updated: "Visita atualizada.",
@@ -1520,6 +1740,11 @@ const dictionaries: Record<Locale, Dictionary> = {
       errorMessages: {
         invalid_message: "Mensagem invalida.",
         send_failed: "Nao foi possivel enviar a mensagem.",
+        report_failed: "Nao foi possivel enviar a denuncia.",
+        invalid_report: "Dados da denuncia invalidos.",
+      },
+      successMessages: {
+        report_sent: "Denuncia enviada. Vai ser revista pela equipa.",
       },
     },
     userFavorites: {
@@ -1582,6 +1807,9 @@ const dictionaries: Record<Locale, Dictionary> = {
       placeholderDonationLink: "https://...",
       labelDonationMessage: "Mensagem para adotantes",
       placeholderDonationMessage: "Como serao usadas as doacoes?",
+      labelVisitHours: "Horario de visitas",
+      placeholderVisitHours: "Seg-Sab, 10h - 18h",
+      visitHoursHint: "Aparece no detalhe dos animais do teu canil.",
       save: "Guardar configuracoes",
       success: "Configuracoes guardadas com sucesso.",
       errorMessages: {
@@ -1725,6 +1953,34 @@ const dictionaries: Record<Locale, Dictionary> = {
         invalid_shelter: "Canil invalido.",
         verification_failed: "Nao foi possivel atualizar a verificacao.",
       },
+    },
+    adminModeracao: {
+      title: "Moderacao",
+      subtitle: "Aprova animais publicados por particulares e gere denuncias.",
+      pendingAnimalsTitle: "Animais a aguardar aprovacao",
+      emptyAnimals: "Nenhum animal pendente.",
+      approve: "Aprovar",
+      reject: "Rejeitar",
+      denunciasTitle: "Denuncias abertas",
+      emptyDenuncias: "Sem denuncias abertas.",
+      motivo: "Motivo",
+      descricao: "Detalhes",
+      reporter: "Reportado por",
+      resolveNote: "Nota interna",
+      resolveNotePlaceholder: "Explica a decisao (opcional)",
+      hideTarget: "Esconder o conteudo denunciado",
+      markIgnored: "Ignorar",
+      markResolved: "Resolver",
+      openTarget: "Abrir conteudo",
+      messages: {
+        animal_approved: "Animal aprovado.",
+        animal_rejected: "Animal rejeitado.",
+        denuncia_resolvida: "Denuncia marcada como resolvida.",
+        denuncia_ignorada: "Denuncia ignorada.",
+        invalid_request: "Pedido invalido.",
+        save_failed: "Nao foi possivel guardar.",
+      },
+      sidebarLabel: "Moderacao",
     },
     userPets: {
       title: "Os meus animais",
@@ -1951,6 +2207,10 @@ const dictionaries: Record<Locale, Dictionary> = {
         request_failed: "Could not submit the application.",
         conversation_failed: "Application created, but conversation could not be started.",
         invalid_pet: "Invalid pet.",
+        cannot_apply_own_pet: "You cannot apply to your own pet.",
+        report_sent: "Report sent. The team will review it.",
+        report_failed: "Could not send report.",
+        invalid_report: "Invalid report data.",
       },
       storyHeading: (name) => `${name}'s story`,
       noDescription: "No description available for this pet.",
@@ -1961,6 +2221,17 @@ const dictionaries: Record<Locale, Dictionary> = {
       currentStatusLabel: "Current status",
       medicalConditionsLabel: "Medical conditions",
       medicalConditionsValue: "No critical conditions registered.",
+      microchipLabel: "Microchip",
+      sterilizedLabel: "Neutered/spayed",
+      yes: "Yes",
+      no: "No",
+      toConfirm: "To confirm",
+      feeAmount: (amount) =>
+        new Intl.NumberFormat("en", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(amount),
+      feeUnknown: "Fee to be defined with the shelter",
+      weightAmount: (kg) => `${kg} kg`,
+      weightUnknown: "Weight n/a",
+      visitsArrange: "Visits: arrange with the shelter",
       keyStatsTitle: "Key statistics",
       breedLabel: "Breed",
       ageLabel: "Age",
@@ -2088,6 +2359,102 @@ const dictionaries: Record<Locale, Dictionary> = {
       notFoundDescription:
         "The page you are looking for does not exist or has been moved. Check the address or go back home.",
     },
+    legal: {
+      privacyTitle: "Privacy Policy",
+      privacySubtitle: "How we handle personal data collected when you use FYA (Found Your Animal).",
+      privacyDisclaimer:
+        "This is a baseline template. Before a real operation, have it reviewed by a lawyer.",
+      privacyLastUpdated: "Last updated: 2025-12",
+      privacySections: [
+        {
+          heading: "1. Who we are",
+          body:
+            "FYA (Found Your Animal) runs a platform connecting adopters with shelters and private owners in Portugal. For data requests, contact contato@fya.local.",
+        },
+        {
+          heading: "2. Data we collect",
+          body:
+            "When you sign up we store email and name. When you interact, we store messages, adoption applications, favorites, reviews and photos you upload. For shelters and private listers, we store the data you publish (photo, description, fee, contacts).",
+        },
+        {
+          heading: "3. Legal basis and purpose",
+          body:
+            "We process data based on consent (account creation) and to fulfill the service you requested (handling adoption requests). We do not sell data to third parties.",
+        },
+        {
+          heading: "4. Retention",
+          body:
+            "We keep data while your account is active. Upon deletion request, we anonymize reviews and messages and remove identifiers within 30 days.",
+        },
+        {
+          heading: "5. Your rights",
+          body:
+            "You can access, rectify, delete, object, export your data and complain to CNPD (www.cnpd.pt). Contact contato@fya.local to exercise these rights.",
+        },
+        {
+          heading: "6. Cookies",
+          body:
+            "We use only functional cookies (Supabase session). We do not use analytics or advertising cookies at the moment.",
+        },
+        {
+          heading: "7. Changes",
+          body:
+            "We may update this policy. We will update the date at the top and, for substantial changes, notify you by email.",
+        },
+      ],
+      termsTitle: "Terms and Conditions",
+      termsSubtitle:
+        "Rules for using the FYA (Found Your Animal) platform. By creating an account you accept these terms.",
+      termsLastUpdated: "Last updated: 2025-12",
+      termsSections: [
+        {
+          heading: "1. Acceptance",
+          body:
+            "By using FYA you accept these terms and the privacy policy. If you disagree, do not use the service.",
+        },
+        {
+          heading: "2. Service",
+          body:
+            "FYA provides tools for shelters, private owners and adopters to interact around pet adoption. We are not party to any adoption contract and do not guarantee any outcome.",
+        },
+        {
+          heading: "3. Account and responsibility",
+          body:
+            "You are responsible for keeping your credentials safe and for all activity in your account. You commit to providing truthful, up-to-date information, especially about pets you publish.",
+        },
+        {
+          heading: "4. Acceptable behavior",
+          body:
+            "You may not publish false, abusive or illegal content, or anything that infringes third-party rights. Listed pets must actually be yours or belong to the shelter you represent. FYA may hide or remove content and accounts that violate these terms.",
+        },
+        {
+          heading: "5. Your content",
+          body:
+            "You keep ownership of the content you upload. You grant FYA a limited license to display that content on the platform to promote adoption.",
+        },
+        {
+          heading: "6. Limitation of liability",
+          body:
+            "To the maximum extent permitted by law, FYA is not liable for damages arising from the use or inability to use the service, or from interactions with third parties met through the platform.",
+        },
+        {
+          heading: "7. Termination",
+          body:
+            "You can delete your account at any time. We may suspend or delete accounts violating these terms.",
+        },
+        {
+          heading: "8. Governing law",
+          body:
+            "These terms are governed by Portuguese law. Lisbon courts have jurisdiction, except as required by mandatory law.",
+        },
+      ],
+      privacyLinkLabel: "Privacy",
+      termsLinkLabel: "Terms",
+      cookieBannerText:
+        "We use only functional cookies needed to sign you in. No analytics cookies.",
+      cookieBannerAccept: "OK, got it",
+      cookieBannerLearnMore: "Learn more",
+    },
     match: {
       eyebrow: "Find your match",
       title: "Which pet is right for you?",
@@ -2146,6 +2513,14 @@ const dictionaries: Record<Locale, Dictionary> = {
       statusReserved: "Reserved",
       statusInTreatment: "In treatment",
       statusAdopted: "Adopted",
+      healthSection: "Health and logistics",
+      feeLabel: "Adoption fee (€)",
+      feeHelper: "Leave empty to decide case by case.",
+      weightLabel: "Weight (kg)",
+      weightHelper: "Approximate.",
+      vaccinatedLabel: "Vaccinations up to date",
+      microchipLabel: "Has microchip",
+      sterilizedLabel: "Neutered/spayed",
     },
     visitPanel: {
       title: "Visits",
@@ -2196,6 +2571,22 @@ const dictionaries: Record<Locale, Dictionary> = {
         only_adopters_can_review: "Only adopters can review shelters.",
       },
       notAdopterReview: "Only adopter accounts can leave reviews.",
+      reportTitle: "Report",
+      reportSubtitle: "Tell us what's wrong so the team can review.",
+      reportReason: "Reason",
+      reportDescription: "Details (optional)",
+      reportDescriptionPlaceholder: "Describe what you saw...",
+      reportSubmit: "Send report",
+      reportLoginRequired: "You need to sign in to report.",
+      reportSent: "Report sent. The team will review it.",
+      reportReasons: {
+        conteudo_inapropriado: "Inappropriate content",
+        animal_nao_pertence: "Pet does not belong to who's listing",
+        spam: "Spam or duplicate listing",
+        comunicacao_abusiva: "Abusive communication",
+        fraude: "Suspected fraud",
+        outro: "Other reason",
+      },
       donateTitle: "Support this shelter",
       donateText: "Help fund the daily care of these animals. Donations go directly to the shelter.",
       donateLoginCta: "Sign in to support",
@@ -2228,6 +2619,11 @@ const dictionaries: Record<Locale, Dictionary> = {
       errorMessages: {
         invalid_message: "Invalid message.",
         send_failed: "Could not send message.",
+        report_failed: "Could not send report.",
+        invalid_report: "Invalid report data.",
+      },
+      successMessages: {
+        report_sent: "Report sent. The team will review it.",
       },
     },
     canilPets: {
@@ -2364,6 +2760,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       notePlaceholder: "Notes for adopter (optional)",
       save: "Save",
       questionnaireVisits: "Questionnaire and visits",
+      exportCsv: "Export CSV",
       successMessages: {
         updated: "Request updated successfully.",
         visit_updated: "Visit updated.",
@@ -2445,6 +2842,11 @@ const dictionaries: Record<Locale, Dictionary> = {
       errorMessages: {
         invalid_message: "Invalid message.",
         send_failed: "Could not send message.",
+        report_failed: "Could not send report.",
+        invalid_report: "Invalid report data.",
+      },
+      successMessages: {
+        report_sent: "Report sent. The team will review it.",
       },
     },
     userFavorites: {
@@ -2501,6 +2903,9 @@ const dictionaries: Record<Locale, Dictionary> = {
       placeholderDonationLink: "https://...",
       labelDonationMessage: "Message to adopters",
       placeholderDonationMessage: "How will donations be used?",
+      labelVisitHours: "Visit hours",
+      placeholderVisitHours: "Mon-Sat, 10am - 6pm",
+      visitHoursHint: "Shown on the public page of your animals.",
       save: "Save settings",
       success: "Settings saved successfully.",
       errorMessages: {
@@ -2644,6 +3049,34 @@ const dictionaries: Record<Locale, Dictionary> = {
         invalid_shelter: "Invalid shelter.",
         verification_failed: "Could not update verification.",
       },
+    },
+    adminModeracao: {
+      title: "Moderation",
+      subtitle: "Approve listings from private owners and manage reports.",
+      pendingAnimalsTitle: "Pets awaiting approval",
+      emptyAnimals: "No pending pets.",
+      approve: "Approve",
+      reject: "Reject",
+      denunciasTitle: "Open reports",
+      emptyDenuncias: "No open reports.",
+      motivo: "Reason",
+      descricao: "Details",
+      reporter: "Reported by",
+      resolveNote: "Internal note",
+      resolveNotePlaceholder: "Explain the decision (optional)",
+      hideTarget: "Hide the reported content",
+      markIgnored: "Ignore",
+      markResolved: "Resolve",
+      openTarget: "Open content",
+      messages: {
+        animal_approved: "Pet approved.",
+        animal_rejected: "Pet rejected.",
+        denuncia_resolvida: "Report marked as resolved.",
+        denuncia_ignorada: "Report ignored.",
+        invalid_request: "Invalid request.",
+        save_failed: "Could not save.",
+      },
+      sidebarLabel: "Moderation",
     },
     userPets: {
       title: "My pets",

@@ -23,6 +23,7 @@ type UserAnimalRow = {
   raca: string | null;
   idade_anos: number | null;
   status: string;
+  estado_moderacao: string;
 };
 
 export default async function UserPetsPage({ params, searchParams }: UserPetsPageProps) {
@@ -43,7 +44,7 @@ export default async function UserPetsPage({ params, searchParams }: UserPetsPag
 
   const { data: animalsRaw } = await supabase
     .from("animais")
-    .select("id,nome,especie,raca,idade_anos,status")
+    .select("id,nome,especie,raca,idade_anos,status,estado_moderacao")
     .eq("owner_profile_id", user.id)
     .order("created_at", { ascending: false });
   const animals = (animalsRaw as UserAnimalRow[] | null) ?? [];
@@ -109,6 +110,16 @@ export default async function UserPetsPage({ params, searchParams }: UserPetsPag
                     <td className="px-6 py-4">
                       <p className="font-semibold">{animal.nome}</p>
                       <p className="text-xs text-muted-foreground">#{animal.id.slice(0, 8)}</p>
+                      {animal.estado_moderacao === "pendente" && (
+                        <span className="mt-1 inline-flex rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                          {locale === "pt" ? "Em moderacao" : "Under moderation"}
+                        </span>
+                      )}
+                      {animal.estado_moderacao === "rejeitado" && (
+                        <span className="mt-1 inline-flex rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-semibold text-destructive">
+                          {locale === "pt" ? "Rejeitado" : "Rejected"}
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-sm">
                       {localizeSpecies(animal.especie, locale)}

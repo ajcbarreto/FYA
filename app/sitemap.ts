@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { locales } from "@/lib/i18n/config";
 
-const STATIC_PATHS = ["", "/pets", "/canis", "/historias", "/match"];
+const STATIC_PATHS = ["", "/pets", "/canis", "/historias", "/match", "/privacidade", "/termos"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
@@ -17,7 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const supabase = await createServerSupabaseClient();
     const [{ data: animals }, { data: shelters }] = await Promise.all([
-      supabase.from("animais").select("id").limit(2000),
+      supabase.from("animais").select("id").eq("estado_moderacao", "aprovado").limit(2000),
       supabase.from("canis").select("id").limit(2000),
     ]);
 

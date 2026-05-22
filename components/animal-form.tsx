@@ -10,6 +10,11 @@ type AnimalFormValues = {
   porte?: string | null;
   status?: string;
   descricao?: string | null;
+  taxa_adocao?: number | null;
+  peso_kg?: number | null;
+  vacinado?: boolean | null;
+  microchip?: boolean | null;
+  esterilizado?: boolean | null;
 };
 
 type AnimalFormProps = {
@@ -115,6 +120,74 @@ export function AnimalForm({ locale, action, animalId, values, submitLabel }: An
           className="w-full rounded-xl border border-border/25 bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20"
         />
       </div>
+
+      <fieldset className="space-y-4 rounded-2xl border border-border/25 p-5">
+        <legend className="px-1 text-sm font-bold">{t.healthSection}</legend>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <label htmlFor="taxa_adocao" className="text-sm font-semibold">
+              {t.feeLabel}
+            </label>
+            <input
+              id="taxa_adocao"
+              name="taxa_adocao"
+              type="number"
+              min={0}
+              step="0.01"
+              defaultValue={values?.taxa_adocao ?? ""}
+              className={inputClass}
+            />
+            <p className="text-[11px] text-muted-foreground">{t.feeHelper}</p>
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="peso_kg" className="text-sm font-semibold">
+              {t.weightLabel}
+            </label>
+            <input
+              id="peso_kg"
+              name="peso_kg"
+              type="number"
+              min={0}
+              step="0.1"
+              defaultValue={values?.peso_kg ?? ""}
+              className={inputClass}
+            />
+            <p className="text-[11px] text-muted-foreground">{t.weightHelper}</p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-4 text-sm">
+          <label className="inline-flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="vacinado"
+              value="true"
+              defaultChecked={Boolean(values?.vacinado)}
+              className="h-4 w-4 rounded border-border"
+            />
+            {t.vaccinatedLabel}
+          </label>
+          <label className="inline-flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="microchip"
+              value="true"
+              defaultChecked={Boolean(values?.microchip)}
+              className="h-4 w-4 rounded border-border"
+            />
+            {t.microchipLabel}
+          </label>
+          <label className="inline-flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="esterilizado"
+              value="true"
+              defaultChecked={Boolean(values?.esterilizado)}
+              className="h-4 w-4 rounded border-border"
+            />
+            {t.sterilizedLabel}
+          </label>
+        </div>
+      </fieldset>
 
       <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground">
         {submitLabel}

@@ -8,13 +8,19 @@ type SiteFooterProps = {
 
 export function SiteFooter({ locale }: SiteFooterProps) {
   const copy = getDictionary(locale).footer;
+  const legal = getDictionary(locale).legal;
   const discoverLinks = [
     { label: copy.petCatalog, href: `/${locale}/pets` },
     { label: copy.shelters, href: `/${locale}/canis` },
     { label: copy.successStories, href: `/${locale}/historias` },
     { label: copy.findMatch, href: `/${locale}/match` },
   ];
-  const supportLinks = [copy.helpCenter, copy.contact, copy.privacy, copy.terms];
+  const supportLinks = [
+    { label: copy.helpCenter, href: null as string | null },
+    { label: copy.contact, href: null as string | null },
+    { label: legal.privacyLinkLabel, href: `/${locale}/privacidade` },
+    { label: legal.termsLinkLabel, href: `/${locale}/termos` },
+  ];
 
   return (
     <footer className="mt-20 w-full border-t border-border/40 bg-muted/40">
@@ -39,7 +45,15 @@ export function SiteFooter({ locale }: SiteFooterProps) {
           <h4 className="mb-4 text-sm font-bold">{copy.support}</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             {supportLinks.map((link) => (
-              <li key={link}>{link}</li>
+              <li key={link.label}>
+                {link.href ? (
+                  <Link href={link.href} className="transition-colors hover:text-primary">
+                    {link.label}
+                  </Link>
+                ) : (
+                  link.label
+                )}
+              </li>
             ))}
           </ul>
         </div>

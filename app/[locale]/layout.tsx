@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { Navbar } from "@/components/navbar";
 import { NavbarSkeleton } from "@/components/navbar-skeleton";
 import { SiteFooter } from "@/components/site-footer";
+import { CookieBanner } from "@/components/cookie-banner";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 
 type LocaleLayoutProps = {
@@ -24,6 +25,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
       </Suspense>
       {children}
       <SiteFooter locale={locale as Locale} />
+      <CookieBanner locale={locale as Locale} />
     </>
   );
 }

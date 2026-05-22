@@ -102,6 +102,74 @@ export async function toggleShelterVerification(formData: FormData) {
   redirect(`/${locale}/admin/canis?success=${verify ? "shelter_verified" : "shelter_unverified"}`);
 }
 
+export async function moderateAnimalListing(formData: FormData) {
+  const locale = getLocale(formData);
+  const animalId = String(formData.get("animalId") ?? "").trim();
+  const decision = String(formData.get("decision") ?? "");
+
+  if (!animalId || !["aprovado", "rejeitado"].includes(decision)) {
+    redirect(`/${locale}/admin/moderacao?error=invalid_request`);
+  }
+
+  const supabase = await requireAdmin(locale);
+  const { error } = await supabase
+    .from("animais")
+    .update({ estado_moderacao: decision })
+    .eq("id", animalId);
+
+  if (error) {
+    redirect(`/${locale}/admin/moderacao?error=save_failed`);
+  }
+
+  revalidatePath(`/${locale}/admin/moderacao`);
+  redirect(`/${locale}/admin/moderacao?success=${decision === "aprovado" ? "animal_approved" : "animal_rejected"}`);
+}
+
+export async function resolveDenuncia(formData: FormData) {
+  const locale = getLocale(formData);
+  const denunciaId = String(formData.get("denunciaId") ?? "").trim();
+  const decision = String(formData.get("decision") ?? "");
+  const hideTarget = String(formData.get("hide_target") ?? "") === "true";
+  const resolutionNote = String(formData.get("resolution_note") ?? "").trim();
+
+  if (!denunciaId || !["ignorada", "resolvida"].includes(decision)) {
+    redirect(`/${locale}/admin/moderacao?error=invalid_request`);
+  }
+
+  const supabase = await requireAdmin(locale);
+
+  if (hideTarget) {
+    const { data: denuncia } = await supabase
+      .from("denuncias")
+      .select("target_type,target_id")
+      .eq("id", denunciaId)
+      .maybeSingle();
+
+    if (denuncia?.target_type === "animal" && denuncia.target_id) {
+      await supabase
+        .from("animais")
+        .update({ estado_moderacao: "rejeitado" })
+        .eq("id", denuncia.target_id);
+    }
+  }
+
+  const { error } = await supabase
+    .from("denuncias")
+    .update({
+      estado: decision,
+      resolution_note: resolutionNote || null,
+      resolved_at: new Date().toISOString(),
+    })
+    .eq("id", denunciaId);
+
+  if (error) {
+    redirect(`/${locale}/admin/moderacao?error=save_failed`);
+  }
+
+  revalidatePath(`/${locale}/admin/moderacao`);
+  redirect(`/${locale}/admin/moderacao?success=denuncia_${decision}`);
+}
+
 export async function updatePetCatalogFilters(formData: FormData) {
   const locale = getLocale(formData);
   const dictionary = getDictionary(locale);
