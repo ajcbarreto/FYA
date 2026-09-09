@@ -53,6 +53,8 @@ export async function openNotification(formData: FormData) {
       .eq("user_profile_id", user.id);
   }
 
-  const target = link.startsWith("/") ? `/${locale}${link}` : `/${locale}/notificacoes`;
+  const target = link.startsWith("/")
+    ? `/${locale}${link}`
+    : `/${locale}/notificacoes`;
   redirect(target);
 }

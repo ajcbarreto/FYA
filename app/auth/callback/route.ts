@@ -1,18 +1,17 @@
+import { safeLocalPath } from "@/lib/auth/redirect";
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { defaultLocale } from "@/lib/i18n/config";
 
-function sanitizeNext(value: string | null) {
-  if (value && value.startsWith("/") && !value.startsWith("//")) {
-    return value;
-  }
-  return `/${defaultLocale}`;
-}
-
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = request.nextUrl;
+  const { searchParams } = request.nextUrl;
+  // Use the configured public origin: the internal Next server may see localhost
+  // behind a proxy even when the browser used a different hostname.
+  const origin = process.env.NEXT_PUBLIC_APP_URL
+    ? new URL(process.env.NEXT_PUBLIC_APP_URL).origin
+    : request.nextUrl.origin;
   const code = searchParams.get("code");
-  const next = sanitizeNext(searchParams.get("next"));
+  const next = safeLocalPath(searchParams.get("next")) ?? `/${defaultLocale}`;
 
   if (code) {
     const supabase = await createServerSupabaseClient();
@@ -22,5 +21,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/${defaultLocale}/auth/login?error=auth_callback`);
+  return NextResponse.redirect(
+    `${origin}/${defaultLocale}/auth/login?error=auth_callback`,
+  );
 }

@@ -19,7 +19,9 @@ const defaults: PlatformSettings = {
 const SETTINGS_KEY = "platform_settings";
 
 function readString(value: unknown, fallback: string) {
-  return typeof value === "string" && value.trim().length > 0 ? value.trim() : fallback;
+  return typeof value === "string" && value.trim().length > 0
+    ? value.trim()
+    : fallback;
 }
 
 function readBoolean(value: unknown, fallback: boolean) {
@@ -37,7 +39,10 @@ export function normalizePlatformSettings(value: unknown): PlatformSettings {
     platformName: readString(candidate.platformName, defaults.platformName),
     contactEmail: readString(candidate.contactEmail, defaults.contactEmail),
     supportEmail: readString(candidate.supportEmail, defaults.supportEmail),
-    defaultAdoptionFee: readString(candidate.defaultAdoptionFee, defaults.defaultAdoptionFee),
+    defaultAdoptionFee: readString(
+      candidate.defaultAdoptionFee,
+      defaults.defaultAdoptionFee,
+    ),
     requireVerificationToPublish: readBoolean(
       candidate.requireVerificationToPublish,
       defaults.requireVerificationToPublish,
@@ -45,7 +50,9 @@ export function normalizePlatformSettings(value: unknown): PlatformSettings {
   };
 }
 
-export async function getPlatformSettings(supabase: SupabaseClient): Promise<PlatformSettings> {
+export async function getPlatformSettings(
+  supabase: SupabaseClient,
+): Promise<PlatformSettings> {
   const { data, error } = await supabase
     .from("app_settings")
     .select("value")

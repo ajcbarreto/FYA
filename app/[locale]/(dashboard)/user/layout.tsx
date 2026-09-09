@@ -8,7 +8,10 @@ type UserLayoutProps = {
   params: Promise<{ locale: string }>;
 };
 
-export default async function UserLayout({ children, params }: UserLayoutProps) {
+export default async function UserLayout({
+  children,
+  params,
+}: UserLayoutProps) {
   const { locale } = await params;
 
   if (!isLocale(locale)) {

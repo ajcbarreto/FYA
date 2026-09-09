@@ -39,7 +39,10 @@ export default async function AdminUsersPage({ params }: AdminUsersPageProps) {
           colRole: "Perfil",
           colJoined: "Registo",
           empty: "Sem utilizadores.",
-          roles: { admin: "Admin", canil: "Canil", user: "Adotante" } as Record<string, string>,
+          roles: { admin: "Admin", canil: "Canil", user: "Adotante" } as Record<
+            string,
+            string
+          >,
         }
       : {
           title: "Users",
@@ -49,19 +52,25 @@ export default async function AdminUsersPage({ params }: AdminUsersPageProps) {
           colRole: "Role",
           colJoined: "Joined",
           empty: "No users.",
-          roles: { admin: "Admin", canil: "Shelter", user: "Adopter" } as Record<string, string>,
+          roles: {
+            admin: "Admin",
+            canil: "Shelter",
+            user: "Adopter",
+          } as Record<string, string>,
         };
 
   return (
-    <main className="space-y-6">
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
+    <main id="main-content" tabIndex={-1} className="space-y-6">
+      <header className="rounded-3xl border border-border/50 bg-card p-6 sm:p-8">
+        <h1 className="display-title text-4xl sm:text-5xl">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
 
       <section className="overflow-hidden rounded-3xl border border-border/20 bg-card">
         {profiles.length === 0 ? (
-          <p className="px-6 py-8 text-sm text-muted-foreground">{copy.empty}</p>
+          <p className="px-6 py-8 text-sm text-muted-foreground">
+            {copy.empty}
+          </p>
         ) : (
           <div className="overflow-x-auto stacked-table">
             <table className="w-full min-w-[680px] text-left">
@@ -76,17 +85,23 @@ export default async function AdminUsersPage({ params }: AdminUsersPageProps) {
               <tbody>
                 {profiles.map((profile) => (
                   <tr key={profile.id} className="border-t border-border/15">
-                    <td className="px-6 py-4 font-semibold">{profile.full_name ?? "-"}</td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">{profile.email}</td>
+                    <td className="px-6 py-4 font-semibold">
+                      {profile.full_name ?? "-"}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
+                      {profile.email}
+                    </td>
                     <td className="px-6 py-4">
                       <span className="rounded-full bg-muted px-3 py-1 text-xs font-bold text-muted-foreground">
                         {copy.roles[profile.role] ?? profile.role}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
-                      {new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short", year: "numeric" }).format(
-                        new Date(profile.created_at),
-                      )}
+                      {new Intl.DateTimeFormat(locale, {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      }).format(new Date(profile.created_at))}
                     </td>
                   </tr>
                 ))}

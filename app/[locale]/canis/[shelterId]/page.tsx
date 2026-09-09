@@ -1,11 +1,24 @@
+import { SubmitButton } from "@/components/submit-button";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { BadgeCheck, Building2, ChevronLeft, Mail, MapPin, MessageSquareText, PawPrint, Phone } from "lucide-react";
+import {
+  BadgeCheck,
+  Building2,
+  ChevronLeft,
+  Mail,
+  MapPin,
+  MessageSquareText,
+  PawPrint,
+  Phone,
+} from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getAnimalsForPublicShelter, getPublicShelterById } from "@/lib/canil/public-directory";
+import {
+  getAnimalsForPublicShelter,
+  getPublicShelterById,
+} from "@/lib/canil/public-directory";
 import {
   getReviewEligibility,
   getShelterRatingSummaries,
@@ -35,7 +48,12 @@ export async function generateMetadata({
   const shelter = await getPublicShelterById(supabase, shelterId);
 
   if (!shelter) {
-    return { title: locale === "pt" ? "Canil nao encontrado | FYA" : "Shelter not found | FYA" };
+    return {
+      title:
+        locale === "pt"
+          ? "Canil nao encontrado | FYA"
+          : "Shelter not found | FYA",
+    };
   }
 
   const title = `${shelter.nome} | FYA`;
@@ -52,7 +70,10 @@ export async function generateMetadata({
   };
 }
 
-export default async function ShelterPublicPage({ params, searchParams }: ShelterPublicPageProps) {
+export default async function ShelterPublicPage({
+  params,
+  searchParams,
+}: ShelterPublicPageProps) {
   const { locale, shelterId } = await params;
   const { success, error } = await searchParams;
 
@@ -79,9 +100,20 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
       : Promise.resolve({ canReview: false, existingReview: null }),
   ]);
   const rating = ratingSummaries.get(shelter.id);
-  const availableCount = animals.filter((animal) => animal.status.toLowerCase().includes("disponivel") || animal.status.toLowerCase().includes("available")).length;
-  const adoptedCount = animals.filter((animal) => animal.status.toLowerCase().includes("adotado") || animal.status.toLowerCase().includes("adopted")).length;
-  const joined = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(new Date(shelter.created_at));
+  const availableCount = animals.filter(
+    (animal) =>
+      animal.status.toLowerCase().includes("disponivel") ||
+      animal.status.toLowerCase().includes("available"),
+  ).length;
+  const adoptedCount = animals.filter(
+    (animal) =>
+      animal.status.toLowerCase().includes("adotado") ||
+      animal.status.toLowerCase().includes("adopted"),
+  ).length;
+  const joined = new Intl.DateTimeFormat(locale, {
+    month: "long",
+    year: "numeric",
+  }).format(new Date(shelter.created_at));
 
   const copy =
     locale === "pt"
@@ -112,12 +144,16 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
           commentLabel: "Comentario (opcional)",
           commentPlaceholder: "Como foi a tua experiencia com este canil?",
           submitReview: "Enviar avaliacao",
-          moderationNote: "A tua avaliacao so fica visivel depois de o canil a aprovar.",
-          pendingNote: "A tua avaliacao foi enviada e aguarda aprovacao do canil.",
-          rejectedNote: "A tua avaliacao anterior nao foi aprovada. Podes editar e reenviar.",
+          moderationNote:
+            "A tua avaliacao so fica visivel depois de o canil a aprovar.",
+          pendingNote:
+            "A tua avaliacao foi enviada e aguarda aprovacao do canil.",
+          rejectedNote:
+            "A tua avaliacao anterior nao foi aprovada. Podes editar e reenviar.",
           loginToReview: "Inicia sessao para avaliar este canil.",
           messages: {
-            review_pending: "Avaliacao enviada. Vai ser revista pelo canil antes de aparecer.",
+            review_pending:
+              "Avaliacao enviada. Vai ser revista pelo canil antes de aparecer.",
             invalid_review: "Escolhe uma classificacao valida.",
             review_failed: "Nao foi possivel guardar a avaliacao.",
           } as Record<string, string>,
@@ -149,23 +185,36 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
           commentLabel: "Comment (optional)",
           commentPlaceholder: "How was your experience with this shelter?",
           submitReview: "Send review",
-          moderationNote: "Your review is only visible after the shelter approves it.",
-          pendingNote: "Your review was sent and is awaiting the shelter's approval.",
-          rejectedNote: "Your previous review was not approved. You can edit and resend it.",
+          moderationNote:
+            "Your review is only visible after the shelter approves it.",
+          pendingNote:
+            "Your review was sent and is awaiting the shelter's approval.",
+          rejectedNote:
+            "Your previous review was not approved. You can edit and resend it.",
           loginToReview: "Sign in to review this shelter.",
           messages: {
-            review_pending: "Review sent. The shelter will review it before it appears.",
+            review_pending:
+              "Review sent. The shelter will review it before it appears.",
             invalid_review: "Pick a valid rating.",
             review_failed: "Could not save the review.",
           } as Record<string, string>,
         };
 
   const feedback =
-    (success && copy.messages[success]) || (error && copy.messages[error]) || null;
+    (success && copy.messages[success]) ||
+    (error && copy.messages[error]) ||
+    null;
 
   return (
-    <main className="mx-auto w-full max-w-7xl flex-1 px-6 pb-16 pt-8 lg:px-8">
-      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto w-full max-w-7xl flex-1 px-6 pb-16 pt-8 lg:px-8"
+    >
+      <ToastFeedback
+        message={feedback}
+        variant={success ? "success" : "error"}
+      />
       <Link
         href={`/${locale}/canis`}
         className="mb-6 inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
@@ -174,14 +223,16 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
         {copy.back}
       </Link>
 
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
+      <header className="rounded-3xl border border-border/50 bg-card p-6 sm:p-8">
         <div className="flex items-center gap-5">
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/15 text-primary">
             <Building2 className="h-7 w-7" />
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-4xl font-extrabold tracking-tight">{shelter.nome}</h1>
+              <h1 className="text-4xl font-extrabold tracking-tight">
+                {shelter.nome}
+              </h1>
               {shelter.verificado && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-secondary/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-secondary">
                   <BadgeCheck className="h-3.5 w-3.5" />
@@ -208,20 +259,33 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
           <div className="rounded-3xl border border-border/20 bg-card p-6">
             <h2 className="text-xl font-bold">{copy.aboutTitle}</h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              {shelter.missao ?? (locale === "pt" ? "Sem descricao publicada." : "No public description yet.")}
+              {shelter.missao ??
+                (locale === "pt"
+                  ? "Sem descricao publicada."
+                  : "No public description yet.")}
             </p>
             <div className="mt-6 grid grid-cols-3 gap-4 text-center">
               <div className="rounded-2xl bg-muted p-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.stats.total}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  {copy.stats.total}
+                </p>
                 <p className="mt-1 text-2xl font-bold">{animals.length}</p>
               </div>
               <div className="rounded-2xl bg-muted p-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.stats.available}</p>
-                <p className="mt-1 text-2xl font-bold text-secondary">{availableCount}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  {copy.stats.available}
+                </p>
+                <p className="mt-1 text-2xl font-bold text-secondary">
+                  {availableCount}
+                </p>
               </div>
               <div className="rounded-2xl bg-muted p-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.stats.adopted}</p>
-                <p className="mt-1 text-2xl font-bold text-primary">{adoptedCount}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  {copy.stats.adopted}
+                </p>
+                <p className="mt-1 text-2xl font-bold text-primary">
+                  {adoptedCount}
+                </p>
               </div>
             </div>
           </div>
@@ -229,7 +293,9 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
           <div className="rounded-3xl border border-border/20 bg-card p-6">
             <h2 className="text-xl font-bold">{copy.residentsTitle}</h2>
             {animals.length === 0 ? (
-              <p className="mt-4 text-sm text-muted-foreground">{copy.noResidents}</p>
+              <p className="mt-4 text-sm text-muted-foreground">
+                {copy.noResidents}
+              </p>
             ) : (
               <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {animals.map((pet) => (
@@ -239,11 +305,19 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
                     className="overflow-hidden rounded-2xl border border-border/20 transition-all hover:-translate-y-1 hover:shadow-md"
                   >
                     <div className="relative aspect-square">
-                      <Image src={pet.imageUrl} alt={pet.name} fill sizes="(max-width: 768px) 100vw, 25vw" className="object-cover" />
+                      <Image
+                        src={pet.imageUrl}
+                        alt={pet.name}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 25vw"
+                        className="object-cover"
+                      />
                     </div>
                     <div className="space-y-1 p-4">
                       <p className="font-bold">{pet.name}</p>
-                      <p className="text-xs text-muted-foreground">{pet.age} • {pet.species}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {pet.age} • {pet.species}
+                      </p>
                     </div>
                   </Link>
                 ))}
@@ -273,13 +347,19 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="shelterId" value={shelter.id} />
                 <p className="text-sm font-bold">
-                  {eligibility.existingReview ? copy.editReview : copy.writeReview}
+                  {eligibility.existingReview
+                    ? copy.editReview
+                    : copy.writeReview}
                 </p>
                 {eligibility.existingReview?.estado === "pendente" && (
-                  <p className="rounded-lg bg-muted px-3 py-2 text-xs text-muted-foreground">{copy.pendingNote}</p>
+                  <p className="rounded-lg bg-muted px-3 py-2 text-xs text-muted-foreground">
+                    {copy.pendingNote}
+                  </p>
                 )}
                 {eligibility.existingReview?.estado === "rejeitada" && (
-                  <p className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">{copy.rejectedNote}</p>
+                  <p className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">
+                    {copy.rejectedNote}
+                  </p>
                 )}
                 <label className="block text-xs font-semibold text-muted-foreground">
                   {copy.ratingLabel}
@@ -305,13 +385,15 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
                     className="mt-1 w-full rounded-xl border border-border/30 bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20"
                   />
                 </label>
-                <button
+                <SubmitButton
                   type="submit"
                   className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                 >
                   {copy.submitReview}
-                </button>
-                <p className="text-xs text-muted-foreground">{copy.moderationNote}</p>
+                </SubmitButton>
+                <p className="text-xs text-muted-foreground">
+                  {copy.moderationNote}
+                </p>
               </form>
             ) : (
               <p className="mt-4 rounded-2xl border border-border/30 bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
@@ -320,22 +402,33 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
             )}
 
             {reviews.length === 0 ? (
-              <p className="mt-4 text-sm text-muted-foreground">{copy.noReviews}</p>
+              <p className="mt-4 text-sm text-muted-foreground">
+                {copy.noReviews}
+              </p>
             ) : (
               <ul className="mt-4 space-y-3">
                 {reviews.map((review) => (
-                  <li key={review.id} className="rounded-2xl border border-border/20 p-4">
+                  <li
+                    key={review.id}
+                    className="rounded-2xl border border-border/20 p-4"
+                  >
                     <div className="flex items-center justify-between gap-3">
-                      <p className="font-semibold">{reviewAuthorName(review, locale)}</p>
+                      <p className="font-semibold">
+                        {reviewAuthorName(review, locale)}
+                      </p>
                       <StarRating value={review.rating} />
                     </div>
                     {review.comentario && (
-                      <p className="mt-2 text-sm text-muted-foreground">{review.comentario}</p>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        {review.comentario}
+                      </p>
                     )}
                     <p className="mt-1 text-xs text-muted-foreground/70">
-                      {new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short", year: "numeric" }).format(
-                        new Date(review.created_at),
-                      )}
+                      {new Intl.DateTimeFormat(locale, {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      }).format(new Date(review.created_at))}
                     </p>
                   </li>
                 ))}
@@ -351,28 +444,38 @@ export default async function ShelterPublicPage({ params, searchParams }: Shelte
               <li className="flex items-start gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 text-primary" />
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.locationLabel}</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    {copy.locationLabel}
+                  </p>
                   <p>{shelter.localizacao}</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
                 <Phone className="mt-0.5 h-4 w-4 text-primary" />
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.phoneLabel}</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    {copy.phoneLabel}
+                  </p>
                   <p>{shelter.telefone ?? copy.notProvided}</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
                 <Mail className="mt-0.5 h-4 w-4 text-primary" />
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.emailLabel}</p>
-                  <p className="break-all">{shelter.email_contacto ?? copy.notProvided}</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    {copy.emailLabel}
+                  </p>
+                  <p className="break-all">
+                    {shelter.email_contacto ?? copy.notProvided}
+                  </p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
                 <PawPrint className="mt-0.5 h-4 w-4 text-primary" />
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{copy.joinedLabel}</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    {copy.joinedLabel}
+                  </p>
                   <p>{joined}</p>
                 </div>
               </li>

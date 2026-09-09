@@ -1,55 +1,97 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-
-type UserSettingsPageProps = {
+import { updateAccountName } from "@/app/account/actions";
+import { SubmitButton } from "@/components/submit-button";
+import { ToastFeedback } from "@/components/toast-feedback";
+export default async function Settings({
+  params,
+  searchParams,
+}: {
   params: Promise<{ locale: string }>;
-};
-
-export default async function UserSettingsPage({ params }: UserSettingsPageProps) {
+  searchParams: Promise<{ success?: string; error?: string }>;
+}) {
   const { locale } = await params;
-  if (!isLocale(locale)) {
-    notFound();
-  }
-
+  if (!isLocale(locale)) notFound();
+  const pt = locale === "pt";
+  const { success, error } = await searchParams;
   const supabase = await createServerSupabaseClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect(`/${locale}/auth/login?next=/user/configuracoes`);
-  }
-
-  const { data: profile } = await supabase.from("profiles").select("full_name,email").eq("id", user.id).single();
-  const displayName = profile?.full_name ?? user.user_metadata.full_name ?? user.email ?? "User";
-
+  if (!user) redirect(`/${locale}/auth/login?next=/user/configuracoes`);
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("full_name,email")
+    .eq("id", user.id)
+    .single();
+  if (profileError)
+    throw new Error("Unable to load account", { cause: profileError });
   return (
-    <main className="space-y-6">
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{locale === "pt" ? "Configuracoes da Conta" : "Account Settings"}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {locale === "pt"
-            ? "Area basica para dados de conta. Podes expandir esta pagina com preferencias e notificacoes."
-            : "Basic account area. You can later extend this page with preferences and notifications."}
+    <main id="main-content" tabIndex={-1} className="space-y-6">
+      <header className="surface">
+        <p className="eyebrow">{pt ? "O teu espaço" : "Your space"}</p>
+        <h1 className="display-title mt-3 text-4xl">
+          {pt ? "A tua conta." : "Your account."}
+        </h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          {pt
+            ? "Mantém os teus dados atualizados para os abrigos te conhecerem melhor."
+            : "Keep your details up to date so shelters can get to know you."}
         </p>
       </header>
-
-      <section className="rounded-3xl border border-border/20 bg-card p-6">
-        <dl className="space-y-4 text-sm">
-          <div>
-            <dt className="text-muted-foreground">{locale === "pt" ? "Nome" : "Name"}</dt>
-            <dd className="font-semibold">{displayName}</dd>
-          </div>
-          <div>
-            <dt className="text-muted-foreground">Email</dt>
-            <dd className="font-semibold">{profile?.email ?? user.email ?? "-"}</dd>
-          </div>
-          <div>
-            <dt className="text-muted-foreground">{locale === "pt" ? "Tipo de conta" : "Account type"}</dt>
-            <dd className="font-semibold">{locale === "pt" ? "Adotante" : "Adopter"}</dd>
-          </div>
-        </dl>
+      <ToastFeedback
+        message={
+          success
+            ? pt
+              ? "Nome atualizado."
+              : "Name updated."
+            : error
+              ? pt
+                ? "Não foi possível guardar. Usa um nome entre 2 e 100 caracteres."
+                : "Could not save. Use a name between 2 and 100 characters."
+              : null
+        }
+        variant={success ? "success" : "error"}
+      />
+      <form action={updateAccountName} className="surface max-w-xl space-y-5">
+        <input type="hidden" name="locale" value={locale} />
+        <label className="block text-sm font-semibold">
+          {pt ? "Como te devemos chamar?" : "What should we call you?"}
+          <input
+            name="full_name"
+            defaultValue={profile.full_name ?? ""}
+            required
+            minLength={2}
+            maxLength={100}
+            autoComplete="name"
+            className="field mt-2"
+          />
+        </label>
+        <div>
+          <p className="text-xs font-semibold text-muted-foreground">Email</p>
+          <p className="mt-1 text-sm">{profile.email}</p>
+        </div>
+        <SubmitButton className="button-primary">
+          {pt ? "Guardar alterações" : "Save changes"}
+        </SubmitButton>
+      </form>
+      <section className="surface max-w-xl">
+        <h2 className="font-semibold">
+          {pt ? "Segurança da conta" : "Account security"}
+        </h2>
+        <p className="my-3 text-sm text-muted-foreground">
+          {pt
+            ? "Podes pedir um link seguro para alterar a tua palavra-passe."
+            : "You can request a secure link to change your password."}
+        </p>
+        <Link
+          href={`/${locale}/auth/forgot-password`}
+          className="text-sm font-semibold underline underline-offset-4"
+        >
+          {pt ? "Alterar palavra-passe" : "Change password"}
+        </Link>
       </section>
     </main>
   );

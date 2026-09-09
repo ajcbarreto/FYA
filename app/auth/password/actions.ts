@@ -15,7 +15,10 @@ async function getOrigin() {
   const origin = headerList.get("origin");
   if (origin) return origin;
   const host = headerList.get("host");
-  const protocol = host?.startsWith("localhost") || host?.startsWith("127.") ? "http" : "https";
+  const protocol =
+    host?.startsWith("localhost") || host?.startsWith("127.")
+      ? "http"
+      : "https";
   return host ? `${protocol}://${host}` : "";
 }
 

@@ -7,31 +7,7 @@
 -- - canil@fya.local
 -- - user@fya.local
 
--- 1) Tabelas de domínio (caso ainda não existam no projeto)
-create table if not exists public.canis (
-  id uuid primary key,
-  owner_profile_id uuid references public.profiles(id) on delete set null,
-  nome text not null,
-  localizacao text not null,
-  missao text,
-  telefone text,
-  email_contacto text,
-  created_at timestamptz not null default now()
-);
-
-create table if not exists public.animais (
-  id uuid primary key,
-  canil_id uuid not null references public.canis(id) on delete cascade,
-  nome text not null,
-  especie text not null,
-  raca text,
-  sexo text,
-  idade_anos int check (idade_anos >= 0),
-  porte text,
-  status text not null default 'disponivel',
-  descricao text,
-  created_at timestamptz not null default now()
-);
+-- Run migrations before this development-only seed.
 
 -- 2) Perfis de exemplo (a partir de utilizadores ja existentes em auth.users)
 with seed_users as (

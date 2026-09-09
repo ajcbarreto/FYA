@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/submit-button";
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
@@ -10,7 +11,10 @@ type CanilSettingsPageProps = {
   searchParams: Promise<{ success?: string; error?: string }>;
 };
 
-export default async function CanilSettingsPage({ params, searchParams }: CanilSettingsPageProps) {
+export default async function CanilSettingsPage({
+  params,
+  searchParams,
+}: CanilSettingsPageProps) {
   const { locale } = await params;
   const { success, error } = await searchParams;
 
@@ -89,13 +93,16 @@ export default async function CanilSettingsPage({ params, searchParams }: CanilS
         : null;
 
   return (
-    <main className="space-y-6">
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
+    <main id="main-content" tabIndex={-1} className="space-y-6">
+      <header className="rounded-3xl border border-border/50 bg-card p-6 sm:p-8">
+        <h1 className="display-title text-4xl sm:text-5xl">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
 
-      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
+      <ToastFeedback
+        message={feedback}
+        variant={success ? "success" : "error"}
+      />
 
       <section className="rounded-3xl border border-border/20 bg-card p-6">
         <form action={updateShelterSettings} className="space-y-5">
@@ -170,9 +177,12 @@ export default async function CanilSettingsPage({ params, searchParams }: CanilS
             />
           </div>
 
-          <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground">
+          <SubmitButton
+            type="submit"
+            className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
+          >
             {copy.save}
-          </button>
+          </SubmitButton>
         </form>
       </section>
     </main>

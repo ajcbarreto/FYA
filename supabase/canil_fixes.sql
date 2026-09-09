@@ -16,7 +16,7 @@ declare
 begin
   metadata_role := coalesce(new.raw_user_meta_data ->> 'role', 'user');
   resolved_role := case
-    when metadata_role in ('user', 'canil', 'admin') then metadata_role::public.app_role
+    when metadata_role in ('user', 'canil') then metadata_role::public.app_role
     else 'user'::public.app_role
   end;
 

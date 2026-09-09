@@ -9,7 +9,10 @@ type AdminLayoutProps = {
   params: Promise<{ locale: string }>;
 };
 
-export default async function AdminLayout({ children, params }: AdminLayoutProps) {
+export default async function AdminLayout({
+  children,
+  params,
+}: AdminLayoutProps) {
   const { locale } = await params;
 
   if (!isLocale(locale)) {

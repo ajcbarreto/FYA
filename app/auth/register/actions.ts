@@ -14,7 +14,9 @@ export async function register(formData: FormData) {
   const dictionary = getDictionary(locale);
   const source = String(formData.get("source") ?? "register");
   const redirectBasePath =
-    source === "shelter_registration" ? `/${locale}/auth/shelter-registration` : `/${locale}/auth/register`;
+    source === "shelter_registration"
+      ? `/${locale}/auth/shelter-registration`
+      : `/${locale}/auth/register`;
   const fullName = String(formData.get("full_name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
@@ -26,7 +28,9 @@ export async function register(formData: FormData) {
   const contactPhone = String(formData.get("contact_phone") ?? "").trim();
 
   if (!fullName || !email || !password || !allowedRoles.includes(role)) {
-    redirect(`${redirectBasePath}?error=${encodeURIComponent(dictionary.auth.invalidData)}`);
+    redirect(
+      `${redirectBasePath}?error=${encodeURIComponent(dictionary.auth.invalidData)}`,
+    );
   }
 
   const userMetadata: Record<string, string> = {
@@ -55,7 +59,9 @@ export async function register(formData: FormData) {
     redirect(`${redirectBasePath}?error=${encodeURIComponent(error.message)}`);
   }
 
-  redirect(`${redirectBasePath}?success=${encodeURIComponent(dictionary.auth.accountCreated)}`);
+  redirect(
+    `${redirectBasePath}?success=${encodeURIComponent(dictionary.auth.accountCreated)}`,
+  );
 }
 
 export async function logout(formData: FormData) {

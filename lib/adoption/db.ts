@@ -12,9 +12,18 @@ export type AdoptionRequestRow = {
   respostas: Record<string, unknown> | null;
   created_at: string;
   reviewed_at: string | null;
-  animais: { nome: string; especie: string; raca: string | null } | { nome: string; especie: string; raca: string | null }[] | null;
-  canis: { nome: string; localizacao: string } | { nome: string; localizacao: string }[] | null;
-  profiles: { full_name: string | null; email: string } | { full_name: string | null; email: string }[] | null;
+  animais:
+    | { nome: string; especie: string; raca: string | null }
+    | { nome: string; especie: string; raca: string | null }[]
+    | null;
+  canis:
+    | { nome: string; localizacao: string }
+    | { nome: string; localizacao: string }[]
+    | null;
+  profiles:
+    | { full_name: string | null; email: string }
+    | { full_name: string | null; email: string }[]
+    | null;
 };
 
 type ConversationRow = {
@@ -25,8 +34,14 @@ type ConversationRow = {
   pedido_id: string | null;
   created_at: string;
   updated_at: string;
-  canis: { nome: string; owner_profile_id: string | null } | { nome: string; owner_profile_id: string | null }[] | null;
-  applicant: { id: string; full_name: string | null; email: string } | { id: string; full_name: string | null; email: string }[] | null;
+  canis:
+    | { nome: string; owner_profile_id: string | null }
+    | { nome: string; owner_profile_id: string | null }[]
+    | null;
+  applicant:
+    | { id: string; full_name: string | null; email: string }
+    | { id: string; full_name: string | null; email: string }[]
+    | null;
   animais: { nome: string } | { nome: string }[] | null;
 };
 
@@ -36,7 +51,10 @@ type MessageRow = {
   sender_profile_id: string;
   conteudo: string;
   created_at: string;
-  sender: { id: string; full_name: string | null; email: string } | { id: string; full_name: string | null; email: string }[] | null;
+  sender:
+    | { id: string; full_name: string | null; email: string }
+    | { id: string; full_name: string | null; email: string }[]
+    | null;
 };
 
 function firstFromRelation<T>(value: T | T[] | null): T | null {
@@ -44,14 +62,24 @@ function firstFromRelation<T>(value: T | T[] | null): T | null {
   return Array.isArray(value) ? (value[0] ?? null) : value;
 }
 
-export function getDisplayName(fullName: string | null, email: string, fallback: string) {
+export function getDisplayName(
+  fullName: string | null,
+  email: string,
+  fallback: string,
+) {
   if (fullName && fullName.trim().length > 0) return fullName.trim();
   if (email.includes("@")) return email.split("@")[0] ?? fallback;
   return fallback;
 }
 
-export function localizeRequestStatus(status: AdoptionRequestRow["status"], locale: string) {
-  const labels: Record<AdoptionRequestRow["status"], { pt: string; en: string }> = {
+export function localizeRequestStatus(
+  status: AdoptionRequestRow["status"],
+  locale: string,
+) {
+  const labels: Record<
+    AdoptionRequestRow["status"],
+    { pt: string; en: string }
+  > = {
     pendente: { pt: "Pendente", en: "Pending" },
     entrevista: { pt: "Entrevista", en: "Interview" },
     aprovado: { pt: "Aprovado", en: "Approved" },
@@ -61,97 +89,179 @@ export function localizeRequestStatus(status: AdoptionRequestRow["status"], loca
   return labels[status][locale === "pt" ? "pt" : "en"];
 }
 
-export async function getCurrentProfileRole(supabase: SupabaseClient, userId: string) {
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", userId).single();
+export async function getCurrentProfileRole(
+  supabase: SupabaseClient,
+  userId: string,
+) {
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", userId)
+    .single();
   return (profile?.role as UserRole | undefined) ?? null;
 }
 
-export async function getAdoptionRequestsForCanil(supabase: SupabaseClient, canilId: string) {
-  const { data, error } = await supabase
+export async function getAdoptionRequestsForCanil(
+  supabase: SupabaseClient,
+  canilId: string,
+  page?: number,
+) {
+  let query = supabase
     .from("pedidos_adocao")
-    .select("id,animal_id,canil_id,applicant_profile_id,status,mensagem_inicial,observacoes_canil,respostas,created_at,reviewed_at,animais(nome,especie,raca),canis(nome,localizacao),profiles!pedidos_adocao_applicant_profile_id_fkey(full_name,email)")
+    .select(
+      "id,animal_id,canil_id,applicant_profile_id,status,mensagem_inicial,observacoes_canil,respostas,created_at,reviewed_at,animais(nome,especie,raca),canis(nome,localizacao),profiles!pedidos_adocao_applicant_profile_id_fkey(full_name,email)",
+    )
     .eq("canil_id", canilId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false });
+  if (page !== undefined) query = query.range((page - 1) * 25, page * 25 - 1);
+  const { data, error } = await query;
 
-  if (error || !data) {
-    if (error) {
-      console.error("[getAdoptionRequestsForCanil] Supabase error:", error.message);
-    }
+  if (error) throw new Error("Unable to load data", { cause: error });
+
+  if (!data) {
     return [];
   }
 
   return data as AdoptionRequestRow[];
 }
 
-export async function getAdoptionRequestsForUser(supabase: SupabaseClient, userId: string) {
-  const { data, error } = await supabase
+export async function getAdoptionRequestsForUser(
+  supabase: SupabaseClient,
+  userId: string,
+  page?: number,
+) {
+  let query = supabase
     .from("pedidos_adocao")
-    .select("id,animal_id,canil_id,applicant_profile_id,status,mensagem_inicial,observacoes_canil,respostas,created_at,reviewed_at,animais(nome,especie,raca),canis(nome,localizacao),profiles!pedidos_adocao_applicant_profile_id_fkey(full_name,email)")
+    .select(
+      "id,animal_id,canil_id,applicant_profile_id,status,mensagem_inicial,observacoes_canil,respostas,created_at,reviewed_at,animais(nome,especie,raca),canis(nome,localizacao),profiles!pedidos_adocao_applicant_profile_id_fkey(full_name,email)",
+    )
     .eq("applicant_profile_id", userId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false });
+  if (page !== undefined) query = query.range((page - 1) * 25, page * 25 - 1);
+  const { data, error } = await query;
 
-  if (error || !data) {
-    if (error) {
-      console.error("[getAdoptionRequestsForUser] Supabase error:", error.message);
-    }
+  if (error) throw new Error("Unable to load data", { cause: error });
+
+  if (!data) {
     return [];
   }
 
   return data as AdoptionRequestRow[];
 }
 
-export async function getConversationsForCanil(supabase: SupabaseClient, canilId: string) {
-  const { data, error } = await supabase
+export async function getConversationsForCanil(
+  supabase: SupabaseClient,
+  canilId: string,
+  page?: number,
+) {
+  let query = supabase
     .from("conversas_adocao")
-    .select("id,canil_id,applicant_profile_id,animal_id,pedido_id,created_at,updated_at,canis(nome,owner_profile_id),applicant:profiles!conversas_adocao_applicant_profile_id_fkey(id,full_name,email),animais(nome)")
+    .select(
+      "id,canil_id,applicant_profile_id,animal_id,pedido_id,created_at,updated_at,canis(nome,owner_profile_id),applicant:profiles!conversas_adocao_applicant_profile_id_fkey(id,full_name,email),animais(nome)",
+    )
     .eq("canil_id", canilId)
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false })
+    .order("id", { ascending: false });
+  if (page !== undefined) query = query.range((page - 1) * 25, page * 25 - 1);
+  const { data, error } = await query;
 
-  if (error || !data) {
-    if (error) {
-      console.error("[getConversationsForCanil] Supabase error:", error.message);
-    }
+  if (error) throw new Error("Unable to load data", { cause: error });
+
+  if (!data) {
     return [];
   }
 
   return data as ConversationRow[];
 }
 
-export async function getConversationsForUser(supabase: SupabaseClient, userId: string) {
-  const { data, error } = await supabase
+export async function getConversationsForUser(
+  supabase: SupabaseClient,
+  userId: string,
+  page?: number,
+) {
+  let query = supabase
     .from("conversas_adocao")
-    .select("id,canil_id,applicant_profile_id,animal_id,pedido_id,created_at,updated_at,canis(nome,owner_profile_id),applicant:profiles!conversas_adocao_applicant_profile_id_fkey(id,full_name,email),animais(nome)")
+    .select(
+      "id,canil_id,applicant_profile_id,animal_id,pedido_id,created_at,updated_at,canis(nome,owner_profile_id),applicant:profiles!conversas_adocao_applicant_profile_id_fkey(id,full_name,email),animais(nome)",
+    )
     .eq("applicant_profile_id", userId)
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false })
+    .order("id", { ascending: false });
+  if (page !== undefined) query = query.range((page - 1) * 25, page * 25 - 1);
+  const { data, error } = await query;
 
-  if (error || !data) {
-    if (error) {
-      console.error("[getConversationsForUser] Supabase error:", error.message);
-    }
+  if (error) throw new Error("Unable to load data", { cause: error });
+
+  if (!data) {
     return [];
   }
 
   return data as ConversationRow[];
 }
 
-export async function getMessagesByConversationId(supabase: SupabaseClient, conversationId: string) {
+export async function getMessagesByConversationId(
+  supabase: SupabaseClient,
+  conversationId: string,
+) {
   const { data, error } = await supabase
     .from("mensagens_adocao")
-    .select("id,conversa_id,sender_profile_id,conteudo,created_at,sender:profiles!mensagens_adocao_sender_profile_id_fkey(id,full_name,email)")
+    .select(
+      "id,conversa_id,sender_profile_id,conteudo,created_at,sender:profiles!mensagens_adocao_sender_profile_id_fkey(id,full_name,email)",
+    )
     .eq("conversa_id", conversationId)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false })
+    .limit(50);
 
-  if (error || !data) {
-    if (error) {
-      console.error("[getMessagesByConversationId] Supabase error:", error.message);
-    }
+  if (error) throw new Error("Unable to load data", { cause: error });
+
+  if (!data) {
     return [];
   }
 
-  return data as MessageRow[];
+  return (data as MessageRow[]).reverse();
 }
 
-export function mapConversationListItem(conversation: ConversationRow, locale: string) {
+/** Incoming chat activity used only for the messages badge. */
+export async function getUnreadMessagesCount(
+  supabase: SupabaseClient,
+  userId: string,
+) {
+  const { data: shelters } = await supabase
+    .from("canis")
+    .select("id")
+    .eq("owner_profile_id", userId);
+  const shelterIds = (shelters ?? []).map((row) => row.id);
+  let query = supabase
+    .from("conversas_adocao")
+    .select("id")
+    .eq("applicant_profile_id", userId);
+  if (shelterIds.length)
+    query = supabase
+      .from("conversas_adocao")
+      .select("id")
+      .or(
+        `applicant_profile_id.eq.${userId},canil_id.in.(${shelterIds.join(",")})`,
+      );
+  const { data: conversations, error: conversationError } = await query;
+  if (conversationError || !conversations?.length) return 0;
+  const { count, error } = await supabase
+    .from("mensagens_adocao")
+    .select("id", { count: "exact", head: true })
+    .in(
+      "conversa_id",
+      conversations.map((row) => row.id),
+    )
+    .neq("sender_profile_id", userId);
+  return error ? 0 : (count ?? 0);
+}
+
+export function mapConversationListItem(
+  conversation: ConversationRow,
+  locale: string,
+) {
   const applicant = firstFromRelation(conversation.applicant);
   const shelter = firstFromRelation(conversation.canis);
   const animal = firstFromRelation(conversation.animais);
@@ -176,14 +286,22 @@ export function mapConversationListItem(conversation: ConversationRow, locale: s
 
 export async function getApplicationAnswersForConversation(
   supabase: SupabaseClient,
-  conversation: { pedidoId: string | null; animalId: string | null; applicantId: string },
+  conversation: {
+    pedidoId: string | null;
+    animalId: string | null;
+    applicantId: string;
+  },
 ) {
-  let query = supabase.from("pedidos_adocao").select("respostas,mensagem_inicial,created_at");
+  let query = supabase
+    .from("pedidos_adocao")
+    .select("respostas,mensagem_inicial,created_at");
 
   if (conversation.pedidoId) {
     query = query.eq("id", conversation.pedidoId);
   } else if (conversation.animalId) {
-    query = query.eq("animal_id", conversation.animalId).eq("applicant_profile_id", conversation.applicantId);
+    query = query
+      .eq("animal_id", conversation.animalId)
+      .eq("applicant_profile_id", conversation.applicantId);
   } else {
     return null;
   }
@@ -193,8 +311,9 @@ export async function getApplicationAnswersForConversation(
     .limit(1)
     .maybeSingle();
 
-  if (error || !data) {
-    if (error) console.error("[getApplicationAnswersForConversation] Supabase error:", error.message);
+  if (error) throw new Error("Unable to load data", { cause: error });
+
+  if (!data) {
     return null;
   }
 
@@ -204,7 +323,10 @@ export async function getApplicationAnswersForConversation(
   };
 }
 
-export function mapRequestApplicantName(row: AdoptionRequestRow, locale: string) {
+export function mapRequestApplicantName(
+  row: AdoptionRequestRow,
+  locale: string,
+) {
   const applicant = firstFromRelation(row.profiles);
   return getDisplayName(
     applicant?.full_name ?? null,
@@ -219,4 +341,32 @@ export function getRowAnimal(row: AdoptionRequestRow) {
 
 export function getRowCanil(row: AdoptionRequestRow) {
   return firstFromRelation(row.canis);
+}
+
+export async function countAdoptionRows(
+  supabase: SupabaseClient,
+  table: "pedidos_adocao" | "conversas_adocao",
+  column: "canil_id" | "applicant_profile_id",
+  id: string,
+) {
+  const { count, error } = await supabase
+    .from(table)
+    .select("id", { count: "exact", head: true })
+    .eq(column, id);
+  if (error) throw new Error("Unable to count records", { cause: error });
+  return count ?? 0;
+}
+export async function getConversationById(
+  supabase: SupabaseClient,
+  id: string,
+) {
+  const { data, error } = await supabase
+    .from("conversas_adocao")
+    .select(
+      "id,canil_id,applicant_profile_id,animal_id,pedido_id,created_at,updated_at,canis(nome,owner_profile_id),applicant:profiles!conversas_adocao_applicant_profile_id_fkey(id,full_name,email),animais(nome)",
+    )
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error("Unable to load conversation", { cause: error });
+  return data as ConversationRow | null;
 }

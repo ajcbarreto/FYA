@@ -31,18 +31,24 @@ export function visitStatusClass(status: VisitStatus) {
   return "bg-muted text-muted-foreground";
 }
 
-export async function getVisitsByPedido(supabase: SupabaseClient, pedidoIds: string[]) {
+export async function getVisitsByPedido(
+  supabase: SupabaseClient,
+  pedidoIds: string[],
+) {
   const result = new Map<string, VisitRow[]>();
   if (pedidoIds.length === 0) return result;
 
   const { data, error } = await supabase
     .from("visitas")
-    .select("id,pedido_id,canil_id,applicant_profile_id,animal_id,scheduled_at,status,notas,created_at")
+    .select(
+      "id,pedido_id,canil_id,applicant_profile_id,animal_id,scheduled_at,status,notas,created_at",
+    )
     .in("pedido_id", pedidoIds)
     .order("scheduled_at", { ascending: true });
 
-  if (error || !data) {
-    if (error) console.error("[getVisitsByPedido] Supabase error:", error.message);
+  if (error) throw new Error("Unable to load data", { cause: error });
+
+  if (!data) {
     return result;
   }
 

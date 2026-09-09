@@ -1,14 +1,20 @@
 "use server";
 
+import { after } from "next/server";
+import { deliverEmailOutbox } from "@/lib/email/outbox";
 import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getCurrentProfileRole } from "@/lib/adoption/db";
 import { parseApplicationAnswers } from "@/lib/adoption/application-form";
-import { getShelterForUser } from "@/lib/canil/shelter-data";
-import { notifyAdopterStatusChange, notifyShelterNewRequest } from "@/lib/email/notifications";
 
-const requestStatuses = ["pendente", "entrevista", "aprovado", "rejeitado", "concluido"] as const;
+const requestStatuses = [
+  "pendente",
+  "entrevista",
+  "aprovado",
+  "rejeitado",
+  "concluido",
+] as const;
 
 function getLocaleFromForm(formData: FormData) {
   const localeValue = String(formData.get("locale") ?? defaultLocale);
@@ -18,102 +24,37 @@ function getLocaleFromForm(formData: FormData) {
 export async function submitAdoptionRequest(formData: FormData) {
   const locale = getLocaleFromForm(formData);
   const petId = String(formData.get("petId") ?? "");
-  const answers = parseApplicationAnswers(formData);
-  const message = (answers.message ?? "").trim();
-
-  if (!petId) {
-    redirect(`/${locale}/pets?error=invalid_pet`);
+  let answers;
+  try {
+    answers = parseApplicationAnswers(formData);
+  } catch {
+    return { error: "invalid_application" };
   }
-
+  if (!/^[0-9a-f-]{36}$/i.test(petId)) return { error: "invalid_pet" };
   const supabase = await createServerSupabaseClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect(`/${locale}/auth/login?next=/pets/${petId}`);
-  }
-
+  if (!user) return { error: "login" };
   const role = await getCurrentProfileRole(supabase, user.id);
-  if (role !== "user") {
-    redirect(`/${locale}/pets/${petId}?error=only_users_can_apply`);
-  }
-
-  const { data: animal } = await supabase
-    .from("animais")
-    .select("id,canil_id,nome")
-    .eq("id", petId)
-    .maybeSingle();
-  if (!animal) {
-    redirect(`/${locale}/pets/${petId}?error=pet_not_found`);
-  }
-
-  const { data: existingRequest } = await supabase
-    .from("pedidos_adocao")
-    .select("id")
-    .eq("animal_id", petId)
-    .eq("applicant_profile_id", user.id)
-    .in("status", ["pendente", "entrevista"])
-    .maybeSingle();
-
-  const requestId = existingRequest?.id ?? crypto.randomUUID();
-
-  const requestPayload = {
-    id: requestId,
-    animal_id: petId,
-    canil_id: animal.canil_id,
-    applicant_profile_id: user.id,
-    status: "pendente" as const,
-    mensagem_inicial: message || null,
-    respostas: answers as unknown as Record<string, unknown>,
-  };
-
-  const { error: requestError } = await supabase.from("pedidos_adocao").upsert(requestPayload);
-  if (requestError) {
-    redirect(`/${locale}/pets/${petId}?error=request_failed`);
-  }
-
-  const { data: existingConversation } = await supabase
-    .from("conversas_adocao")
-    .select("id")
-    .eq("canil_id", animal.canil_id)
-    .eq("applicant_profile_id", user.id)
-    .eq("animal_id", petId)
-    .maybeSingle();
-
-  const conversationId = existingConversation?.id ?? crypto.randomUUID();
-  if (!existingConversation) {
-    const { error: conversationError } = await supabase.from("conversas_adocao").insert({
-      id: conversationId,
-      canil_id: animal.canil_id,
-      applicant_profile_id: user.id,
-      animal_id: petId,
-      pedido_id: requestId,
-    });
-
-    if (conversationError) {
-      redirect(`/${locale}/pets/${petId}?error=conversation_failed`);
+  if (role !== "user") return { error: "only_users_can_apply" };
+  const { data, error } = await supabase.rpc("submit_adoption", {
+    p_animal: petId,
+    p_answers: answers,
+    p_message: answers.message ?? "",
+  });
+  if (error || !data)
+    return {
+      error: error?.code === "23514" ? "pet_unavailable" : "request_failed",
+    };
+  after(async () => {
+    try {
+      await deliverEmailOutbox();
+    } catch {
+      console.error("Email delivery deferred to scheduled retry");
     }
-  }
-
-  const initialMessage = message || (locale === "pt" ? "Ola! Tenho interesse neste animal." : "Hi! I am interested in this pet.");
-  const { error: messageError } = await supabase.from("mensagens_adocao").insert({
-    conversa_id: conversationId,
-    sender_profile_id: user.id,
-    conteudo: initialMessage,
   });
-
-  await notifyShelterNewRequest(supabase, {
-    canilId: animal.canil_id,
-    animalName: animal.nome,
-    locale,
-  });
-
-  if (messageError) {
-    redirect(`/${locale}/user/pedidos?success=request_created`);
-  }
-
-  redirect(`/${locale}/user/mensagens?conversation=${conversationId}&success=message_sent`);
+  return { conversationId: String(data), locale };
 }
 
 export async function updateRequestStatus(formData: FormData) {
@@ -122,7 +63,10 @@ export async function updateRequestStatus(formData: FormData) {
   const status = String(formData.get("status") ?? "");
   const notes = String(formData.get("notes") ?? "").trim();
 
-  if (!requestId || !requestStatuses.includes(status as (typeof requestStatuses)[number])) {
+  if (
+    !requestId ||
+    !requestStatuses.includes(status as (typeof requestStatuses)[number])
+  ) {
     redirect(`/${locale}/canil/pedidos?error=invalid_request`);
   }
 
@@ -140,72 +84,63 @@ export async function updateRequestStatus(formData: FormData) {
     redirect(`/${locale}/canil/pedidos?error=unauthorized`);
   }
 
-  const { shelter } = await getShelterForUser(supabase, user.id);
-  if (!shelter && role !== "admin") {
-    redirect(`/${locale}/canil/pedidos?error=no_shelter`);
-  }
-
-  let query = supabase.from("pedidos_adocao").update({
-    status,
-    observacoes_canil: notes || null,
-    reviewed_at: new Date().toISOString(),
-  }).eq("id", requestId);
-
-  if (shelter) {
-    query = query.eq("canil_id", shelter.id);
-  }
-
-  const { data: updatedRows, error } = await query.select("applicant_profile_id,animais(nome)");
-  if (error) {
-    redirect(`/${locale}/canil/pedidos?error=save_failed`);
-  }
-
-  const updatedRow = updatedRows?.[0];
-  if (updatedRow) {
-    const animalRelation = updatedRow.animais;
-    const animal = Array.isArray(animalRelation) ? animalRelation[0] : animalRelation;
-    await notifyAdopterStatusChange({
-      applicantProfileId: updatedRow.applicant_profile_id as string,
-      animalName: (animal?.nome as string | undefined) ?? "",
-      status: status as (typeof requestStatuses)[number],
-      locale,
-    });
-  }
-
+  const { error } = await supabase.rpc("transition_adoption", {
+    p_request: requestId,
+    p_status: status,
+    p_notes: notes,
+  });
+  if (error)
+    redirect(
+      `/${locale}/canil/pedidos?error=${error.code === "23514" ? "invalid_request" : "save_failed"}`,
+    );
+  after(async () => {
+    try {
+      await deliverEmailOutbox();
+    } catch {
+      console.error("Email delivery deferred to scheduled retry");
+    }
+  });
   redirect(`/${locale}/canil/pedidos?success=updated`);
 }
 
-export async function sendAdoptionMessage(formData: FormData) {
-  const locale = getLocaleFromForm(formData);
-  const conversationId = String(formData.get("conversationId") ?? "");
-  const message = String(formData.get("message") ?? "").trim();
-  const audience = String(formData.get("audience") ?? "user");
-
-  if (!conversationId || !message) {
-    const redirectBase = audience === "canil" ? `/${locale}/canil/mensagens` : `/${locale}/user/mensagens`;
-    redirect(`${redirectBase}?error=invalid_message`);
-  }
-
+export async function sendAdoptionMessage(
+  conversationId: string,
+  messageId: string,
+  text: string,
+) {
+  const message = text.trim();
+  if (
+    ![conversationId, messageId].every((id) => /^[0-9a-f-]{36}$/i.test(id)) ||
+    !message ||
+    message.length > 4000
+  )
+    return { error: "invalid_message" };
   const supabase = await createServerSupabaseClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  if (!user) {
-    const nextPath = audience === "canil" ? "/canil/mensagens" : "/user/mensagens";
-    redirect(`/${locale}/auth/login?next=${nextPath}`);
-  }
-
-  const { error } = await supabase.from("mensagens_adocao").insert({
+  if (!user) return { error: "login" };
+  const payload = {
+    id: messageId,
     conversa_id: conversationId,
     sender_profile_id: user.id,
     conteudo: message,
-  });
-
-  const redirectBase = audience === "canil" ? `/${locale}/canil/mensagens` : `/${locale}/user/mensagens`;
-  if (error) {
-    redirect(`${redirectBase}?conversation=${conversationId}&error=send_failed`);
+  };
+  const fields = "id,conversa_id,sender_profile_id,conteudo,created_at";
+  const { data, error } = await supabase
+    .from("mensagens_adocao")
+    .insert(payload)
+    .select(fields)
+    .single();
+  if (error?.code === "23505") {
+    const { data: existing } = await supabase
+      .from("mensagens_adocao")
+      .select(fields)
+      .eq("id", messageId)
+      .eq("sender_profile_id", user.id)
+      .eq("conversa_id", conversationId)
+      .single();
+    if (existing && existing.conteudo === message) return { message: existing };
   }
-
-  redirect(`${redirectBase}?conversation=${conversationId}&success=message_sent`);
+  return error || !data ? { error: "send_failed" } : { message: data };
 }

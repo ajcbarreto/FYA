@@ -5,12 +5,17 @@ import { locales } from "@/lib/i18n/config";
 const STATIC_PATHS = ["", "/pets", "/canis", "/historias", "/match"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
+  const base = (
+    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+  ).replace(/\/$/, "");
   const entries: MetadataRoute.Sitemap = [];
 
   for (const locale of locales) {
     for (const path of STATIC_PATHS) {
-      entries.push({ url: `${base}/${locale}${path}`, changeFrequency: "daily" });
+      entries.push({
+        url: `${base}/${locale}${path}`,
+        changeFrequency: "daily",
+      });
     }
   }
 

@@ -8,7 +8,9 @@ export function NavbarSkeleton({ locale }: NavbarSkeletonProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
       <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-        <div className="text-2xl font-bold tracking-tight text-primary">FYA</div>
+        <div className="text-2xl font-bold tracking-tight text-primary">
+          FYA
+        </div>
         <div className="hidden items-center gap-4 md:flex">
           <div className="h-3 w-16 animate-pulse rounded bg-muted" />
           <div className="h-3 w-20 animate-pulse rounded bg-muted" />

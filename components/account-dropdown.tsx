@@ -1,33 +1,33 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Settings, LayoutDashboard, LogOut, ChevronDown } from "lucide-react"
-import { logout } from "@/app/auth/register/actions"
+import Link from "next/link";
+import { Settings, LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
+import { logout } from "@/app/auth/register/actions";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 type AccountDropdownProps = {
-  locale: string
-  displayName: string
-  email: string | null
-  initial: string
-  roleLabel: string
-  dashboardHref: string
-  dashboardLabel: string
-  settingsHref: string
-  settingsLabel: string
+  locale: string;
+  displayName: string;
+  email: string | null;
+  initial: string;
+  roleLabel: string;
+  dashboardHref: string;
+  dashboardLabel: string;
+  settingsHref: string;
+  settingsLabel: string;
   menuCopy: {
-    openMenu: string
-    panel: string
-    settings: string
-    logout: string
-  }
-}
+    openMenu: string;
+    panel: string;
+    settings: string;
+    logout: string;
+  };
+};
 
 export function AccountDropdown({
   locale,
@@ -42,9 +42,9 @@ export function AccountDropdown({
   menuCopy,
 }: AccountDropdownProps) {
   const itemClass =
-    "cursor-pointer gap-3 rounded-xl px-2 py-2.5 text-sm font-medium focus:bg-muted"
+    "cursor-pointer gap-3 rounded-xl px-2 py-2.5 text-sm font-medium focus:bg-muted";
   const itemIcon =
-    "inline-flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground"
+    "inline-flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground";
 
   return (
     <DropdownMenu>
@@ -73,7 +73,9 @@ export function AccountDropdown({
           </span>
           <div className="min-w-0">
             <p className="truncate text-sm font-bold">{displayName}</p>
-            {email ? <p className="truncate text-xs text-muted-foreground">{email}</p> : null}
+            {email ? (
+              <p className="truncate text-xs text-muted-foreground">{email}</p>
+            ) : null}
             <span className="mt-1 inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
               {roleLabel}
             </span>
@@ -118,5 +120,5 @@ export function AccountDropdown({
         </form>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

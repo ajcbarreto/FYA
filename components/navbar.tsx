@@ -1,11 +1,14 @@
+import { Brand } from "@/components/brand";
+import { hasSupabaseEnv } from "@/lib/supabase/config";
 import Link from "next/link";
-import { Bell, Heart } from "lucide-react";
+import { Bell, Heart, MessageCircle } from "lucide-react";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { resolveUserRole } from "@/lib/auth/role";
 import { getUnreadNotificationsCount } from "@/lib/notifications/db";
+import { getUnreadMessagesCount } from "@/lib/adoption/db";
 import type { UserRole } from "@/lib/supabase/types";
 import { AccountDropdown } from "@/components/account-dropdown";
 import { MobileMenu, type MobileLink } from "@/components/mobile-menu";
@@ -16,17 +19,18 @@ type NavbarProps = {
 
 export async function Navbar({ locale }: NavbarProps) {
   const dictionary = getDictionary(locale);
-  const supabase = await createServerSupabaseClient();
+  const supabase = hasSupabaseEnv ? await createServerSupabaseClient() : null;
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
 
   let role: UserRole | null = null;
   let fullName: string | null = null;
   let email: string | null = null;
   let unreadNotifications = 0;
+  let unreadMessages = 0;
 
-  if (user) {
+  if (user && supabase) {
     const { data: profile } = await supabase
       .from("profiles")
       .select("full_name,email")
@@ -35,14 +39,19 @@ export async function Navbar({ locale }: NavbarProps) {
 
     fullName = profile?.full_name ?? null;
     email = profile?.email ?? user.email ?? null;
-    [role, unreadNotifications] = await Promise.all([
+    [role, unreadNotifications, unreadMessages] = await Promise.all([
       resolveUserRole(supabase, user),
       getUnreadNotificationsCount(supabase, user.id),
+      getUnreadMessagesCount(supabase, user.id),
     ]);
   }
 
   const roleDashboardHref =
-    role === "admin" ? `/${locale}/admin` : role === "canil" ? `/${locale}/canil` : `/${locale}/user`;
+    role === "admin"
+      ? `/${locale}/admin`
+      : role === "canil"
+        ? `/${locale}/canil`
+        : `/${locale}/user`;
   const roleDashboardLabel =
     role === "admin"
       ? dictionary.nav.admin
@@ -55,7 +64,10 @@ export async function Navbar({ locale }: NavbarProps) {
       : role === "canil"
         ? `/${locale}/canil/configuracoes`
         : `/${locale}/user/configuracoes`;
-  const roleSettingsLabel = role === "canil" ? dictionary.nav.canilSettings : dictionary.nav.userSettings;
+  const roleSettingsLabel =
+    role === "canil"
+      ? dictionary.nav.canilSettings
+      : dictionary.nav.userSettings;
   const roleLabel =
     role === "admin"
       ? locale === "pt"
@@ -93,19 +105,28 @@ export async function Navbar({ locale }: NavbarProps) {
     { href: `/${locale}/historias`, label: dictionary.nav.stories },
   ];
   if (user) {
-    mobileLinks.push({ href: `/${locale}/notificacoes`, label: dictionary.nav.notifications });
+    mobileLinks.push({
+      href: `/${locale}/notificacoes`,
+      label: dictionary.nav.notifications,
+    });
   }
   if (role === "user") {
     mobileLinks.push(
       { href: `/${locale}/user`, label: dictionary.nav.userDashboard },
-      { href: `/${locale}/user/favoritos`, label: dictionary.nav.userFavorites },
+      {
+        href: `/${locale}/user/favoritos`,
+        label: dictionary.nav.userFavorites,
+      },
       { href: `/${locale}/user/pedidos`, label: dictionary.nav.userRequests },
       { href: `/${locale}/user/mensagens`, label: dictionary.nav.userMessages },
     );
   } else if (role === "canil") {
     mobileLinks.push(
       { href: `/${locale}/canil`, label: dictionary.nav.canilDashboard },
-      { href: `/${locale}/canil/configuracoes`, label: dictionary.nav.canilSettings },
+      {
+        href: `/${locale}/canil/configuracoes`,
+        label: dictionary.nav.canilSettings,
+      },
     );
   } else if (role === "admin") {
     mobileLinks.push({ href: `/${locale}/admin`, label: dictionary.nav.admin });
@@ -123,57 +144,47 @@ export async function Navbar({ locale }: NavbarProps) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
-      <nav className="mx-auto w-full max-w-7xl px-6 py-4 lg:px-8">
+      <nav className="mx-auto w-full max-w-7xl px-5 py-4 lg:px-8">
         <div className="flex items-center justify-between">
-          <Link href={`/${locale}`} className="text-2xl font-bold tracking-tight text-primary">
-            FYA
+          <Link
+            href={`/${locale}`}
+            className="text-2xl font-bold tracking-tight text-primary"
+          >
+            <Brand />
           </Link>
 
-          <div className="hidden items-center gap-7 text-sm font-semibold md:flex">
-            <Link href={`/${locale}`} className="text-muted-foreground transition-colors hover:text-primary">
+          <div className="hidden items-center gap-6 text-sm font-semibold lg:flex">
+            <Link
+              href={`/${locale}`}
+              className="text-muted-foreground transition-colors hover:text-primary"
+            >
               {dictionary.nav.home}
             </Link>
-            <Link href={`/${locale}/pets`} className="text-muted-foreground transition-colors hover:text-primary">
+            <Link
+              href={`/${locale}/pets`}
+              className="text-muted-foreground transition-colors hover:text-primary"
+            >
               {dictionary.nav.pets}
             </Link>
-            <Link href={`/${locale}/canis`} className="text-muted-foreground transition-colors hover:text-primary">
+            <Link
+              href={`/${locale}/canis`}
+              className="text-muted-foreground transition-colors hover:text-primary"
+            >
               {dictionary.nav.shelters}
             </Link>
-            <Link href={`/${locale}/historias`} className="text-muted-foreground transition-colors hover:text-primary">
+            <Link
+              href={`/${locale}/historias`}
+              className="text-muted-foreground transition-colors hover:text-primary"
+            >
               {dictionary.nav.stories}
             </Link>
 
-            {role === "user" && (
-              <>
-                <Link href={`/${locale}/user`} className="text-muted-foreground transition-colors hover:text-primary">
-                  {dictionary.nav.userDashboard}
-                </Link>
-                <Link href={`/${locale}/user/favoritos`} className="text-muted-foreground transition-colors hover:text-primary">
-                  {dictionary.nav.userFavorites}
-                </Link>
-                <Link href={`/${locale}/user/pedidos`} className="text-muted-foreground transition-colors hover:text-primary">
-                  {dictionary.nav.userRequests}
-                </Link>
-                <Link href={`/${locale}/user/mensagens`} className="text-muted-foreground transition-colors hover:text-primary">
-                  {dictionary.nav.userMessages}
-                </Link>
-              </>
-            )}
-
-            {role === "canil" && (
-              <>
-                <Link href={`/${locale}/canil`} className="text-muted-foreground transition-colors hover:text-primary">
-                  {dictionary.nav.canilDashboard}
-                </Link>
-                <Link href={`/${locale}/canil/configuracoes`} className="text-muted-foreground transition-colors hover:text-primary">
-                  {dictionary.nav.canilSettings}
-                </Link>
-              </>
-            )}
-
-            {role === "admin" && (
-              <Link href={`/${locale}/admin`} className="text-muted-foreground transition-colors hover:text-primary">
-                {dictionary.nav.admin}
+            {user && (
+              <Link
+                href={roleDashboardHref}
+                className="rounded-full bg-muted px-4 py-2 text-primary"
+              >
+                {roleDashboardLabel}
               </Link>
             )}
           </div>
@@ -188,6 +199,21 @@ export async function Navbar({ locale }: NavbarProps) {
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
               >
                 <Heart className="h-5 w-5" />
+              </Link>
+            )}
+
+            {user && (role === "user" || role === "canil") && (
+              <Link
+                href={`/${locale}/${role === "canil" ? "canil" : "user"}/mensagens`}
+                aria-label={dictionary.nav.userMessages}
+                className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
+              >
+                <MessageCircle className="h-5 w-5" />
+                {unreadMessages > 0 && (
+                  <span className="absolute right-0 top-0 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-white ring-2 ring-background">
+                    {unreadMessages > 9 ? "9+" : unreadMessages}
+                  </span>
+                )}
               </Link>
             )}
 
@@ -238,7 +264,11 @@ export async function Navbar({ locale }: NavbarProps) {
               />
             )}
 
-            <MobileMenu links={mobileLinks} openLabel={mobileMenuCopy.open} closeLabel={mobileMenuCopy.close} />
+            <MobileMenu
+              links={mobileLinks}
+              openLabel={mobileMenuCopy.open}
+              closeLabel={mobileMenuCopy.close}
+            />
           </div>
         </div>
       </nav>

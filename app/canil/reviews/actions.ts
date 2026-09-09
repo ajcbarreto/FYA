@@ -18,7 +18,12 @@ export async function submitShelterReview(formData: FormData) {
   const comentario = String(formData.get("comentario") ?? "").trim();
   const redirectBase = `/${locale}/canis/${shelterId}`;
 
-  if (!shelterId || !Number.isFinite(ratingValue) || ratingValue < 1 || ratingValue > 5) {
+  if (
+    !shelterId ||
+    !Number.isFinite(ratingValue) ||
+    ratingValue < 1 ||
+    ratingValue > 5
+  ) {
     redirect(`${redirectBase}?error=invalid_review`);
   }
 
@@ -95,5 +100,7 @@ export async function moderateReview(formData: FormData) {
   }
 
   revalidatePath(redirectBase);
-  redirect(`${redirectBase}?success=${decision === "aprovada" ? "review_approved" : "review_rejected"}`);
+  redirect(
+    `${redirectBase}?success=${decision === "aprovada" ? "review_approved" : "review_rejected"}`,
+  );
 }

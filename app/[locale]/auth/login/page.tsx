@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -6,6 +7,7 @@ import { login } from "@/app/auth/login/actions";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
 import { ToastFeedback } from "@/components/toast-feedback";
+import { SocialLoginButtons } from "@/components/social-login-buttons";
 
 type LoginPageProps = {
   params: Promise<{ locale: string }>;
@@ -16,7 +18,10 @@ type LoginPageProps = {
   }>;
 };
 
-export default async function LoginPage({ params, searchParams }: LoginPageProps) {
+export default async function LoginPage({
+  params,
+  searchParams,
+}: LoginPageProps) {
   const { locale } = await params;
   const { error, next, success } = await searchParams;
 
@@ -29,25 +34,34 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
     locale === "pt"
       ? {
           sideTitle: "Bem-vindo de volta a matilha.",
-          sideText: "Reconecta-te com canis e encontra o companheiro ideal para a tua familia.",
+          sideText:
+            "Reconecta-te com canis e encontra o companheiro ideal para a tua familia.",
           forgotPassword: "Esqueceste a password?",
           rememberDevice: "Lembrar este dispositivo",
           orContinue: "Ou continuar com",
           registerPrompt: "Ainda nao tens conta?",
-          passwordUpdated: "Password atualizada. Inicia sessao com a nova password.",
+          passwordUpdated:
+            "Password atualizada. Inicia sessao com a nova password.",
+          socialIntro: "Ou entra com",
         }
       : {
           sideTitle: "Welcome back to the pack.",
-          sideText: "Reconnect with local shelters and find the companion that completes your family.",
+          sideText:
+            "Reconnect with local shelters and find the companion that completes your family.",
           forgotPassword: "Forgot password?",
           rememberDevice: "Remember this device",
           orContinue: "Or continue with",
           registerPrompt: "Don't have an account?",
           passwordUpdated: "Password updated. Sign in with your new password.",
+          socialIntro: "Or continue with",
         };
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 items-center justify-center px-4 py-10 md:px-8 md:py-12">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto flex w-full max-w-6xl flex-1 items-center justify-center px-4 py-10 md:px-8 md:py-12"
+    >
       <section className="flex min-h-[700px] w-full flex-col overflow-hidden rounded-2xl bg-muted/35 shadow-[0_20px_40px_rgba(56,56,51,0.06)] md:flex-row">
         <div className="relative hidden w-1/2 p-12 md:flex md:flex-col md:justify-between">
           <Image
@@ -61,19 +75,29 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
           <div className="absolute inset-0 bg-gradient-to-t from-primary/45 to-transparent" />
           <div className="relative z-10 inline-flex w-fit items-center gap-2 rounded-xl bg-background/80 px-4 py-2 backdrop-blur-md">
             <PawPrint className="h-4 w-4 text-primary" />
-            <span className="text-xs font-bold uppercase tracking-wider">FYA</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              FYA
+            </span>
           </div>
           <div className="relative z-10 max-w-sm text-white">
-            <h2 className="text-4xl font-extrabold leading-tight tracking-tight">{copy.sideTitle}</h2>
-            <p className="mt-4 text-base leading-relaxed text-white/90">{copy.sideText}</p>
+            <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
+              {copy.sideTitle}
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-white/90">
+              {copy.sideText}
+            </p>
           </div>
         </div>
 
         <div className="flex w-full items-center justify-center bg-card p-8 md:w-1/2 md:p-16 lg:p-24">
           <div className="w-full max-w-md">
             <div className="mb-10">
-              <h1 className="text-3xl font-bold tracking-tight">{dictionary.auth.loginTitle}</h1>
-              <p className="mt-2 text-muted-foreground">{dictionary.auth.loginSubtitle}</p>
+              <h1 className="display-title text-4xl sm:text-5xl">
+                {dictionary.auth.loginTitle}
+              </h1>
+              <p className="mt-2 text-muted-foreground">
+                {dictionary.auth.loginSubtitle}
+              </p>
             </div>
 
             {error && (
@@ -82,7 +106,9 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
               </p>
             )}
             <ToastFeedback
-              message={success === "password_updated" ? copy.passwordUpdated : null}
+              message={
+                success === "password_updated" ? copy.passwordUpdated : null
+              }
               variant="success"
             />
 
@@ -91,7 +117,10 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
               <input type="hidden" name="next" value={next ?? ""} />
 
               <div className="space-y-2">
-                <label htmlFor="email" className="ml-3 block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                <label
+                  htmlFor="email"
+                  className="ml-3 block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground"
+                >
                   {dictionary.auth.email}
                 </label>
                 <div className="relative">
@@ -101,7 +130,9 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
                     name="email"
                     type="email"
                     required
-                    placeholder={locale === "pt" ? "tu@email.com" : "hello@example.com"}
+                    placeholder={
+                      locale === "pt" ? "tu@email.com" : "hello@example.com"
+                    }
                     className="h-13 w-full rounded-xl bg-muted px-14 pr-5 text-sm outline-none ring-0 transition-colors focus:bg-background focus:ring-2 focus:ring-primary/30"
                   />
                 </div>
@@ -109,7 +140,10 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
 
               <div className="space-y-2">
                 <div className="mx-3 flex items-center justify-between">
-                  <label htmlFor="password" className="block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                  <label
+                    htmlFor="password"
+                    className="block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground"
+                  >
                     {dictionary.auth.password}
                   </label>
                   <Link
@@ -133,22 +167,36 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
               </div>
 
               <label className="ml-3 flex items-center gap-3 text-sm text-muted-foreground">
-                <input type="checkbox" name="remember" className="h-4 w-4 rounded border-border text-primary focus:ring-primary" />
+                <input
+                  type="checkbox"
+                  name="remember"
+                  className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                />
                 {copy.rememberDevice}
               </label>
 
-              <button
+              <SubmitButton
                 type="submit"
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
               >
                 {dictionary.auth.loginSubmit}
                 <ArrowRight className="h-4 w-4" />
-              </button>
+              </SubmitButton>
             </form>
+
+            <div className="my-7 flex items-center gap-3 text-xs text-muted-foreground">
+              <span className="h-px flex-1 bg-border" />
+              <span>{copy.socialIntro}</span>
+              <span className="h-px flex-1 bg-border" />
+            </div>
+            <SocialLoginButtons locale={locale} />
 
             <p className="mt-8 text-center text-sm text-muted-foreground">
               {copy.registerPrompt}{" "}
-              <Link href={`/${locale}/auth/register`} className="font-bold text-primary hover:underline">
+              <Link
+                href={`/${locale}/auth/register`}
+                className="font-bold text-primary hover:underline"
+              >
                 {dictionary.auth.goToRegister}
               </Link>
             </p>

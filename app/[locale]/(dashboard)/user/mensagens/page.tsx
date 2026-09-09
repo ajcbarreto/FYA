@@ -1,20 +1,40 @@
+import { ListPagination } from "@/components/list-pagination";
+import { countAdoptionRows, getConversationById } from "@/lib/adoption/db";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getConversationsForUser, getMessagesByConversationId, mapConversationListItem } from "@/lib/adoption/db";
+import {
+  getConversationsForUser,
+  getMessagesByConversationId,
+  mapConversationListItem,
+} from "@/lib/adoption/db";
 import { ChatThread } from "@/components/chat-thread";
 import { ToastFeedback } from "@/components/toast-feedback";
 
 type UserMessagesPageProps = {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ conversation?: string; q?: string; success?: string; error?: string }>;
+  searchParams: Promise<{
+    conversation?: string;
+    q?: string;
+    page?: string;
+    success?: string;
+    error?: string;
+  }>;
 };
 
-export default async function UserMessagesPage({ params, searchParams }: UserMessagesPageProps) {
+export default async function UserMessagesPage({
+  params,
+  searchParams,
+}: UserMessagesPageProps) {
   const { locale } = await params;
-  const { conversation: selectedConversationId, q, success, error } = await searchParams;
+  const {
+    conversation: selectedConversationId,
+    q,
+    success,
+    error,
+  } = await searchParams;
   const query = (q ?? "").trim().toLowerCase();
 
   if (!isLocale(locale)) {
@@ -30,19 +50,56 @@ export default async function UserMessagesPage({ params, searchParams }: UserMes
     redirect(`/${locale}/auth/login?next=/user/mensagens`);
   }
 
-  const conversationRows = await getConversationsForUser(supabase, user.id);
-  const conversations = conversationRows.map((row) => mapConversationListItem(row, locale));
+  const total = await countAdoptionRows(
+    supabase,
+    "conversas_adocao",
+    "applicant_profile_id",
+    user.id,
+  );
+  const requestedPage = Math.max(
+    1,
+    Number.parseInt((await searchParams).page ?? "1", 10) || 1,
+  );
+  const page = Math.min(requestedPage, Math.max(1, Math.ceil(total / 25)));
+  if (requestedPage !== page)
+    redirect(`/${locale}/user/mensagens?page=${page}`);
+  const conversationRows = await getConversationsForUser(
+    supabase,
+    user.id,
+    page,
+  );
+  if (
+    selectedConversationId &&
+    !conversationRows.some((row) => row.id === selectedConversationId)
+  ) {
+    const selected = await getConversationById(
+      supabase,
+      selectedConversationId,
+    );
+    if (selected) conversationRows.unshift(selected);
+  }
+  const conversations = conversationRows.map((row) =>
+    mapConversationListItem(row, locale),
+  );
   const visibleConversations = query
     ? conversations.filter((conversation) =>
-        [conversation.canilName, conversation.animalName, conversation.applicantName].some((value) =>
-          value.toLowerCase().includes(query),
-        ),
+        [
+          conversation.canilName,
+          conversation.animalName,
+          conversation.applicantName,
+        ].some((value) => value.toLowerCase().includes(query)),
       )
     : conversations;
   const activeConversation = selectedConversationId
-    ? conversations.find((conversation) => conversation.id === selectedConversationId) ?? conversations[0] ?? null
-    : conversations[0] ?? null;
-  const messages = activeConversation ? await getMessagesByConversationId(supabase, activeConversation.id) : [];
+    ? (conversations.find(
+        (conversation) => conversation.id === selectedConversationId,
+      ) ??
+      conversations[0] ??
+      null)
+    : (conversations[0] ?? null);
+  const messages = activeConversation
+    ? await getMessagesByConversationId(supabase, activeConversation.id)
+    : [];
 
   const copy =
     locale === "pt"
@@ -83,11 +140,14 @@ export default async function UserMessagesPage({ params, searchParams }: UserMes
         : null;
 
   return (
-    <main className="space-y-6">
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
+    <main id="main-content" tabIndex={-1} className="space-y-6">
+      <header className="rounded-3xl border border-border/50 bg-card p-6 sm:p-8">
+        <h1 className="display-title text-4xl sm:text-5xl">{copy.title}</h1>
       </header>
-      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
+      <ToastFeedback
+        message={feedback}
+        variant={success ? "success" : "error"}
+      />
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
         <article
@@ -100,32 +160,43 @@ export default async function UserMessagesPage({ params, searchParams }: UserMes
               type="search"
               name="q"
               defaultValue={q ?? ""}
-              placeholder={copy.searchPlaceholder}
+              placeholder={
+                locale === "pt" ? "Pesquisar nesta página" : "Search this page"
+              }
               className="h-11 w-full rounded-lg border border-border/40 bg-background px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20"
             />
           </form>
           <div className="space-y-1.5">
             {visibleConversations.length === 0 ? (
-              <p className="px-2 py-4 text-sm text-muted-foreground">{copy.noConversations}</p>
+              <p className="px-2 py-4 text-sm text-muted-foreground">
+                {copy.noConversations}
+              </p>
             ) : (
               visibleConversations.map((conversation) => (
                 <a
                   key={conversation.id}
-                  href={`/${locale}/user/mensagens?conversation=${conversation.id}`}
+                  href={`/${locale}/user/mensagens?page=${page}&conversation=${conversation.id}`}
                   className={`block w-full rounded-lg px-4 py-3 text-left transition-colors ${
-                    activeConversation?.id === conversation.id ? "bg-muted" : "hover:bg-muted/60"
+                    activeConversation?.id === conversation.id
+                      ? "bg-muted"
+                      : "hover:bg-muted/60"
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <p className="font-semibold">{conversation.canilName}</p>
                     <span className="text-xs text-muted-foreground">
-                      {new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(
-                        new Date(conversation.updatedAt),
-                      )}
+                      {new Intl.DateTimeFormat(locale, {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }).format(new Date(conversation.updatedAt))}
                     </span>
                   </div>
-                  <p className="mt-0.5 text-xs text-primary">{conversation.animalName}</p>
-                  <p className="mt-1 truncate text-sm text-muted-foreground">{conversation.applicantName}</p>
+                  <p className="mt-0.5 text-xs text-primary">
+                    {conversation.animalName}
+                  </p>
+                  <p className="mt-1 truncate text-sm text-muted-foreground">
+                    {conversation.applicantName}
+                  </p>
                 </a>
               ))
             )}
@@ -148,7 +219,9 @@ export default async function UserMessagesPage({ params, searchParams }: UserMes
                   <ArrowLeft className="h-4 w-4" />
                 </Link>
                 <div className="min-w-0">
-                  <p className="truncate text-lg font-bold">{activeConversation.animalName}</p>
+                  <p className="truncate text-lg font-bold">
+                    {activeConversation.animalName}
+                  </p>
                   <p className="truncate text-sm text-muted-foreground">
                     {copy.withShelter} {activeConversation.canilName}
                   </p>
@@ -159,7 +232,9 @@ export default async function UserMessagesPage({ params, searchParams }: UserMes
                 conversationId={activeConversation.id}
                 currentUserId={user.id}
                 currentUserInitial={(user.email ?? "?").charAt(0).toUpperCase()}
-                otherPartyInitial={(activeConversation.canilName || "?").charAt(0).toUpperCase()}
+                otherPartyInitial={(activeConversation.canilName || "?")
+                  .charAt(0)
+                  .toUpperCase()}
                 audience="user"
                 locale={locale}
                 initialMessages={messages.map((message) => ({
@@ -177,10 +252,18 @@ export default async function UserMessagesPage({ params, searchParams }: UserMes
               />
             </>
           ) : (
-            <p className="text-sm text-muted-foreground">{copy.noConversations}</p>
+            <p className="text-sm text-muted-foreground">
+              {copy.noConversations}
+            </p>
           )}
         </article>
       </section>
+      <ListPagination
+        page={page}
+        total={total}
+        base={`/${locale}/user/mensagens`}
+        locale={locale}
+      />
     </main>
   );
 }

@@ -13,7 +13,10 @@ type NewAnimalPageProps = {
   searchParams: Promise<{ error?: string }>;
 };
 
-export default async function NewAnimalPage({ params, searchParams }: NewAnimalPageProps) {
+export default async function NewAnimalPage({
+  params,
+  searchParams,
+}: NewAnimalPageProps) {
   const { locale } = await params;
   const { error } = await searchParams;
 
@@ -45,7 +48,8 @@ export default async function NewAnimalPage({ params, searchParams }: NewAnimalP
           errors: {
             invalid_data: "Preenche pelo menos nome, especie e estado.",
             save_failed: "Nao foi possivel criar o animal.",
-            needs_verification: "O teu canil precisa de ser verificado pelo admin antes de publicar animais.",
+            needs_verification:
+              "O teu canil precisa de ser verificado pelo admin antes de publicar animais.",
           },
         }
       : {
@@ -56,14 +60,18 @@ export default async function NewAnimalPage({ params, searchParams }: NewAnimalP
           errors: {
             invalid_data: "Provide at least name, species and status.",
             save_failed: "Could not create the pet.",
-            needs_verification: "Your shelter must be verified by an admin before publishing animals.",
+            needs_verification:
+              "Your shelter must be verified by an admin before publishing animals.",
           },
         };
 
-  const feedback = error && copy.errors[error as keyof typeof copy.errors] ? copy.errors[error as keyof typeof copy.errors] : null;
+  const feedback =
+    error && copy.errors[error as keyof typeof copy.errors]
+      ? copy.errors[error as keyof typeof copy.errors]
+      : null;
 
   return (
-    <main className="space-y-6">
+    <main id="main-content" tabIndex={-1} className="space-y-6">
       <Link
         href={`/${locale}/canil/animais`}
         className="inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
@@ -72,15 +80,19 @@ export default async function NewAnimalPage({ params, searchParams }: NewAnimalP
         {copy.back}
       </Link>
 
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
+      <header className="rounded-3xl border border-border/50 bg-card p-6 sm:p-8">
+        <h1 className="display-title text-4xl sm:text-5xl">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
 
       <ToastFeedback message={feedback} variant="error" />
 
       <section className="rounded-3xl border border-border/20 bg-card p-6">
-        <AnimalForm locale={locale} action={createAnimal} submitLabel={copy.submit} />
+        <AnimalForm
+          locale={locale}
+          action={createAnimal}
+          submitLabel={copy.submit}
+        />
       </section>
     </main>
   );

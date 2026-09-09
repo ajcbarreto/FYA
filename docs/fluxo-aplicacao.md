@@ -1,3 +1,5 @@
+> Documento histórico. Para instalação e permissões atuais, seguir o README e as migrações em `supabase/migrations/`; não executar a checklist antiga abaixo numa base nova.
+
 # FYA - Fluxo da Aplicacao (simples e claro)
 
 Este documento explica:

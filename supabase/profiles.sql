@@ -30,7 +30,7 @@ begin
     new.email,
     nullif(new.raw_user_meta_data ->> 'full_name', ''),
     case
-      when metadata_role in ('user', 'canil', 'admin') then metadata_role::public.app_role
+      when metadata_role in ('user', 'canil') then metadata_role::public.app_role
       else 'user'::public.app_role
     end
   );

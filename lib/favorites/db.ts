@@ -1,15 +1,23 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { toCatalogItem, type AnimalRow, type PetCatalogItem } from "@/lib/pet-catalog/db-pets";
+import {
+  toCatalogItem,
+  type AnimalRow,
+  type PetCatalogItem,
+} from "@/lib/pet-catalog/db-pets";
 import { listPrimaryPhotosForAnimals } from "@/lib/canil/animal-photos";
 
-export async function getFavoriteAnimalIds(supabase: SupabaseClient, userId: string) {
+export async function getFavoriteAnimalIds(
+  supabase: SupabaseClient,
+  userId: string,
+) {
   const { data, error } = await supabase
     .from("favoritos")
     .select("animal_id")
     .eq("user_profile_id", userId);
 
-  if (error || !data) {
-    if (error) console.error("[getFavoriteAnimalIds] Supabase error:", error.message);
+  if (error) throw new Error("Unable to load data", { cause: error });
+
+  if (!data) {
     return new Set<string>();
   }
 
@@ -29,8 +37,9 @@ export async function getFavoritesForUser(
     .eq("user_profile_id", userId)
     .order("created_at", { ascending: false });
 
-  if (error || !data) {
-    if (error) console.error("[getFavoritesForUser] Supabase error:", error.message);
+  if (error) throw new Error("Unable to load data", { cause: error });
+
+  if (!data) {
     return [];
   }
 
@@ -43,5 +52,7 @@ export async function getFavoritesForUser(
     supabase,
     animals.map((animal) => animal.id),
   );
-  return animals.map((animal) => toCatalogItem(animal, locale, photoMap.get(animal.id)));
+  return animals.map((animal) =>
+    toCatalogItem(animal, locale, photoMap.get(animal.id)),
+  );
 }

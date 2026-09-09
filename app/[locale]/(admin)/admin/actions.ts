@@ -1,11 +1,16 @@
 "use server";
 
+import { validFilterConfig } from "@/lib/pet-catalog/options";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getPetCatalogFiltersKey, parseCommaSeparatedList } from "@/lib/pet-catalog/filter-config";
+import {
+  getPetCatalogFiltersKey,
+  parseCommaSeparatedList,
+} from "@/lib/pet-catalog/filter-config";
 import { getPlatformSettingsKey } from "@/lib/admin/platform-settings";
 import type { UserRole } from "@/lib/supabase/types";
 
@@ -48,8 +53,11 @@ export async function updatePlatformSettings(formData: FormData) {
   const platformName = String(formData.get("platformName") ?? "").trim();
   const contactEmail = String(formData.get("contactEmail") ?? "").trim();
   const supportEmail = String(formData.get("supportEmail") ?? "").trim();
-  const defaultAdoptionFee = String(formData.get("defaultAdoptionFee") ?? "").trim();
-  const requireVerificationToPublish = String(formData.get("requireVerificationToPublish") ?? "") === "on";
+  const defaultAdoptionFee = String(
+    formData.get("defaultAdoptionFee") ?? "",
+  ).trim();
+  const requireVerificationToPublish =
+    String(formData.get("requireVerificationToPublish") ?? "") === "on";
 
   if (!platformName) {
     redirect(`/${locale}/admin/configuracoes?error=invalid_platform`);
@@ -99,7 +107,9 @@ export async function toggleShelterVerification(formData: FormData) {
 
   revalidatePath(`/${locale}/admin/canis`);
   revalidatePath(`/${locale}/admin`);
-  redirect(`/${locale}/admin/canis?success=${verify ? "shelter_verified" : "shelter_unverified"}`);
+  redirect(
+    `/${locale}/admin/canis?success=${verify ? "shelter_verified" : "shelter_unverified"}`,
+  );
 }
 
 export async function updatePetCatalogFilters(formData: FormData) {
@@ -111,20 +121,30 @@ export async function updatePetCatalogFilters(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const species = parseCommaSeparatedList(String(formData.get("species") ?? ""));
-  const ageRanges = parseCommaSeparatedList(String(formData.get("ageRanges") ?? ""));
+  const species = parseCommaSeparatedList(
+    String(formData.get("species") ?? ""),
+  );
+  const ageRanges = parseCommaSeparatedList(
+    String(formData.get("ageRanges") ?? ""),
+  );
   const sizes = parseCommaSeparatedList(String(formData.get("sizes") ?? ""));
-  const genders = parseCommaSeparatedList(String(formData.get("genders") ?? ""));
-  const compatibilities = parseCommaSeparatedList(String(formData.get("compatibilities") ?? ""));
+  const genders = parseCommaSeparatedList(
+    String(formData.get("genders") ?? ""),
+  );
+  const compatibilities = parseCommaSeparatedList(
+    String(formData.get("compatibilities") ?? ""),
+  );
 
   if (
-    species.length === 0 ||
-    ageRanges.length === 0 ||
-    sizes.length === 0 ||
-    genders.length === 0 ||
-    compatibilities.length === 0
+    !validFilterConfig("species", species) ||
+    !validFilterConfig("ageRanges", ageRanges) ||
+    !validFilterConfig("sizes", sizes) ||
+    !validFilterConfig("genders", genders) ||
+    !validFilterConfig("compatibilities", compatibilities)
   ) {
-    redirect(`/${locale}/admin/configuracoes?error=${encodeURIComponent(dictionary.admin.genericError)}`);
+    redirect(
+      `/${locale}/admin/configuracoes?error=${encodeURIComponent(dictionary.admin.genericError)}`,
+    );
   }
 
   const { error } = await supabase.from("app_settings").upsert(
@@ -145,9 +165,13 @@ export async function updatePetCatalogFilters(formData: FormData) {
   );
 
   if (error) {
-    redirect(`/${locale}/admin/configuracoes?error=${encodeURIComponent(dictionary.admin.genericError)}`);
+    redirect(
+      `/${locale}/admin/configuracoes?error=${encodeURIComponent(dictionary.admin.genericError)}`,
+    );
   }
 
   revalidatePath(`/${locale}/admin/configuracoes`);
-  redirect(`/${locale}/admin/configuracoes?success=${encodeURIComponent(dictionary.admin.success)}`);
+  redirect(
+    `/${locale}/admin/configuracoes?success=${encodeURIComponent(dictionary.admin.success)}`,
+  );
 }

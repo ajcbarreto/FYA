@@ -1,15 +1,29 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { Bell, CalendarClock, ClipboardList, HeartHandshake, MessageCircle, PawPrint } from "lucide-react";
+import {
+  Bell,
+  CalendarClock,
+  ClipboardList,
+  HeartHandshake,
+  MessageCircle,
+  PawPrint,
+} from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getShelterForUser, localizeAnimalStatus, localizeSpecies, type ShelterAnimalRecord } from "@/lib/canil/shelter-data";
+import {
+  getShelterForUser,
+  localizeAnimalStatus,
+  localizeSpecies,
+  type ShelterAnimalRecord,
+} from "@/lib/canil/shelter-data";
 
 type CanilDashboardPageProps = {
   params: Promise<{ locale: string }>;
 };
 
-export default async function CanilDashboardPage({ params }: CanilDashboardPageProps) {
+export default async function CanilDashboardPage({
+  params,
+}: CanilDashboardPageProps) {
   const { locale } = await params;
 
   if (!isLocale(locale)) {
@@ -30,7 +44,8 @@ export default async function CanilDashboardPage({ params }: CanilDashboardPageP
     locale === "pt"
       ? {
           title: "Dashboard do Canil",
-          subtitle: "Visao geral operacional do teu canil na FYA (Found Your Animal).",
+          subtitle:
+            "Visao geral operacional do teu canil na FYA (Found Your Animal).",
           welcomePrefix: "Bem-vindo de volta,",
           cards: {
             totalPets: "Total de pets",
@@ -56,7 +71,8 @@ export default async function CanilDashboardPage({ params }: CanilDashboardPageP
         }
       : {
           title: "Shelter Dashboard",
-          subtitle: "Operational overview of your shelter inside FYA (Found Your Animal).",
+          subtitle:
+            "Operational overview of your shelter inside FYA (Found Your Animal).",
           welcomePrefix: "Welcome back,",
           cards: {
             totalPets: "Total pets",
@@ -83,9 +99,15 @@ export default async function CanilDashboardPage({ params }: CanilDashboardPageP
 
   const stats = {
     total: animals.length,
-    available: animals.filter((animal) => animal.status.toLowerCase() === "disponivel").length,
-    pending: animals.filter((animal) => ["reservado", "em_tratamento"].includes(animal.status.toLowerCase())).length,
-    adopted: animals.filter((animal) => animal.status.toLowerCase() === "adotado").length,
+    available: animals.filter(
+      (animal) => animal.status.toLowerCase() === "disponivel",
+    ).length,
+    pending: animals.filter((animal) =>
+      ["reservado", "em_tratamento"].includes(animal.status.toLowerCase()),
+    ).length,
+    adopted: animals.filter(
+      (animal) => animal.status.toLowerCase() === "adotado",
+    ).length,
   };
 
   const recentActivity = animals.slice(0, 4).map((animal) => ({
@@ -97,18 +119,23 @@ export default async function CanilDashboardPage({ params }: CanilDashboardPageP
     const normalized = animal.status.toLowerCase();
     if (normalized === "disponivel") return "bg-secondary/20 text-secondary";
     if (normalized === "adotado") return "bg-primary/15 text-primary";
-    if (normalized === "reservado") return "bg-accent/20 text-accent-foreground";
+    if (normalized === "reservado")
+      return "bg-accent/20 text-accent-foreground";
     return "bg-muted text-muted-foreground";
   };
 
   return (
-    <main className="space-y-8">
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">{copy.title}</p>
+    <main id="main-content" tabIndex={-1} className="space-y-8">
+      <header className="rounded-3xl border border-border/50 bg-card p-6 sm:p-8">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+          {copy.title}
+        </p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
           {copy.welcomePrefix} {shelter?.nome ?? "FYA Shelter"}
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-muted-foreground">{copy.subtitle}</p>
+        <p className="mt-3 max-w-3xl text-sm text-muted-foreground">
+          {copy.subtitle}
+        </p>
       </header>
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -116,14 +143,18 @@ export default async function CanilDashboardPage({ params }: CanilDashboardPageP
           <div className="mb-4 inline-flex rounded-full bg-primary/15 p-3 text-primary">
             <PawPrint className="h-5 w-5" />
           </div>
-          <p className="text-sm text-muted-foreground">{copy.cards.totalPets}</p>
+          <p className="text-sm text-muted-foreground">
+            {copy.cards.totalPets}
+          </p>
           <p className="mt-1 text-3xl font-bold">{stats.total}</p>
         </article>
         <article className="rounded-3xl border border-border/20 bg-card p-6">
           <div className="mb-4 inline-flex rounded-full bg-secondary/15 p-3 text-secondary">
             <HeartHandshake className="h-5 w-5" />
           </div>
-          <p className="text-sm text-muted-foreground">{copy.cards.available}</p>
+          <p className="text-sm text-muted-foreground">
+            {copy.cards.available}
+          </p>
           <p className="mt-1 text-3xl font-bold">{stats.available}</p>
         </article>
         <article className="rounded-3xl border border-border/20 bg-card p-6">
@@ -146,24 +177,38 @@ export default async function CanilDashboardPage({ params }: CanilDashboardPageP
         <article className="rounded-3xl border border-border/20 bg-card p-6 xl:col-span-2">
           <div className="mb-5 flex items-center justify-between gap-4">
             <h2 className="text-xl font-bold">{copy.sections.activity}</h2>
-            <Link href={`/${locale}/canil/animais`} className="text-sm font-bold text-primary hover:underline">
+            <Link
+              href={`/${locale}/canil/animais`}
+              className="text-sm font-bold text-primary hover:underline"
+            >
               {copy.actions.viewAllPets}
             </Link>
           </div>
 
           {recentActivity.length === 0 ? (
-            <p className="rounded-2xl bg-muted px-4 py-5 text-sm text-muted-foreground">{copy.emptyActivity}</p>
+            <p className="rounded-2xl bg-muted px-4 py-5 text-sm text-muted-foreground">
+              {copy.emptyActivity}
+            </p>
           ) : (
             <div className="space-y-3">
               {recentActivity.map((animal) => (
-                <div key={animal.id} className="flex items-center justify-between rounded-2xl border border-border/20 px-4 py-3">
+                <div
+                  key={animal.id}
+                  className="flex items-center justify-between rounded-2xl border border-border/20 px-4 py-3"
+                >
                   <div>
                     <p className="font-semibold">{animal.nome}</p>
                     <p className="text-xs text-muted-foreground">
-                      {(animal.raca ?? localizeSpecies(animal.especie, locale)).replaceAll("_", " ")}
+                      {(
+                        animal.raca ?? localizeSpecies(animal.especie, locale)
+                      ).replaceAll("_", " ")}
                     </p>
                   </div>
-                  <span className={`rounded-full px-3 py-1 text-xs font-bold ${statusPillClass(animal)}`}>{animal.statusLabel}</span>
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-bold ${statusPillClass(animal)}`}
+                  >
+                    {animal.statusLabel}
+                  </span>
                 </div>
               ))}
             </div>

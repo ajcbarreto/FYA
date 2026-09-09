@@ -1,17 +1,28 @@
+import { ListPagination } from "@/components/list-pagination";
+import { countAdoptionRows } from "@/lib/adoption/db";
+import { AdoptionProgress } from "@/components/adoption-progress";
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getAdoptionRequestsForUser, getRowAnimal, getRowCanil, localizeRequestStatus } from "@/lib/adoption/db";
+import {
+  getAdoptionRequestsForUser,
+  getRowAnimal,
+  getRowCanil,
+  localizeRequestStatus,
+} from "@/lib/adoption/db";
 import { getVisitsByPedido } from "@/lib/adoption/visits";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { VisitPanel } from "@/components/visit-panel";
 
 type UserRequestsPageProps = {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ success?: string; error?: string }>;
+  searchParams: Promise<{ page?: string; success?: string; error?: string }>;
 };
 
-export default async function UserRequestsPage({ params, searchParams }: UserRequestsPageProps) {
+export default async function UserRequestsPage({
+  params,
+  searchParams,
+}: UserRequestsPageProps) {
   const { locale } = await params;
   const { success, error } = await searchParams;
 
@@ -28,7 +39,19 @@ export default async function UserRequestsPage({ params, searchParams }: UserReq
     redirect(`/${locale}/auth/login?next=/user/pedidos`);
   }
 
-  const requests = await getAdoptionRequestsForUser(supabase, user.id);
+  const total = await countAdoptionRows(
+    supabase,
+    "pedidos_adocao",
+    "applicant_profile_id",
+    user.id,
+  );
+  const requestedPage = Math.max(
+    1,
+    Number.parseInt((await searchParams).page ?? "1", 10) || 1,
+  );
+  const page = Math.min(requestedPage, Math.max(1, Math.ceil(total / 25)));
+  if (requestedPage !== page) redirect(`/${locale}/user/pedidos?page=${page}`);
+  const requests = await getAdoptionRequestsForUser(supabase, user.id, page);
   const visitsByPedido = await getVisitsByPedido(
     supabase,
     requests.map((request) => request.id),
@@ -44,7 +67,8 @@ export default async function UserRequestsPage({ params, searchParams }: UserReq
             date: "Data",
             notes: "Notas do Canil",
           },
-          empty: "Ainda nao tens pedidos. Visita o catalogo e candidata-te a um pet.",
+          empty:
+            "Ainda nao tens pedidos. Visita o catalogo e candidata-te a um pet.",
           visitsLabel: "Visitas",
           success: {
             request_created: "Candidatura enviada com sucesso.",
@@ -55,7 +79,8 @@ export default async function UserRequestsPage({ params, searchParams }: UserReq
             request_failed: "Nao foi possivel submeter candidatura.",
             invalid_visit: "Dados de visita invalidos.",
             visit_in_past: "Escolhe uma data no futuro.",
-            visit_not_allowed: "Nao e possivel agendar visita para este pedido.",
+            visit_not_allowed:
+              "Nao e possivel agendar visita para este pedido.",
             visit_failed: "Nao foi possivel agendar a visita.",
           } as Record<string, string>,
         }
@@ -68,11 +93,13 @@ export default async function UserRequestsPage({ params, searchParams }: UserReq
             date: "Date",
             notes: "Shelter notes",
           },
-          empty: "You have not submitted requests yet. Visit the pet catalog to apply.",
+          empty:
+            "You have not submitted requests yet. Visit the pet catalog to apply.",
           visitsLabel: "Visits",
           success: {
             request_created: "Application submitted successfully.",
-            visit_proposed: "Visit proposed. Waiting for the shelter to confirm.",
+            visit_proposed:
+              "Visit proposed. Waiting for the shelter to confirm.",
             visit_updated: "Visit updated.",
           } as Record<string, string>,
           errors: {
@@ -88,17 +115,22 @@ export default async function UserRequestsPage({ params, searchParams }: UserReq
     (success && copy.success[success]) || (error && copy.errors[error]) || null;
 
   return (
-    <main className="space-y-6">
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
+    <main id="main-content" tabIndex={-1} className="space-y-6">
+      <header className="rounded-3xl border border-border/50 bg-card p-6 sm:p-8">
+        <h1 className="display-title text-4xl sm:text-5xl">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
 
-      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
+      <ToastFeedback
+        message={feedback}
+        variant={success ? "success" : "error"}
+      />
 
       <section className="overflow-hidden rounded-3xl border border-border/20 bg-card">
         {requests.length === 0 ? (
-          <p className="px-6 py-8 text-sm text-muted-foreground">{copy.empty}</p>
+          <p className="px-6 py-8 text-sm text-muted-foreground">
+            {copy.empty}
+          </p>
         ) : (
           <div className="overflow-x-auto stacked-table">
             <table className="w-full min-w-[760px] text-left">
@@ -112,14 +144,25 @@ export default async function UserRequestsPage({ params, searchParams }: UserReq
               </thead>
               <tbody>
                 {requests.map((request) => {
-                  const canPropose = request.status !== "rejeitado" && request.status !== "concluido";
+                  const canPropose =
+                    request.status !== "rejeitado" &&
+                    request.status !== "concluido";
                   return (
-                    <tr key={request.id} className="border-t border-border/15 align-top">
+                    <tr
+                      key={request.id}
+                      className="border-t border-border/15 align-top"
+                    >
                       <td className="px-6 py-4">
-                        <p className="font-semibold">{getRowAnimal(request)?.nome ?? "-"}</p>
-                        <p className="text-xs text-muted-foreground">{getRowCanil(request)?.nome ?? "-"}</p>
+                        <p className="font-semibold">
+                          {getRowAnimal(request)?.nome ?? "-"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {getRowCanil(request)?.nome ?? "-"}
+                        </p>
                         <details className="mt-3 text-xs text-muted-foreground">
-                          <summary className="cursor-pointer font-semibold text-primary">{copy.visitsLabel}</summary>
+                          <summary className="cursor-pointer font-semibold text-primary">
+                            {copy.visitsLabel}
+                          </summary>
                           <div className="mt-2">
                             <VisitPanel
                               locale={locale}
@@ -131,14 +174,25 @@ export default async function UserRequestsPage({ params, searchParams }: UserReq
                           </div>
                         </details>
                       </td>
-                      <td className="px-6 py-4 text-sm font-semibold">{localizeRequestStatus(request.status, locale)}</td>
+                      <td className="px-6 py-4 text-sm font-semibold">
+                        {localizeRequestStatus(request.status, locale)}
+                        <AdoptionProgress
+                          status={request.status}
+                          locale={locale}
+                        />
+                      </td>
                       <td className="px-6 py-4 text-sm">
-                        {new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short", year: "numeric" }).format(
-                          new Date(request.created_at),
-                        )}
+                        {new Intl.DateTimeFormat(locale, {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        }).format(new Date(request.created_at))}
                       </td>
                       <td className="px-6 py-4 text-sm text-muted-foreground">
-                        {request.observacoes_canil ?? (locale === "pt" ? "Sem notas do canil." : "No notes from shelter.")}
+                        {request.observacoes_canil ??
+                          (locale === "pt"
+                            ? "Sem notas do canil."
+                            : "No notes from shelter.")}
                       </td>
                     </tr>
                   );
@@ -148,6 +202,12 @@ export default async function UserRequestsPage({ params, searchParams }: UserReq
           </div>
         )}
       </section>
+      <ListPagination
+        page={page}
+        total={total}
+        base={`/${locale}/user/pedidos`}
+        locale={locale}
+      />
     </main>
   );
 }

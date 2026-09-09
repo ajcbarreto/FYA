@@ -8,7 +8,10 @@ type CanilLayoutProps = {
   params: Promise<{ locale: string }>;
 };
 
-export default async function CanilLayout({ children, params }: CanilLayoutProps) {
+export default async function CanilLayout({
+  children,
+  params,
+}: CanilLayoutProps) {
   const { locale } = await params;
 
   if (!isLocale(locale)) {

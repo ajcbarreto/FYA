@@ -3,14 +3,19 @@ import { notFound, redirect } from "next/navigation";
 import { FileText, Heart, MessageCircle, Search } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getAdoptionRequestsForUser, getConversationsForUser } from "@/lib/adoption/db";
+import {
+  getAdoptionRequestsForUser,
+  getConversationsForUser,
+} from "@/lib/adoption/db";
 import { getFavoriteAnimalIds } from "@/lib/favorites/db";
 
 type UserDashboardPageProps = {
   params: Promise<{ locale: string }>;
 };
 
-export default async function UserDashboardPage({ params }: UserDashboardPageProps) {
+export default async function UserDashboardPage({
+  params,
+}: UserDashboardPageProps) {
   const { locale } = await params;
   if (!isLocale(locale)) {
     notFound();
@@ -70,16 +75,19 @@ export default async function UserDashboardPage({ params }: UserDashboardPagePro
 
   const stats = {
     total: requests.length,
-    pending: requests.filter((request) => ["pendente", "entrevista"].includes(request.status)).length,
-    approved: requests.filter((request) => request.status === "aprovado").length,
+    pending: requests.filter((request) =>
+      ["pendente", "entrevista"].includes(request.status),
+    ).length,
+    approved: requests.filter((request) => request.status === "aprovado")
+      .length,
     chats: conversations.length,
     favorites: favorites.size,
   };
 
   return (
-    <main className="space-y-6">
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
+    <main id="main-content" tabIndex={-1} className="space-y-6">
+      <header className="rounded-3xl border border-border/50 bg-card p-6 sm:p-8">
+        <h1 className="display-title text-4xl sm:text-5xl">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
 
@@ -90,36 +98,56 @@ export default async function UserDashboardPage({ params }: UserDashboardPagePro
         </article>
         <article className="rounded-2xl border border-border/20 bg-card p-5">
           <p className="text-sm text-muted-foreground">{copy.cards.pending}</p>
-          <p className="mt-1 text-3xl font-bold text-primary">{stats.pending}</p>
+          <p className="mt-1 text-3xl font-bold text-primary">
+            {stats.pending}
+          </p>
         </article>
         <article className="rounded-2xl border border-border/20 bg-card p-5">
           <p className="text-sm text-muted-foreground">{copy.cards.approved}</p>
-          <p className="mt-1 text-3xl font-bold text-secondary">{stats.approved}</p>
+          <p className="mt-1 text-3xl font-bold text-secondary">
+            {stats.approved}
+          </p>
         </article>
         <article className="rounded-2xl border border-border/20 bg-card p-5">
           <p className="text-sm text-muted-foreground">{copy.cards.chats}</p>
           <p className="mt-1 text-3xl font-bold">{stats.chats}</p>
         </article>
         <article className="rounded-2xl border border-border/20 bg-card p-5">
-          <p className="text-sm text-muted-foreground">{copy.cards.favorites}</p>
-          <p className="mt-1 text-3xl font-bold text-primary">{stats.favorites}</p>
+          <p className="text-sm text-muted-foreground">
+            {copy.cards.favorites}
+          </p>
+          <p className="mt-1 text-3xl font-bold text-primary">
+            {stats.favorites}
+          </p>
         </article>
       </section>
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <Link href={`/${locale}/pets`} className="flex items-center gap-3 rounded-2xl border border-border/20 bg-card p-5 hover:bg-muted">
+        <Link
+          href={`/${locale}/pets`}
+          className="flex items-center gap-3 rounded-2xl border border-border/20 bg-card p-5 hover:bg-muted"
+        >
           <Search className="h-5 w-5 text-primary" />
           <span className="font-semibold">{copy.actions.browsePets}</span>
         </Link>
-        <Link href={`/${locale}/user/favoritos`} className="flex items-center gap-3 rounded-2xl border border-border/20 bg-card p-5 hover:bg-muted">
+        <Link
+          href={`/${locale}/user/favoritos`}
+          className="flex items-center gap-3 rounded-2xl border border-border/20 bg-card p-5 hover:bg-muted"
+        >
           <Heart className="h-5 w-5 text-primary" />
           <span className="font-semibold">{copy.actions.viewFavorites}</span>
         </Link>
-        <Link href={`/${locale}/user/pedidos`} className="flex items-center gap-3 rounded-2xl border border-border/20 bg-card p-5 hover:bg-muted">
+        <Link
+          href={`/${locale}/user/pedidos`}
+          className="flex items-center gap-3 rounded-2xl border border-border/20 bg-card p-5 hover:bg-muted"
+        >
           <FileText className="h-5 w-5 text-primary" />
           <span className="font-semibold">{copy.actions.viewRequests}</span>
         </Link>
-        <Link href={`/${locale}/user/mensagens`} className="flex items-center gap-3 rounded-2xl border border-border/20 bg-card p-5 hover:bg-muted">
+        <Link
+          href={`/${locale}/user/mensagens`}
+          className="flex items-center gap-3 rounded-2xl border border-border/20 bg-card p-5 hover:bg-muted"
+        >
           <MessageCircle className="h-5 w-5 text-primary" />
           <span className="font-semibold">{copy.actions.openMessages}</span>
         </Link>

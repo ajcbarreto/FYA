@@ -182,10 +182,10 @@ type Dictionary = {
 const dictionaries: Record<Locale, Dictionary> = {
   pt: {
     nav: {
-      home: "Home",
-      pets: "Catalogo de Pets",
-      shelters: "Canis",
-      stories: "Historias",
+      home: "Início",
+      pets: "Animais",
+      shelters: "Abrigos",
+      stories: "Histórias",
       notifications: "Notificacoes",
       login: "Entrar",
       register: "Registar",
@@ -209,23 +209,30 @@ const dictionaries: Record<Locale, Dictionary> = {
       featureTitle: "Porque escolher a FYA",
       features: {
         adopterTitle: "Para Adotantes",
-        adopterDescription: "Descoberta inteligente, perfis claros e comunicacao segura com canis.",
+        adopterDescription:
+          "Descoberta inteligente, perfis claros e comunicacao segura com canis.",
         shelterTitle: "Para Canis",
-        shelterDescription: "Gestao eficiente de animais e candidaturas com foco em processos transparentes.",
+        shelterDescription:
+          "Gestao eficiente de animais e candidaturas com foco em processos transparentes.",
         secureTitle: "Segura e Confiavel",
-        secureDescription: "Perfis verificados e acesso por perfis para proteger cada interacao.",
+        secureDescription:
+          "Perfis verificados e acesso por perfis para proteger cada interacao.",
       },
       howItWorksTitle: "Como funciona",
       steps: {
         searchTitle: "1. Pesquisar",
-        searchDescription: "Procura animais e oportunidades alinhadas com o teu perfil.",
+        searchDescription:
+          "Procura animais e oportunidades alinhadas com o teu perfil.",
         connectTitle: "2. Conectar",
-        connectDescription: "Fala com canis e acompanha todo o processo num so lugar.",
+        connectDescription:
+          "Fala com canis e acompanha todo o processo num so lugar.",
         adoptTitle: "3. Adotar",
-        adoptDescription: "Conclui a adocao com mais confianca e acompanhamento.",
+        adoptDescription:
+          "Conclui a adocao com mais confianca e acompanhamento.",
       },
       finalCtaTitle: "Pronto para encontrar o teu animal?",
-      finalCtaDescription: "Junta-te a adotantes e canis que ja usam a FYA para criar matches reais.",
+      finalCtaDescription:
+        "Junta-te a adotantes e canis que ja usam a FYA para criar matches reais.",
       finalCtaButton: "Comecar agora",
     },
     auth: {
@@ -259,7 +266,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       contactRole: "Cargo / Funcao",
       contactPhone: "Telefone",
       verificationSection: "Verificacao",
-      registrationCertificateLabel: "Carregue o Certificado de Registro da Entidade",
+      registrationCertificateLabel:
+        "Carregue o Certificado de Registro da Entidade",
       registrationCertificateHint: "PDF, JPG ou PNG (Max 5MB)",
       shelterDeclaration:
         "Confirmo que as informacoes fornecidas sao verdadeiras e que tenho autoridade para representar este abrigo na plataforma FYA (Found Your Animal).",
@@ -269,7 +277,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
     petCatalog: {
       title: "Pets disponiveis para adocao",
-      subtitle: "Explora animais de varios canis e encontra o teu proximo melhor amigo.",
+      subtitle:
+        "Explora animais de varios canis e encontra o teu proximo melhor amigo.",
       resultCount: "A mostrar 1.240 animais em procura de uma familia.",
       gridView: "Grelha",
       listView: "Lista",
@@ -305,18 +314,21 @@ const dictionaries: Record<Locale, Dictionary> = {
       storyTitle: "Historia",
       medicalSummaryTitle: "Resumo medico",
       contactCardTitle: "Contacto do canil",
-      contactCardSubtitle: "Responderemos em ate 24 horas com os proximos passos da adocao.",
+      contactCardSubtitle:
+        "Responderemos em ate 24 horas com os proximos passos da adocao.",
       applyCta: "Candidatar para adotar",
       saveCta: "Guardar pet",
       adoptionHintTitle: "Dica para adocao",
-      adoptionHintDescription: "Partilha a tua rotina e experiencia com animais para acelerar a avaliacao.",
+      adoptionHintDescription:
+        "Partilha a tua rotina e experiencia com animais para acelerar a avaliacao.",
       similarPetsTitle: "Conhece mais amigos",
     },
     admin: {
       title: "Painel de administracao",
       subtitle: "Configura os dados globais da plataforma.",
       filterConfigTitle: "Configuracao dos filtros do catalogo",
-      filterConfigDescription: "Define quais opcoes aparecem no filtro da pagina de pets.",
+      filterConfigDescription:
+        "Define quais opcoes aparecem no filtro da pagina de pets.",
       species: "Especies",
       ageRanges: "Faixas etarias",
       sizes: "Portes",
@@ -330,7 +342,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
     canilProfile: {
       title: "Perfil do Abrigo",
-      subtitle: "Gere a identidade publica do teu abrigo na FYA (Found Your Animal).",
+      subtitle:
+        "Gere a identidade publica do teu abrigo na FYA (Found Your Animal).",
       shelterRole: "Abrigo",
       verifiedLabel: "Verificacao",
       verifiedValue: "Verificado",
@@ -358,7 +371,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       viewMessages: "Ver mensagens",
       exportReport: "Exportar relatorio",
       profileProgressTitle: "Progresso do perfil",
-      profileProgressDescription: "Perfil base concluido. Completa telefone e localizacao para maior destaque.",
+      profileProgressDescription:
+        "Perfil base concluido. Completa telefone e localizacao para maior destaque.",
       openProfileCta: "Abrir perfil do abrigo",
     },
   },
@@ -391,23 +405,30 @@ const dictionaries: Record<Locale, Dictionary> = {
       featureTitle: "Why choose FYA",
       features: {
         adopterTitle: "For Adopters",
-        adopterDescription: "Smart discovery, clear profiles, and secure communication with shelters.",
+        adopterDescription:
+          "Smart discovery, clear profiles, and secure communication with shelters.",
         shelterTitle: "For Shelters",
-        shelterDescription: "Efficient management for pets and applications with transparent workflows.",
+        shelterDescription:
+          "Efficient management for pets and applications with transparent workflows.",
         secureTitle: "Secure and Trusted",
-        secureDescription: "Verified profiles and role-based access to protect every interaction.",
+        secureDescription:
+          "Verified profiles and role-based access to protect every interaction.",
       },
       howItWorksTitle: "How it works",
       steps: {
         searchTitle: "1. Search",
-        searchDescription: "Find pets and opportunities that match your profile.",
+        searchDescription:
+          "Find pets and opportunities that match your profile.",
         connectTitle: "2. Connect",
-        connectDescription: "Talk to shelters and track every step in one place.",
+        connectDescription:
+          "Talk to shelters and track every step in one place.",
         adoptTitle: "3. Adopt",
-        adoptDescription: "Complete the adoption journey with confidence and guidance.",
+        adoptDescription:
+          "Complete the adoption journey with confidence and guidance.",
       },
       finalCtaTitle: "Ready to find your animal?",
-      finalCtaDescription: "Join adopters and shelters already using FYA to create real matches.",
+      finalCtaDescription:
+        "Join adopters and shelters already using FYA to create real matches.",
       finalCtaButton: "Get started today",
     },
     auth: {
@@ -441,7 +462,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       contactRole: "Role / Position",
       contactPhone: "Phone",
       verificationSection: "Verification",
-      registrationCertificateLabel: "Upload Organization Registration Certificate",
+      registrationCertificateLabel:
+        "Upload Organization Registration Certificate",
       registrationCertificateHint: "PDF, JPG, or PNG (Max 5MB)",
       shelterDeclaration:
         "I confirm that the provided information is accurate and that I am authorized to represent this shelter on FYA (Found Your Animal).",
@@ -451,7 +473,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
     petCatalog: {
       title: "Available pets for adoption",
-      subtitle: "Explore animals from trusted shelters and find your next best friend.",
+      subtitle:
+        "Explore animals from trusted shelters and find your next best friend.",
       resultCount: "Showing 1,240 pets currently looking for a family.",
       gridView: "Grid",
       listView: "List",
@@ -487,18 +510,21 @@ const dictionaries: Record<Locale, Dictionary> = {
       storyTitle: "Story",
       medicalSummaryTitle: "Medical summary",
       contactCardTitle: "Shelter contact",
-      contactCardSubtitle: "We usually reply within 24 hours with the next adoption steps.",
+      contactCardSubtitle:
+        "We usually reply within 24 hours with the next adoption steps.",
       applyCta: "Apply to adopt",
       saveCta: "Save pet",
       adoptionHintTitle: "Adoption tip",
-      adoptionHintDescription: "Share your routine and pet experience to speed up the review.",
+      adoptionHintDescription:
+        "Share your routine and pet experience to speed up the review.",
       similarPetsTitle: "Meet more friends",
     },
     admin: {
       title: "Admin panel",
       subtitle: "Configure global platform data.",
       filterConfigTitle: "Pet catalog filter configuration",
-      filterConfigDescription: "Define which options appear in the pet catalog filters.",
+      filterConfigDescription:
+        "Define which options appear in the pet catalog filters.",
       species: "Species",
       ageRanges: "Age ranges",
       sizes: "Sizes",
@@ -512,7 +538,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
     canilProfile: {
       title: "Shelter Profile",
-      subtitle: "Manage your shelter public identity on FYA (Found Your Animal).",
+      subtitle:
+        "Manage your shelter public identity on FYA (Found Your Animal).",
       shelterRole: "Shelter",
       verifiedLabel: "Verification",
       verifiedValue: "Verified",
@@ -540,7 +567,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       viewMessages: "View messages",
       exportReport: "Export report",
       profileProgressTitle: "Profile progress",
-      profileProgressDescription: "Base profile is complete. Add phone and location for better visibility.",
+      profileProgressDescription:
+        "Base profile is complete. Add phone and location for better visibility.",
       openProfileCta: "Open shelter profile",
     },
   },

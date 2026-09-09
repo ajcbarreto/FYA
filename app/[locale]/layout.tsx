@@ -1,3 +1,4 @@
+import { LocaleDocument } from "@/components/locale-document";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Navbar } from "@/components/navbar";
@@ -10,7 +11,10 @@ type LocaleLayoutProps = {
   params: Promise<{ locale: string }>;
 };
 
-export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
+export default async function LocaleLayout({
+  children,
+  params,
+}: LocaleLayoutProps) {
   const { locale } = await params;
 
   if (!isLocale(locale)) {
@@ -19,6 +23,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
   return (
     <>
+      <LocaleDocument locale={locale} />
       <Suspense fallback={<NavbarSkeleton locale={locale as Locale} />}>
         <Navbar locale={locale as Locale} />
       </Suspense>

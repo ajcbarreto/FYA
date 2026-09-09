@@ -1,11 +1,6 @@
-type SupabaseEnvName = "NEXT_PUBLIC_SUPABASE_URL" | "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY";
-
-function readEnv(name: SupabaseEnvName) {
-  return process.env[name] ?? "";
-}
-
-const supabaseUrl = readEnv("NEXT_PUBLIC_SUPABASE_URL");
-const supabasePublishableKey = readEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const supabasePublishableKey =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "";
 
 const hasSupabaseEnv = Boolean(supabaseUrl && supabasePublishableKey);
 
@@ -19,4 +14,9 @@ function assertSupabaseEnv() {
   );
 }
 
-export { supabaseUrl, supabasePublishableKey, hasSupabaseEnv, assertSupabaseEnv };
+export {
+  supabaseUrl,
+  supabasePublishableKey,
+  hasSupabaseEnv,
+  assertSupabaseEnv,
+};

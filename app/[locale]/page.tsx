@@ -1,238 +1,255 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ArrowRight, Heart, MapPin, PawPrint, Search, Users, ShieldCheck } from "lucide-react";
-import { getDictionary } from "@/lib/i18n/dictionaries";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Heart,
+  Search,
+  PawPrint,
+  MessageCircle,
+  House,
+} from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
+import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getCatalogPets, getCatalogPetsCount } from "@/lib/pet-catalog/db-pets";
-
-type LocalizedHomePageProps = {
+import { getCatalogPets } from "@/lib/pet-catalog/db-pets";
+import { AboutFamily } from "@/components/about-family";
+import { PetCard } from "@/components/pet-card";
+export default async function Home({
+  params,
+}: {
   params: Promise<{ locale: string }>;
-};
-
-export default async function LocalizedHomePage({ params }: LocalizedHomePageProps) {
+}) {
   const { locale } = await params;
-
-  if (!isLocale(locale)) {
-    notFound();
-  }
-
-  const dictionary = getDictionary(locale);
-  const supabase = await createServerSupabaseClient();
-  const [urgentPets, totalPets] = await Promise.all([
-    getCatalogPets(supabase, locale, { limit: 4 }),
-    getCatalogPetsCount(supabase),
-  ]);
-  const content =
-    locale === "pt"
-      ? {
-          trusted: "Confiado por 5.000+ familias",
-          urgentTitle: "Pets urgentes",
-          urgentSubtitle: "Estes amigos estao ha mais tempo a espera de um lar.",
-          seeAll: "Ver todos",
-          todayFound: `${totalPets} pets encontrados`,
-          nearYou: "Na tua area hoje",
-          howSubtitle:
-            "Tres passos simples para encontrares o teu novo membro da familia com seguranca e acompanhamento.",
-          footerTagline: "Ajudamos cada pet a encontrar um lar para sempre com cuidado e comunidade.",
-          company: "Empresa",
-          support: "Suporte",
-          about: "Sobre",
-          stories: "Historias",
-          careers: "Carreiras",
-          helpCenter: "Centro de ajuda",
-          contact: "Contacto",
-          privacy: "Privacidade",
-          madeWithLove: "Feito com carinho pela FYA.",
-          browseCatalog: "Explorar catalogo",
-          learnMore: "Saber mais",
-          sheltersTitle: "Canis",
-          sheltersDescription: "Explora os nossos canis e abrigos parceiros.",
-          sheltersCta: "Ver canis",
-        }
-      : {
-          trusted: "Trusted by 5,000+ families",
-          urgentTitle: "Urgent pets",
-          urgentSubtitle: "These friends have been waiting the longest for a home.",
-          seeAll: "See all",
-          todayFound: `${totalPets} pets found`,
-          nearYou: "In your area today",
-          howSubtitle:
-            "Three simple steps to bring your new family member home with confidence and guidance.",
-          footerTagline: "Helping every pet find their forever home through care and community.",
-          company: "Company",
-          support: "Support",
-          about: "About",
-          stories: "Stories",
-          careers: "Careers",
-          helpCenter: "Help center",
-          contact: "Contact",
-          privacy: "Privacy policy",
-          madeWithLove: "Made with love by FYA.",
-          browseCatalog: "Browse catalog",
-          learnMore: "Learn more",
-          sheltersTitle: "Shelters",
-          sheltersDescription: "Browse our partner shelters and rescues.",
-          sheltersCta: "View shelters",
-        };
-
-  const steps = [
-    { icon: Search, title: dictionary.home.steps.searchTitle, description: dictionary.home.steps.searchDescription },
-    { icon: Users, title: dictionary.home.steps.connectTitle, description: dictionary.home.steps.connectDescription },
-    { icon: ShieldCheck, title: dictionary.home.steps.adoptTitle, description: dictionary.home.steps.adoptDescription },
-  ];
-
+  if (!isLocale(locale)) notFound();
+  const pt = locale === "pt";
+  const pets = hasSupabaseEnv
+    ? await getCatalogPets(await createServerSupabaseClient(), locale, {
+        limit: 4,
+      })
+    : [];
   return (
-    <main className="w-full flex-1 pt-8 md:pt-12">
-      <section className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-12 px-6 py-10 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-16">
-        <div className="space-y-8">
-          <div className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-xs font-bold uppercase tracking-wide text-accent-foreground">
-            <Heart className="h-4 w-4 fill-current" />
-            {content.trusted}
-          </div>
-          <h1 className="max-w-2xl text-5xl font-extrabold leading-[1.08] tracking-tight lg:text-7xl">
-            {dictionary.home.title}{" "}
-            <span className="text-secondary">{locale === "pt" ? "para toda a familia" : "for every family"}</span>
+    <main id="main-content" tabIndex={-1}>
+      <section className="page-shell grid items-center gap-10 pb-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pb-20">
+        <div className="py-4 lg:py-10">
+          <span className="eyebrow inline-flex items-center gap-2">
+            <span className="size-2 rounded-full bg-accent" />
+            {pt
+              ? "Pequenos encontros. Grandes histórias."
+              : "Small encounters. Big stories."}
+          </span>
+          <h1 className="display-title mt-6 max-w-2xl text-6xl sm:text-7xl xl:text-[88px]">
+            {pt ? "O teu melhor amigo" : "Your best friend"}
+            <br />
+            <span className="italic text-secondary">
+              {pt ? "está por aqui." : "is waiting here."}
+            </span>
           </h1>
-          <p className="max-w-xl text-lg leading-relaxed text-muted-foreground">{dictionary.home.subtitle}</p>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href={`/${locale}/pets`}
-              className="rounded-xl bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              {content.browseCatalog}
-            </Link>
-            <Link
-              href={`/${locale}/auth/shelter-registration`}
-              className="rounded-xl border border-border/60 bg-card px-7 py-3.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
-            >
-              {dictionary.home.primaryCta}
-            </Link>
-          </div>
-        </div>
-
-        <div className="relative">
-          <div className="absolute inset-0 -z-10 rotate-12 rounded-[57%_43%_61%_39%/45%_41%_59%_55%] bg-primary/10" />
-          <div className="relative aspect-square overflow-hidden rounded-2xl shadow-2xl">
-            <Image
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIgI4hK1OJrZt7EYogXqM0gNrsB9cteCk_tD7p7wfZ-_nWeAzyA80QW_vA-zbLGagTGGsyz5jIz0fP7Kdd8bCMlVQU-UeSZQqSO7-MLh4xqDtGATWAyVAzgJyQLSO2NcFE4SKC7v1tb9A5NY95NCjTY0-QBBoXwXZmjgG3ijmqAVvxQjZa9m8_RYbDtkHa03tjMxLSiXk9GnlzF1l3AkDmWbWjgiSmcJRFs_EP7tID8f-uVlTbZJqMpDRkbJ6Lej6seyDKHiGFnw8"
-              alt={locale === "pt" ? "Cao e gato juntos" : "Dog and cat together"}
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover"
+          <p className="mt-6 max-w-md text-base leading-7 text-muted-foreground">
+            {pt
+              ? "Há uma nova história à tua espera. Conhece animais para adoção e os abrigos que cuidam deles, até encontrarem um lugar a que chamar casa."
+              : "A new story is waiting for you. Meet animals looking for a home and the shelters caring for them along the way."}
+          </p>
+          <form
+            action={`/${locale}/pets`}
+            className="mt-8 flex max-w-lg items-center gap-2 rounded-2xl border border-border/60 bg-white p-2 shadow-sm"
+          >
+            <Search className="ml-3 size-5 shrink-0 text-muted-foreground" />
+            <label htmlFor="home-search" className="sr-only">
+              {pt ? "Procurar um animal" : "Find an animal"}
+            </label>
+            <input
+              id="home-search"
+              name="q"
+              placeholder={
+                pt
+                  ? "Quem gostavas de conhecer?"
+                  : "Who would you like to meet?"
+              }
+              className="h-12 min-w-0 flex-1 bg-transparent text-sm outline-none"
             />
-          </div>
-          <div className="absolute -bottom-6 -left-6 flex items-center gap-4 rounded-xl bg-card p-5 shadow-xl">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary/20 text-secondary">
-              <PawPrint className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-sm font-bold">{content.todayFound}</p>
-              <p className="text-xs text-muted-foreground">{content.nearYou}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-muted/45 px-6 py-20 lg:px-8">
-        <div className="mx-auto w-full max-w-7xl">
-          <div className="mb-12 flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-3xl font-bold">{content.urgentTitle}</h2>
-              <p className="mt-2 text-muted-foreground">{content.urgentSubtitle}</p>
-            </div>
-            <Link href={`/${locale}/pets`} className="hidden items-center gap-1 text-sm font-bold text-primary md:inline-flex">
-              {content.seeAll}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {urgentPets.map((pet) => (
+            <button
+              className="button-primary px-5"
+              aria-label={pt ? "Pesquisar" : "Search"}
+            >
+              <ArrowRight className="size-5" />
+            </button>
+          </form>
+          <div className="mt-5 flex flex-wrap items-center gap-2 text-xs">
+            <span className="mr-1 text-muted-foreground">
+              {pt ? "Quero conhecer" : "I'd love to meet"}
+            </span>
+            {[
+              ["cao", pt ? "Cães" : "Dogs"],
+              ["gato", pt ? "Gatos" : "Cats"],
+              ["outro", pt ? "Outros amigos" : "Other friends"],
+            ].map(([value, label]) => (
               <Link
-                key={pet.id}
-                href={`/${locale}/pets/${pet.id}`}
-                className="group block overflow-hidden rounded-xl bg-card transition-all hover:-translate-y-1.5 hover:shadow-lg"
+                key={value}
+                href={`/${locale}/pets?species=${value}`}
+                className="rounded-full border border-border px-3.5 py-2 transition-colors hover:bg-muted"
               >
-                <div className="relative h-64">
-                  <Image
-                    src={pet.imageUrl}
-                    alt={pet.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                    className="object-cover"
-                  />
-                  <span className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
-                    {dictionary.petCatalog.tags.urgent}
-                  </span>
-                </div>
-                <div className="space-y-4 p-6">
-                  <h3 className="text-xl font-bold">{pet.name}</h3>
-                  <p className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4" />
-                    {pet.location}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {pet.traits.map((tag) => (
-                      <span key={tag} className="rounded-full bg-secondary/15 px-3 py-1 text-xs font-semibold text-secondary">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <span className="inline-flex w-full items-center justify-center rounded-xl bg-muted px-4 py-2.5 text-sm font-semibold text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                    {locale === "pt" ? `Conhecer ${pet.name}` : `Meet ${pet.name}`}
-                  </span>
-                </div>
+                {label}
+                <ArrowUpRight className="ml-1 inline size-3" />
               </Link>
             ))}
           </div>
         </div>
-      </section>
-
-      <section className="mx-auto w-full max-w-7xl px-6 py-24 text-center lg:px-8">
-        <h2 className="text-4xl font-bold">{dictionary.home.howItWorksTitle}</h2>
-        <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">{content.howSubtitle}</p>
-        <div className="mt-16 grid grid-cols-1 gap-12 md:grid-cols-3">
-          {steps.map((step) => {
-            const Icon = step.icon;
-            return (
-              <article key={step.title} className="flex flex-col items-center">
-                <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-muted text-primary transition-transform hover:scale-110">
-                  <Icon className="h-9 w-9" />
-                </div>
-                <h3 className="text-xl font-bold">{step.title}</h3>
-                <p className="mt-3 text-muted-foreground">{step.description}</p>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="px-6 pb-20 lg:px-8">
-        <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center overflow-hidden rounded-3xl bg-secondary p-12 text-center md:p-20">
-          <div className="absolute right-0 top-0 h-56 w-56 -translate-y-1/2 translate-x-1/2 rounded-[57%_43%_61%_39%/45%_41%_59%_55%] bg-white/10" />
-          <div className="relative z-10">
-            <h2 className="text-4xl font-bold text-white md:text-5xl">{dictionary.home.finalCtaTitle}</h2>
-            <p className="mx-auto mt-5 max-w-xl text-lg text-white/80">{dictionary.home.finalCtaDescription}</p>
-            <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link
-                href={`/${locale}/pets`}
-                className="rounded-xl bg-white px-8 py-3.5 text-sm font-semibold text-secondary transition-colors hover:bg-white/90"
-              >
-                {content.browseCatalog}
-              </Link>
-              <Link
-                href={`/${locale}/auth/register`}
-                className="rounded-xl border border-white/40 px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
-              >
-                {content.learnMore}
-              </Link>
+        <div className="relative isolate mx-auto w-full max-w-xl pb-5">
+          <div className="absolute -right-2 top-8 -z-10 h-[85%] w-[94%] rotate-3 rounded-[45%_45%_15%_15%] bg-[#dce5ce]" />
+          <div className="relative aspect-[.95] overflow-hidden rounded-[45%_45%_12%_12%] bg-[#e5d6bd]">
+            <Image
+              src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&q=85"
+              alt={
+                pt
+                  ? "Retrato ilustrativo de um cão ao ar livre"
+                  : "Illustrative portrait of a dog outdoors"
+              }
+              fill
+              priority
+              sizes="(max-width: 1024px) 90vw, 45vw"
+              className="object-cover"
+            />
+            <span className="absolute bottom-5 right-5 rounded-full bg-black/25 px-3 py-1 text-[10px] text-white">
+              {pt ? "Imagem ilustrativa" : "Illustrative image"}
+            </span>
+          </div>
+          <span className="absolute right-0 top-5 flex size-20 rotate-12 items-center justify-center rounded-full bg-[#e9edb9] text-primary shadow-sm">
+            <PawPrint className="size-9" />
+          </span>
+          <div className="absolute -left-2 bottom-6 flex max-w-[85%] items-center gap-3 rounded-2xl border border-white bg-white/95 p-4 shadow-lg sm:-left-6">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#f9e6dc] text-accent">
+              <Heart className="size-5" />
+            </span>
+            <div>
+              <p className="text-sm font-bold">
+                {pt ? "Uma casa muda tudo." : "A home changes everything."}
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {pt
+                  ? "A próxima história pode ser a tua."
+                  : "The next story could be yours."}
+              </p>
             </div>
           </div>
         </div>
       </section>
-
+      <section className="border-y border-border/50 bg-muted/60">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-6 px-8 py-6">
+          {[
+            pt ? "Adoção com responsabilidade" : "Responsible adoption",
+            pt
+              ? "Contacto direto com os abrigos"
+              : "Direct contact with shelters",
+            pt ? "Acompanhamento em cada passo" : "Support at every step",
+          ].map((text, i) => (
+            <p
+              key={text}
+              className="flex items-center gap-3 text-sm font-medium"
+            >
+              <span className="text-accent">0{i + 1}</span>
+              {text}
+            </p>
+          ))}
+        </div>
+      </section>
+      <section className="page-shell">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
+          <div>
+            <p className="eyebrow">
+              {pt ? "À procura de uma família" : "Looking for a family"}
+            </p>
+            <h2 className="display-title mt-3 text-4xl sm:text-5xl">
+              {pt ? "Um encontro que fica." : "A connection that lasts."}
+            </h2>
+          </div>
+          <Link href={`/${locale}/pets`} className="button-secondary">
+            {pt ? "Conhecer todos" : "Meet them all"}
+            <ArrowUpRight className="size-4" />
+          </Link>
+        </div>
+        {pets.length > 0 ? (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {pets.map((pet) => (
+              <PetCard key={pet.id} pet={pet} locale={locale} />
+            ))}
+          </div>
+        ) : (
+          <div className="surface flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+            <PawPrint className="size-10 text-secondary" />
+            <p className="flex-1 text-muted-foreground">
+              {pt
+                ? "Cada adoção começa por conhecer melhor um animal. Explora o catálogo e encontra os próximos companheiros."
+                : "Every adoption starts by getting to know an animal. Explore the catalog to find your next companion."}
+            </p>
+            <Link href={`/${locale}/pets`} className="button-primary">
+              {pt ? "Explorar catálogo" : "Explore catalog"}
+              <ArrowRight className="size-4" />
+            </Link>
+          </div>
+        )}
+      </section>
+      <section className="page-shell pt-4">
+        <div className="rounded-[2rem] bg-primary px-6 py-10 text-primary-foreground sm:p-12">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[.18em] text-white/65">
+                {pt ? "Mais perto de casa" : "Closer to home"}
+              </p>
+              <h2 className="display-title mt-3 text-4xl sm:text-5xl">
+                {pt
+                  ? "O início de uma boa história."
+                  : "The start of a good story."}
+              </h2>
+            </div>
+            <Link
+              href={`/${locale}/match`}
+              className="inline-flex items-center gap-2 text-sm font-semibold underline underline-offset-8"
+            >
+              {pt ? "Ajuda-me a escolher" : "Help me choose"}
+              <ArrowUpRight className="size-4" />
+            </Link>
+          </div>
+          <div className="mt-10 grid gap-8 md:grid-cols-3">
+            {[
+              {
+                icon: Search,
+                title: pt ? "Encontra uma ligação" : "Find a connection",
+                text: pt
+                  ? "Descobre os animais, as suas histórias e as necessidades de cada um."
+                  : "Discover animals, their stories and their individual needs.",
+              },
+              {
+                icon: MessageCircle,
+                title: pt ? "Vamos conversar" : "Start a conversation",
+                text: pt
+                  ? "Apresenta-te ao abrigo, coloca as tuas dúvidas e combina uma visita."
+                  : "Introduce yourself to the shelter, ask questions and arrange a visit.",
+              },
+              {
+                icon: House,
+                title: pt ? "Abre a porta de casa" : "Open your door",
+                text: pt
+                  ? "Prepara a chegada com o abrigo e acompanha cada etapa da adoção."
+                  : "Prepare for their arrival with the shelter and follow every step.",
+              },
+            ].map(({ icon: Icon, title, text }, i) => (
+              <article key={title} className="border-t border-white/20 pt-6">
+                <div className="mb-5 flex items-center justify-between">
+                  <Icon className="size-6 text-[#dce6ae]" />
+                  <span className="text-xs text-white/50">0{i + 1}</span>
+                </div>
+                <h3 className="text-lg font-semibold">{title}</h3>
+                <p className="mt-2 max-w-xs text-sm leading-6 text-white/70">
+                  {text}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+      <AboutFamily locale={locale} />
     </main>
   );
 }

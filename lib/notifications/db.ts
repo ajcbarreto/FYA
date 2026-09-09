@@ -3,14 +3,17 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export type NotificationRow = {
   id: string;
   user_profile_id: string;
-  tipo: "pedido_status" | "nova_mensagem";
+  tipo: "pedido_status" | "favorito" | "canil_favorito";
   referencia: string | null;
   link: string | null;
   lida: boolean;
   created_at: string;
 };
 
-export async function getUnreadNotificationsCount(supabase: SupabaseClient, userId: string) {
+export async function getUnreadNotificationsCount(
+  supabase: SupabaseClient,
+  userId: string,
+) {
   const { count, error } = await supabase
     .from("notificacoes")
     .select("id", { count: "exact", head: true })
@@ -18,14 +21,21 @@ export async function getUnreadNotificationsCount(supabase: SupabaseClient, user
     .eq("lida", false);
 
   if (error) {
-    console.error("[getUnreadNotificationsCount] Supabase error:", error.message);
+    console.error(
+      "[getUnreadNotificationsCount] Supabase error:",
+      error.message,
+    );
     return 0;
   }
 
   return count ?? 0;
 }
 
-export async function listNotifications(supabase: SupabaseClient, userId: string, limit = 30) {
+export async function listNotifications(
+  supabase: SupabaseClient,
+  userId: string,
+  limit = 30,
+) {
   const { data, error } = await supabase
     .from("notificacoes")
     .select("id,user_profile_id,tipo,referencia,link,lida,created_at")
@@ -33,15 +43,19 @@ export async function listNotifications(supabase: SupabaseClient, userId: string
     .order("created_at", { ascending: false })
     .limit(limit);
 
-  if (error || !data) {
-    if (error) console.error("[listNotifications] Supabase error:", error.message);
+  if (error) throw new Error("Unable to load data", { cause: error });
+
+  if (!data) {
     return [];
   }
 
   return data as NotificationRow[];
 }
 
-export function localizeNotification(notification: NotificationRow, locale: string) {
+export function localizeNotification(
+  notification: NotificationRow,
+  locale: string,
+) {
   const isPt = locale === "pt";
   if (notification.tipo === "pedido_status") {
     const statusMap: Record<string, { pt: string; en: string }> = {
@@ -51,7 +65,8 @@ export function localizeNotification(notification: NotificationRow, locale: stri
       rejeitado: { pt: "rejeitado", en: "rejected" },
     };
     const status = notification.referencia
-      ? statusMap[notification.referencia]?.[isPt ? "pt" : "en"] ?? notification.referencia
+      ? (statusMap[notification.referencia]?.[isPt ? "pt" : "en"] ??
+        notification.referencia)
       : "";
     return {
       title: isPt ? "Pedido de adopcao atualizado" : "Adoption request updated",
@@ -62,9 +77,9 @@ export function localizeNotification(notification: NotificationRow, locale: stri
   }
 
   return {
-    title: isPt ? "Nova mensagem" : "New message",
+    title: isPt ? "Nova atividade" : "New activity",
     body: isPt
-      ? "Recebeste uma nova mensagem numa conversa de adopcao."
-      : "You received a new message in an adoption conversation.",
+      ? "Tens uma nova atualização na tua conta."
+      : "You have a new account update.",
   };
 }

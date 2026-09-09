@@ -21,19 +21,10 @@ export async function findMatches(formData: FormData) {
     params.set("species", species);
   }
 
-  // Apartamento ou pouco tempo livre -> porte pequeno.
-  // Casa com espaco e muito tempo -> porte grande.
-  let size = "";
-  if (home === "apartamento" || time === "pouco") {
-    size = "pequeno";
-  } else if (home === "casa_grande" && time === "muito") {
-    size = "grande";
-  } else if (home === "casa" || time === "medio") {
-    size = "medio";
-  }
-  if (size) {
-    params.set("size", size);
-  }
+  // Only use an observed compatibility, never infer temperament from body size.
+  if (home === "apartamento") params.set("compatibility", "apartment");
+  if (time === "pouco") params.set("guidance", "routine");
+  params.set("match", "true");
 
   const serialized = params.toString();
   redirect(serialized ? `/${locale}/pets?${serialized}` : `/${locale}/pets`);

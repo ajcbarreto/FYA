@@ -1,93 +1,55 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Dialog } from "radix-ui";
 import { Menu, X } from "lucide-react";
-
-export type MobileLink = {
-  href: string;
-  label: string;
-};
-
-type MobileMenuProps = {
+import { Brand } from "@/components/brand";
+export type MobileLink = { href: string; label: string };
+export function MobileMenu({
+  links,
+  closeLabel,
+  openLabel,
+}: {
   links: MobileLink[];
   closeLabel: string;
   openLabel: string;
-};
-
-export function MobileMenu({ links, closeLabel, openLabel }: MobileMenuProps) {
+}) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
-
-  // O drawer e renderizado num portal no body: o <header> da navbar usa
-  // backdrop-blur, o que cria um containing block para elementos fixed e
-  // recortava o drawer a altura do header.
-  const drawer =
-    open && typeof document !== "undefined"
-      ? createPortal(
-          <div className="fixed inset-0 z-[100]">
-            <button
-              type="button"
-              aria-label={closeLabel}
-              onClick={() => setOpen(false)}
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            />
-            <div className="absolute right-0 top-0 flex h-full w-72 max-w-[85vw] flex-col gap-1 overflow-y-auto bg-background p-5 shadow-2xl">
-              <div className="mb-4 flex items-center justify-between">
-                <span className="text-xl font-bold text-primary">FYA</span>
-                <button
-                  type="button"
-                  aria-label={closeLabel}
-                  onClick={() => setOpen(false)}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              {links.map((link) => {
-                const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setOpen(false)}
-                    className={`rounded-lg px-4 py-3 text-sm font-semibold transition-colors ${
-                      active
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-muted hover:text-primary"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>,
-          document.body,
-        )
-      : null;
-
   return (
-    <div className="md:hidden">
-      <button
-        type="button"
-        aria-label={openLabel}
-        aria-expanded={open}
-        onClick={() => setOpen(true)}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border/50 bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
-      >
-        <Menu className="h-5 w-5" />
-      </button>
-      {drawer}
-    </div>
+    <Dialog.Root open={open} onOpenChange={setOpen}>
+      <Dialog.Trigger aria-label={openLabel} className="icon-button lg:hidden">
+        <Menu className="size-5" />
+      </Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-[100] bg-foreground/35 backdrop-blur-sm" />
+        <Dialog.Content
+          aria-describedby={undefined}
+          className="fixed inset-y-0 right-0 z-[101] flex w-80 max-w-[90vw] flex-col gap-2 overflow-y-auto bg-background p-6 shadow-2xl"
+        >
+          <Dialog.Title className="mb-6">
+            <Brand />
+          </Dialog.Title>
+          <Dialog.Close
+            aria-label={closeLabel}
+            className="icon-button absolute right-5 top-6"
+          >
+            <X className="size-5" />
+          </Dialog.Close>
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setOpen(false)}
+              aria-current={pathname === link.href ? "page" : undefined}
+              className={`rounded-xl px-4 py-3 text-sm font-semibold ${pathname === link.href ? "bg-primary text-white" : "hover:bg-muted"}`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }

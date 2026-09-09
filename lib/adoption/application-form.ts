@@ -11,16 +11,31 @@ export type AdoptionApplicationAnswers = {
   message?: string;
 };
 
-export const housingOptions = ["apartment", "house", "shared", "other"] as const;
+export const housingOptions = [
+  "apartment",
+  "house",
+  "shared",
+  "other",
+] as const;
 export const householdSizeOptions = ["1", "2", "3", "4+"] as const;
 export const hoursAloneOptions = ["0-2", "3-5", "6-8", "8+"] as const;
 export const experienceOptions = ["none", "some", "experienced"] as const;
 
-export function parseApplicationAnswers(formData: FormData): AdoptionApplicationAnswers {
+function validOption(value: string | undefined, options: readonly string[]) {
+  if (value && !options.includes(value))
+    throw new Error("Invalid application option");
+  return value;
+}
+
+export function parseApplicationAnswers(
+  formData: FormData,
+): AdoptionApplicationAnswers {
   const get = (name: string) => {
     const value = formData.get(name);
     if (typeof value !== "string") return undefined;
     const trimmed = value.trim();
+    if (trimmed.length > 4000)
+      throw new Error("Application answer is too long");
     return trimmed.length > 0 ? trimmed : undefined;
   };
   const getBool = (name: string) => {
@@ -31,27 +46,36 @@ export function parseApplicationAnswers(formData: FormData): AdoptionApplication
   };
 
   return {
-    housing_type: get("housing_type"),
+    housing_type: validOption(get("housing_type"), housingOptions),
     has_garden: getBool("has_garden"),
-    household_size: get("household_size"),
+    household_size: validOption(get("household_size"), householdSizeOptions),
     has_children: getBool("has_children"),
     has_other_pets: getBool("has_other_pets"),
     other_pets_detail: get("other_pets_detail"),
-    experience: get("experience"),
-    hours_alone: get("hours_alone"),
+    experience: validOption(get("experience"), experienceOptions),
+    hours_alone: validOption(get("hours_alone"), hoursAloneOptions),
     reason: get("reason"),
     message: get("message"),
   };
 }
 
-export function localizeAnswerKey(key: keyof AdoptionApplicationAnswers, locale: string) {
-  const dict: Record<keyof AdoptionApplicationAnswers, { pt: string; en: string }> = {
+export function localizeAnswerKey(
+  key: keyof AdoptionApplicationAnswers,
+  locale: string,
+) {
+  const dict: Record<
+    keyof AdoptionApplicationAnswers,
+    { pt: string; en: string }
+  > = {
     housing_type: { pt: "Tipo de habitacao", en: "Housing type" },
     has_garden: { pt: "Tem quintal/jardim", en: "Has garden" },
     household_size: { pt: "Pessoas em casa", en: "Household size" },
     has_children: { pt: "Tem criancas", en: "Has children" },
     has_other_pets: { pt: "Tem outros animais", en: "Has other pets" },
-    other_pets_detail: { pt: "Detalhes outros animais", en: "Other pets details" },
+    other_pets_detail: {
+      pt: "Detalhes outros animais",
+      en: "Other pets details",
+    },
     experience: { pt: "Experiencia com animais", en: "Pet experience" },
     hours_alone: { pt: "Horas sozinho/dia", en: "Hours alone per day" },
     reason: { pt: "Motivo para adotar", en: "Reason to adopt" },
@@ -72,7 +96,12 @@ export function localizeAnswerValue(
   if (typeof value !== "string" || value.length === 0) {
     return locale === "pt" ? "Nao respondido" : "Not answered";
   }
-  const labels: Partial<Record<keyof AdoptionApplicationAnswers, Record<string, { pt: string; en: string }>>> = {
+  const labels: Partial<
+    Record<
+      keyof AdoptionApplicationAnswers,
+      Record<string, { pt: string; en: string }>
+    >
+  > = {
     housing_type: {
       apartment: { pt: "Apartamento", en: "Apartment" },
       house: { pt: "Casa", en: "House" },

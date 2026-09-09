@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -14,7 +15,10 @@ type RegisterPageProps = {
   }>;
 };
 
-export default async function RegisterPage({ params, searchParams }: RegisterPageProps) {
+export default async function RegisterPage({
+  params,
+  searchParams,
+}: RegisterPageProps) {
   const { locale } = await params;
   const { error, success } = await searchParams;
 
@@ -51,7 +55,11 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
         };
 
   return (
-    <main className="flex min-h-[calc(100vh-4rem)] flex-col bg-background">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="flex min-h-[calc(100vh-4rem)] flex-col bg-background"
+    >
       <section className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 items-center gap-12 px-6 py-12 lg:grid-cols-2 lg:px-8 lg:py-16">
         <div className="hidden lg:flex lg:flex-col lg:gap-10">
           <div className="relative w-fit">
@@ -77,16 +85,22 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
           <div className="max-w-md">
             <h1 className="text-5xl font-extrabold leading-tight tracking-tight">
               {copy.pageTitle.split(" ").slice(0, -2).join(" ")}{" "}
-              <span className="text-secondary">{copy.pageTitle.split(" ").slice(-2).join(" ")}</span>
+              <span className="text-secondary">
+                {copy.pageTitle.split(" ").slice(-2).join(" ")}
+              </span>
             </h1>
-            <p className="mt-6 text-base leading-relaxed text-muted-foreground">{copy.pageDescription}</p>
+            <p className="mt-6 text-base leading-relaxed text-muted-foreground">
+              {copy.pageDescription}
+            </p>
             <div className="mt-8 flex items-center gap-4 rounded-2xl bg-muted/55 p-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
                 <PawPrint className="h-5 w-5" />
               </div>
               <div>
                 <p className="font-bold">{copy.joined}</p>
-                <p className="text-sm text-muted-foreground">{copy.joinedSubtitle}</p>
+                <p className="text-sm text-muted-foreground">
+                  {copy.joinedSubtitle}
+                </p>
               </div>
             </div>
           </div>
@@ -94,8 +108,12 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
 
         <div className="rounded-2xl border border-border/30 bg-muted/35 p-8 shadow-[0_20px_40px_rgba(56,56,51,0.06)] md:p-12">
           <div className="mb-10 text-center lg:text-left">
-            <h2 className="text-3xl font-bold tracking-tight text-primary">{copy.createAccount}</h2>
-            <p className="mt-2 text-muted-foreground">{dictionary.auth.registerSubtitle}</p>
+            <h2 className="text-3xl font-bold tracking-tight text-primary">
+              {copy.createAccount}
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              {dictionary.auth.registerSubtitle}
+            </p>
           </div>
 
           {error && (
@@ -112,7 +130,10 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
           <form action={register} className="space-y-6">
             <input type="hidden" name="locale" value={locale} />
             <div className="space-y-2">
-              <label htmlFor="full_name" className="ml-1 block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+              <label
+                htmlFor="full_name"
+                className="ml-1 block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground"
+              >
                 {dictionary.auth.fullName}
               </label>
               <div className="relative">
@@ -127,7 +148,10 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="email" className="ml-1 block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+              <label
+                htmlFor="email"
+                className="ml-1 block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground"
+              >
                 {dictionary.auth.email}
               </label>
               <div className="relative">
@@ -143,7 +167,10 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="ml-1 block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+              <label
+                htmlFor="password"
+                className="ml-1 block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground"
+              >
                 {dictionary.auth.password}
               </label>
               <div className="relative">
@@ -160,7 +187,10 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="role" className="ml-1 block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+              <label
+                htmlFor="role"
+                className="ml-1 block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground"
+              >
                 {dictionary.auth.accountType}
               </label>
               <select
@@ -173,30 +203,39 @@ export default async function RegisterPage({ params, searchParams }: RegisterPag
                 <option value="canil">{dictionary.auth.canil}</option>
               </select>
               <p className="text-xs text-muted-foreground">
-                <Link href={`/${locale}/auth/shelter-registration`} className="font-medium text-secondary hover:underline">
+                <Link
+                  href={`/${locale}/auth/shelter-registration`}
+                  className="font-medium text-secondary hover:underline"
+                >
                   {dictionary.auth.shelterRegistrationLink}
                 </Link>
               </p>
             </div>
 
             <label className="flex items-start gap-3 px-1 text-sm text-muted-foreground">
-              <input type="checkbox" className="mt-1 h-4 w-4 rounded border-border text-secondary focus:ring-secondary" />
+              <input
+                type="checkbox"
+                className="mt-1 h-4 w-4 rounded border-border text-secondary focus:ring-secondary"
+              />
               <span>{copy.terms}</span>
             </label>
 
-            <button
+            <SubmitButton
               type="submit"
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
             >
               {dictionary.auth.submit}
               <ArrowRight className="h-4 w-4" />
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </section>
 
       <footer className="mt-8 bg-muted/45 px-6 py-10 text-center text-xs text-muted-foreground lg:px-8">
-        © 2026 FYA (Found Your Animal). {locale === "pt" ? "Construido com carinho para cada pata." : "Built with care for every paw."}
+        © 2026 FYA (Found Your Animal).{" "}
+        {locale === "pt"
+          ? "Construido com carinho para cada pata."
+          : "Built with care for every paw."}
       </footer>
     </main>
   );

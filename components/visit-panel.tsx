@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/submit-button";
 import { CalendarClock } from "lucide-react";
 import { proposeVisit, updateVisitStatus } from "@/app/adoption/visits-actions";
 import {
@@ -15,7 +16,13 @@ type VisitPanelProps = {
   canPropose?: boolean;
 };
 
-export function VisitPanel({ locale, pedidoId, visits, audience, canPropose = false }: VisitPanelProps) {
+export function VisitPanel({
+  locale,
+  pedidoId,
+  visits,
+  audience,
+  canPropose = false,
+}: VisitPanelProps) {
   const isPt = locale === "pt";
   const t = {
     title: isPt ? "Visitas" : "Visits",
@@ -39,10 +46,17 @@ export function VisitPanel({ locale, pedidoId, visits, audience, canPropose = fa
       ) : (
         <ul className="space-y-1.5">
           {visits.map((visit) => (
-            <li key={visit.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-background px-3 py-2">
-              <span className="font-semibold">{formatVisitDate(visit.scheduled_at, locale)}</span>
+            <li
+              key={visit.id}
+              className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-background px-3 py-2"
+            >
+              <span className="font-semibold">
+                {formatVisitDate(visit.scheduled_at, locale)}
+              </span>
               <span className="flex items-center gap-2">
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${visitStatusClass(visit.status)}`}>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${visitStatusClass(visit.status)}`}
+                >
                   {localizeVisitStatus(visit.status, locale)}
                 </span>
                 {audience === "canil" && visit.status === "proposta" && (
@@ -92,7 +106,10 @@ export function VisitPanel({ locale, pedidoId, visits, audience, canPropose = fa
       )}
 
       {audience === "user" && canPropose && (
-        <form action={proposeVisit} className="flex flex-wrap items-end gap-2 pt-1">
+        <form
+          action={proposeVisit}
+          className="flex flex-wrap items-end gap-2 pt-1"
+        >
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="pedidoId" value={pedidoId} />
           <label className="flex flex-col gap-1 font-semibold text-muted-foreground">
@@ -104,9 +121,12 @@ export function VisitPanel({ locale, pedidoId, visits, audience, canPropose = fa
               className="h-9 rounded-lg border border-border/30 bg-background px-2 text-xs outline-none focus:ring-2 focus:ring-primary/20"
             />
           </label>
-          <button type="submit" className="h-9 rounded-full bg-primary px-4 text-xs font-bold text-primary-foreground">
+          <SubmitButton
+            type="submit"
+            className="h-9 rounded-full bg-primary px-4 text-xs font-bold text-primary-foreground"
+          >
             {t.submit}
-          </button>
+          </SubmitButton>
         </form>
       )}
     </div>
@@ -134,7 +154,7 @@ function VisitAction({
       <input type="hidden" name="visitId" value={visitId} />
       <input type="hidden" name="status" value={status} />
       <input type="hidden" name="audience" value={audience} />
-      <button
+      <SubmitButton
         type="submit"
         className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
           tone === "primary"
@@ -143,7 +163,7 @@ function VisitAction({
         }`}
       >
         {label}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

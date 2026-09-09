@@ -5,7 +5,12 @@ import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 
-const visitStatuses = ["proposta", "confirmada", "cancelada", "realizada"] as const;
+const visitStatuses = [
+  "proposta",
+  "confirmada",
+  "cancelada",
+  "realizada",
+] as const;
 
 function getLocaleFromForm(formData: FormData) {
   const localeValue = String(formData.get("locale") ?? defaultLocale);
@@ -72,9 +77,15 @@ export async function updateVisitStatus(formData: FormData) {
   const visitId = String(formData.get("visitId") ?? "").trim();
   const status = String(formData.get("status") ?? "").trim();
   const audience = String(formData.get("audience") ?? "user");
-  const redirectBase = audience === "canil" ? `/${locale}/canil/pedidos` : `/${locale}/user/pedidos`;
+  const redirectBase =
+    audience === "canil"
+      ? `/${locale}/canil/pedidos`
+      : `/${locale}/user/pedidos`;
 
-  if (!visitId || !visitStatuses.includes(status as (typeof visitStatuses)[number])) {
+  if (
+    !visitId ||
+    !visitStatuses.includes(status as (typeof visitStatuses)[number])
+  ) {
     redirect(`${redirectBase}?error=invalid_visit`);
   }
 
@@ -84,10 +95,15 @@ export async function updateVisitStatus(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/${locale}/auth/login?next=${audience === "canil" ? "/canil/pedidos" : "/user/pedidos"}`);
+    redirect(
+      `/${locale}/auth/login?next=${audience === "canil" ? "/canil/pedidos" : "/user/pedidos"}`,
+    );
   }
 
-  const { error } = await supabase.from("visitas").update({ status }).eq("id", visitId);
+  const { error } = await supabase
+    .from("visitas")
+    .update({ status })
+    .eq("id", visitId);
 
   if (error) {
     redirect(`${redirectBase}?error=visit_failed`);

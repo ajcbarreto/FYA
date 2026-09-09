@@ -1,18 +1,9 @@
-import { Heart } from "lucide-react";
-import { toggleFavorite } from "@/app/favorites/actions";
-
-type FavoriteButtonProps = {
-  animalId: string;
-  locale: string;
-  isFavorite: boolean;
-  redirectTo: string;
-  size?: "sm" | "lg";
-  labels?: {
-    add: string;
-    remove: string;
-  };
-};
-
+"use client";
+import { useOptimistic, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { Heart, LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
+import { setFavorite } from "@/app/favorites/actions";
 export function FavoriteButton({
   animalId,
   locale,
@@ -20,54 +11,62 @@ export function FavoriteButton({
   redirectTo,
   size = "sm",
   labels,
-}: FavoriteButtonProps) {
-  const buttonLabels = labels ?? {
-    add: locale === "pt" ? "Guardar pet" : "Save pet",
-    remove: locale === "pt" ? "Remover dos favoritos" : "Remove from favorites",
+}: {
+  animalId: string;
+  locale: string;
+  isFavorite: boolean;
+  redirectTo: string;
+  size?: "sm" | "lg";
+  labels?: { add: string; remove: string };
+}) {
+  const [favorite, setOptimistic] = useOptimistic(isFavorite);
+  const [pending, startTransition] = useTransition();
+  const router = useRouter();
+  const pt = locale === "pt";
+  const copy = labels ?? {
+    add: pt ? "Guardar animal" : "Save animal",
+    remove: pt ? "Remover dos favoritos" : "Remove from favorites",
   };
-
-  if (size === "lg") {
-    return (
-      <form action={toggleFavorite}>
-        <input type="hidden" name="locale" value={locale} />
-        <input type="hidden" name="animalId" value={animalId} />
-        <input type="hidden" name="redirectTo" value={redirectTo} />
-        <input type="hidden" name="action" value={isFavorite ? "remove" : "add"} />
-        <button
-          type="submit"
-          aria-pressed={isFavorite}
-          aria-label={isFavorite ? buttonLabels.remove : buttonLabels.add}
-          className={`inline-flex w-full items-center justify-center gap-2 rounded-xl border px-5 py-3 text-sm font-semibold transition-colors ${
-            isFavorite
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border text-foreground hover:border-primary/40 hover:bg-muted"
-          }`}
-        >
-          <Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
-          {isFavorite ? buttonLabels.remove : buttonLabels.add}
-        </button>
-      </form>
-    );
-  }
-
   return (
-    <form action={toggleFavorite} className="absolute right-2.5 top-2.5">
-      <input type="hidden" name="locale" value={locale} />
-      <input type="hidden" name="animalId" value={animalId} />
-      <input type="hidden" name="redirectTo" value={redirectTo} />
-      <input type="hidden" name="action" value={isFavorite ? "remove" : "add"} />
-      <button
-        type="submit"
-        aria-pressed={isFavorite}
-        aria-label={isFavorite ? buttonLabels.remove : buttonLabels.add}
-        className={`inline-flex h-8 w-8 items-center justify-center rounded-full shadow-sm backdrop-blur-md transition-all ${
-          isFavorite
-            ? "bg-primary text-primary-foreground"
-            : "bg-white/70 text-foreground hover:bg-primary hover:text-primary-foreground"
-        }`}
-      >
-        <Heart className={`h-3.5 w-3.5 ${isFavorite ? "fill-current" : ""}`} />
-      </button>
-    </form>
+    <button
+      type="button"
+      disabled={pending}
+      aria-pressed={favorite}
+      aria-label={favorite ? copy.remove : copy.add}
+      onClick={() =>
+        startTransition(async () => {
+          setOptimistic(!favorite);
+          try {
+            const result = await setFavorite(animalId, !favorite, locale);
+            if (result.error === "login") {
+              router.push(
+                `/${locale}/auth/login?next=${encodeURIComponent(redirectTo.replace(new RegExp(`^/${locale}`), ""))}`,
+              );
+              return;
+            }
+            if (result.error) throw new Error(result.error);
+            router.refresh();
+          } catch {
+            toast.error(
+              pt
+                ? "Não foi possível guardar. Tenta novamente."
+                : "Could not save. Please try again.",
+            );
+          }
+        })
+      }
+      className={
+        size === "lg"
+          ? "button-secondary w-full"
+          : "absolute right-3 top-3 z-10 flex size-11 items-center justify-center rounded-full bg-white/95 text-primary shadow-sm transition-transform hover:scale-105"
+      }
+    >
+      {pending ? (
+        <LoaderCircle className="size-4 animate-spin" />
+      ) : (
+        <Heart className={`size-4 ${favorite ? "fill-current" : ""}`} />
+      )}
+      {size === "lg" && (favorite ? copy.remove : copy.add)}
+    </button>
   );
 }

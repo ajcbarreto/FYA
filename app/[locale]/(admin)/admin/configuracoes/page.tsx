@@ -1,10 +1,14 @@
+import { SubmitButton } from "@/components/submit-button";
 import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getPetCatalogFiltersConfig } from "@/lib/pet-catalog/filter-config";
 import { getPlatformSettings } from "@/lib/admin/platform-settings";
-import { updatePetCatalogFilters, updatePlatformSettings } from "@/app/[locale]/(admin)/admin/actions";
+import {
+  updatePetCatalogFilters,
+  updatePlatformSettings,
+} from "@/app/[locale]/(admin)/admin/actions";
 import { ToastFeedback } from "@/components/toast-feedback";
 
 type AdminSettingsPageProps = {
@@ -12,7 +16,10 @@ type AdminSettingsPageProps = {
   searchParams: Promise<{ success?: string; error?: string }>;
 };
 
-export default async function AdminSettingsPage({ params, searchParams }: AdminSettingsPageProps) {
+export default async function AdminSettingsPage({
+  params,
+  searchParams,
+}: AdminSettingsPageProps) {
   const { locale } = await params;
   const { success, error } = await searchParams;
 
@@ -37,7 +44,8 @@ export default async function AdminSettingsPage({ params, searchParams }: AdminS
           contactEmail: "Email de contacto",
           supportEmail: "Email de apoio",
           adoptionFee: "Taxa de adocao sugerida",
-          adoptionFeeHint: "Texto livre mostrado no detalhe do animal (ex: 150 EUR). Deixa vazio para nao mostrar.",
+          adoptionFeeHint:
+            "Texto livre mostrado no detalhe do animal (ex: 150 EUR). Deixa vazio para nao mostrar.",
           requireVerification: "Exigir canil verificado para publicar animais",
           requireVerificationHint:
             "Se ativo, um canil so consegue criar novos animais depois de ser verificado pelo admin.",
@@ -56,7 +64,8 @@ export default async function AdminSettingsPage({ params, searchParams }: AdminS
           contactEmail: "Contact email",
           supportEmail: "Support email",
           adoptionFee: "Suggested adoption fee",
-          adoptionFeeHint: "Free text shown on the pet detail page (e.g. 150 EUR). Leave empty to hide.",
+          adoptionFeeHint:
+            "Free text shown on the pet detail page (e.g. 150 EUR). Leave empty to hide.",
           requireVerification: "Require verified shelter to publish animals",
           requireVerificationHint:
             "When enabled, a shelter can only create new animals after being verified by an admin.",
@@ -77,10 +86,13 @@ export default async function AdminSettingsPage({ params, searchParams }: AdminS
     "h-11 w-full rounded-xl border border-border/25 bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20";
 
   return (
-    <main className="space-y-6">
-      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
+    <main id="main-content" tabIndex={-1} className="space-y-6">
+      <ToastFeedback
+        message={feedback}
+        variant={success ? "success" : "error"}
+      />
+      <header className="rounded-3xl border border-border/50 bg-card p-6 sm:p-8">
+        <h1 className="display-title text-4xl sm:text-5xl">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
 
@@ -93,7 +105,13 @@ export default async function AdminSettingsPage({ params, searchParams }: AdminS
             <label htmlFor="platformName" className="text-sm font-semibold">
               {copy.platformName}
             </label>
-            <input id="platformName" name="platformName" defaultValue={platform.platformName} required className={inputClass} />
+            <input
+              id="platformName"
+              name="platformName"
+              defaultValue={platform.platformName}
+              required
+              className={inputClass}
+            />
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -124,7 +142,10 @@ export default async function AdminSettingsPage({ params, searchParams }: AdminS
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="defaultAdoptionFee" className="text-sm font-semibold">
+            <label
+              htmlFor="defaultAdoptionFee"
+              className="text-sm font-semibold"
+            >
               {copy.adoptionFee}
             </label>
             <input
@@ -133,7 +154,9 @@ export default async function AdminSettingsPage({ params, searchParams }: AdminS
               defaultValue={platform.defaultAdoptionFee}
               className={inputClass}
             />
-            <p className="text-xs text-muted-foreground">{copy.adoptionFeeHint}</p>
+            <p className="text-xs text-muted-foreground">
+              {copy.adoptionFeeHint}
+            </p>
           </div>
 
           <label className="flex items-start gap-3 rounded-2xl bg-muted/60 p-4">
@@ -144,21 +167,34 @@ export default async function AdminSettingsPage({ params, searchParams }: AdminS
               className="mt-0.5 h-4 w-4 rounded border-border"
             />
             <span>
-              <span className="text-sm font-semibold">{copy.requireVerification}</span>
-              <span className="mt-0.5 block text-xs text-muted-foreground">{copy.requireVerificationHint}</span>
+              <span className="text-sm font-semibold">
+                {copy.requireVerification}
+              </span>
+              <span className="mt-0.5 block text-xs text-muted-foreground">
+                {copy.requireVerificationHint}
+              </span>
             </span>
           </label>
 
-          <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground">
+          <SubmitButton
+            type="submit"
+            className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
+          >
             {copy.save}
-          </button>
+          </SubmitButton>
         </form>
       </section>
 
       <section className="rounded-3xl border border-border/20 bg-card p-6">
-        <h2 className="text-lg font-bold">{dictionary.admin.filterConfigTitle}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{dictionary.admin.filterConfigDescription}</p>
-        <p className="mt-2 text-xs text-muted-foreground">{dictionary.admin.hint}</p>
+        <h2 className="text-lg font-bold">
+          {dictionary.admin.filterConfigTitle}
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {dictionary.admin.filterConfigDescription}
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {dictionary.admin.hint}
+        </p>
 
         <form action={updatePetCatalogFilters} className="mt-5 space-y-4">
           <input type="hidden" name="locale" value={locale} />
@@ -168,19 +204,31 @@ export default async function AdminSettingsPage({ params, searchParams }: AdminS
               ["ageRanges", dictionary.admin.ageRanges, filterConfig.ageRanges],
               ["sizes", dictionary.admin.sizes, filterConfig.sizes],
               ["genders", dictionary.admin.genders, filterConfig.genders],
-              ["compatibilities", dictionary.admin.compatibilities, filterConfig.compatibilities],
+              [
+                "compatibilities",
+                dictionary.admin.compatibilities,
+                filterConfig.compatibilities,
+              ],
             ] as const
           ).map(([name, label, values]) => (
             <div key={name} className="space-y-2">
               <label htmlFor={name} className="text-sm font-semibold">
                 {label}
               </label>
-              <input id={name} name={name} defaultValue={values.join(", ")} className={inputClass} />
+              <input
+                id={name}
+                name={name}
+                defaultValue={values.join(", ")}
+                className={inputClass}
+              />
             </div>
           ))}
-          <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground">
+          <SubmitButton
+            type="submit"
+            className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
+          >
             {dictionary.admin.save}
-          </button>
+          </SubmitButton>
         </form>
       </section>
     </main>

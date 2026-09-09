@@ -42,3 +42,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+!.env.example
+.claude/
+.cursor/
+
+# Local test artifacts and private image references
+/tmp/
+/test-results/
+/playwright-report/
+/.local-test/
+/.next-e2e/

@@ -1,4 +1,6 @@
+import { SubmitButton } from "@/components/submit-button";
 type AnimalFormValues = {
+  compatibilidades?: string[];
   nome?: string;
   especie?: string;
   raca?: string | null;
@@ -17,7 +19,13 @@ type AnimalFormProps = {
   submitLabel: string;
 };
 
-export function AnimalForm({ locale, action, animalId, values, submitLabel }: AnimalFormProps) {
+export function AnimalForm({
+  locale,
+  action,
+  animalId,
+  values,
+  submitLabel,
+}: AnimalFormProps) {
   const isPt = locale === "pt";
   const t = {
     name: isPt ? "Nome" : "Name",
@@ -50,11 +58,45 @@ export function AnimalForm({ locale, action, animalId, values, submitLabel }: An
       <input type="hidden" name="locale" value={locale} />
       {animalId && <input type="hidden" name="animalId" value={animalId} />}
 
+      <fieldset className="rounded-xl bg-muted p-4">
+        <legend className="px-1 text-sm font-semibold">
+          {isPt ? "Compatibilidades confirmadas" : "Confirmed compatibility"}
+        </legend>
+        <p className="mb-3 text-xs text-muted-foreground">
+          {isPt
+            ? "Seleciona apenas o que a equipa observou neste animal."
+            : "Select only what your team has observed for this animal."}
+        </p>
+        <div className="flex flex-wrap gap-4">
+          {[
+            ["children", isPt ? "Crianças" : "Children"],
+            ["seniors", isPt ? "Seniores" : "Seniors"],
+            ["apartment", isPt ? "Apartamento" : "Apartment"],
+            ["trained", isPt ? "Treinado" : "Trained"],
+          ].map(([value, label]) => (
+            <label key={value} className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                name="compatibilidades"
+                value={value}
+                defaultChecked={values?.compatibilidades?.includes(value)}
+              />
+              {label}
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <div className="space-y-2">
         <label htmlFor="nome" className="text-sm font-semibold">
           {t.name}
         </label>
-        <input id="nome" name="nome" defaultValue={values?.nome ?? ""} required className={inputClass} />
+        <input
+          id="nome"
+          name="nome"
+          defaultValue={values?.nome ?? ""}
+          required
+          className={inputClass}
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -62,7 +104,13 @@ export function AnimalForm({ locale, action, animalId, values, submitLabel }: An
           <label htmlFor="especie" className="text-sm font-semibold">
             {t.species}
           </label>
-          <select id="especie" name="especie" defaultValue={values?.especie ?? ""} required className={inputClass}>
+          <select
+            id="especie"
+            name="especie"
+            defaultValue={values?.especie ?? ""}
+            required
+            className={inputClass}
+          >
             <option value="">{t.select}</option>
             <option value="cao">{t.species_cao}</option>
             <option value="gato">{t.species_gato}</option>
@@ -73,13 +121,23 @@ export function AnimalForm({ locale, action, animalId, values, submitLabel }: An
           <label htmlFor="raca" className="text-sm font-semibold">
             {t.breed}
           </label>
-          <input id="raca" name="raca" defaultValue={values?.raca ?? ""} className={inputClass} />
+          <input
+            id="raca"
+            name="raca"
+            defaultValue={values?.raca ?? ""}
+            className={inputClass}
+          />
         </div>
         <div className="space-y-2">
           <label htmlFor="sexo" className="text-sm font-semibold">
             {t.sex}
           </label>
-          <select id="sexo" name="sexo" defaultValue={values?.sexo ?? ""} className={inputClass}>
+          <select
+            id="sexo"
+            name="sexo"
+            defaultValue={values?.sexo ?? ""}
+            className={inputClass}
+          >
             <option value="">{t.select}</option>
             <option value="macho">{t.sex_macho}</option>
             <option value="femea">{t.sex_femea}</option>
@@ -103,7 +161,12 @@ export function AnimalForm({ locale, action, animalId, values, submitLabel }: An
           <label htmlFor="porte" className="text-sm font-semibold">
             {t.size}
           </label>
-          <select id="porte" name="porte" defaultValue={values?.porte ?? ""} className={inputClass}>
+          <select
+            id="porte"
+            name="porte"
+            defaultValue={values?.porte ?? ""}
+            className={inputClass}
+          >
             <option value="">{t.select}</option>
             <option value="pequeno">{t.size_pequeno}</option>
             <option value="medio">{t.size_medio}</option>
@@ -114,7 +177,13 @@ export function AnimalForm({ locale, action, animalId, values, submitLabel }: An
           <label htmlFor="status" className="text-sm font-semibold">
             {t.status}
           </label>
-          <select id="status" name="status" defaultValue={values?.status ?? "disponivel"} required className={inputClass}>
+          <select
+            id="status"
+            name="status"
+            defaultValue={values?.status ?? "disponivel"}
+            required
+            className={inputClass}
+          >
             <option value="disponivel">{t.status_disponivel}</option>
             <option value="reservado">{t.status_reservado}</option>
             <option value="em_tratamento">{t.status_em_tratamento}</option>
@@ -136,9 +205,12 @@ export function AnimalForm({ locale, action, animalId, values, submitLabel }: An
         />
       </div>
 
-      <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground">
+      <SubmitButton
+        type="submit"
+        className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
+      >
         {submitLabel}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

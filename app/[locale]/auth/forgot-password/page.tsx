@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Mail } from "lucide-react";
@@ -10,7 +11,10 @@ type ForgotPasswordPageProps = {
   searchParams: Promise<{ success?: string; error?: string }>;
 };
 
-export default async function ForgotPasswordPage({ params, searchParams }: ForgotPasswordPageProps) {
+export default async function ForgotPasswordPage({
+  params,
+  searchParams,
+}: ForgotPasswordPageProps) {
   const { locale } = await params;
   const { success, error } = await searchParams;
 
@@ -22,7 +26,8 @@ export default async function ForgotPasswordPage({ params, searchParams }: Forgo
     locale === "pt"
       ? {
           title: "Recuperar password",
-          subtitle: "Indica o teu email e enviamos um link para definires uma nova password.",
+          subtitle:
+            "Indica o teu email e enviamos um link para definires uma nova password.",
           emailLabel: "Email",
           emailPlaceholder: "tu@email.com",
           submit: "Enviar link de recuperacao",
@@ -32,7 +37,8 @@ export default async function ForgotPasswordPage({ params, searchParams }: Forgo
         }
       : {
           title: "Reset password",
-          subtitle: "Enter your email and we will send a link to set a new password.",
+          subtitle:
+            "Enter your email and we will send a link to set a new password.",
           emailLabel: "Email",
           emailPlaceholder: "you@email.com",
           submit: "Send recovery link",
@@ -42,11 +48,22 @@ export default async function ForgotPasswordPage({ params, searchParams }: Forgo
         };
 
   const feedback =
-    success === "sent" ? copy.sent : error === "invalid_email" ? copy.invalid_email : null;
+    success === "sent"
+      ? copy.sent
+      : error === "invalid_email"
+        ? copy.invalid_email
+        : null;
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16">
-      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16"
+    >
+      <ToastFeedback
+        message={feedback}
+        variant={success ? "success" : "error"}
+      />
       <div className="rounded-3xl border border-border/30 bg-card p-8 shadow-sm">
         <h1 className="text-2xl font-extrabold tracking-tight">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
@@ -60,7 +77,10 @@ export default async function ForgotPasswordPage({ params, searchParams }: Forgo
         <form action={requestPasswordReset} className="mt-6 space-y-4">
           <input type="hidden" name="locale" value={locale} />
           <div className="space-y-2">
-            <label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <label
+              htmlFor="email"
+              className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+            >
               {copy.emailLabel}
             </label>
             <div className="relative">
@@ -75,12 +95,12 @@ export default async function ForgotPasswordPage({ params, searchParams }: Forgo
               />
             </div>
           </div>
-          <button
+          <SubmitButton
             type="submit"
             className="w-full rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
           >
             {copy.submit}
-          </button>
+          </SubmitButton>
         </form>
 
         <Link

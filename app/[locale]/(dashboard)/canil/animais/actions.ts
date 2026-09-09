@@ -5,7 +5,10 @@ import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
-import { ANIMAL_PHOTOS_BUCKET, buildPhotoStoragePath } from "@/lib/canil/animal-photos";
+import {
+  ANIMAL_PHOTOS_BUCKET,
+  buildPhotoStoragePath,
+} from "@/lib/canil/animal-photos";
 import { getPlatformSettings } from "@/lib/admin/platform-settings";
 
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
@@ -20,6 +23,7 @@ function getLocaleFromForm(formData: FormData) {
 }
 
 type AnimalInput = {
+  compatibilidades: string[];
   nome: string;
   especie: string;
   raca: string | null;
@@ -32,20 +36,38 @@ type AnimalInput = {
 
 function parseAnimalInput(formData: FormData): AnimalInput | null {
   const nome = String(formData.get("nome") ?? "").trim();
-  const especie = String(formData.get("especie") ?? "").trim().toLowerCase();
+  const especie = String(formData.get("especie") ?? "")
+    .trim()
+    .toLowerCase();
   const racaRaw = String(formData.get("raca") ?? "").trim();
-  const sexoRaw = String(formData.get("sexo") ?? "").trim().toLowerCase();
-  const porteRaw = String(formData.get("porte") ?? "").trim().toLowerCase();
-  const statusRaw = String(formData.get("status") ?? "disponivel").trim().toLowerCase();
+  const sexoRaw = String(formData.get("sexo") ?? "")
+    .trim()
+    .toLowerCase();
+  const porteRaw = String(formData.get("porte") ?? "")
+    .trim()
+    .toLowerCase();
+  const statusRaw = String(formData.get("status") ?? "disponivel")
+    .trim()
+    .toLowerCase();
   const idadeRaw = String(formData.get("idade_anos") ?? "").trim();
   const descricaoRaw = String(formData.get("descricao") ?? "").trim();
 
-  if (!nome || !ALLOWED_SPECIES.includes(especie) || !ALLOWED_STATUS.includes(statusRaw)) {
+  if (
+    !nome ||
+    !ALLOWED_SPECIES.includes(especie) ||
+    !ALLOWED_STATUS.includes(statusRaw)
+  ) {
     return null;
   }
   const idade = idadeRaw ? Number.parseInt(idadeRaw, 10) : NaN;
 
   return {
+    compatibilidades: formData
+      .getAll("compatibilidades")
+      .map(String)
+      .filter((v) =>
+        ["children", "seniors", "apartment", "trained"].includes(v),
+      ),
     nome,
     especie,
     raca: racaRaw || null,
@@ -234,7 +256,9 @@ export async function uploadAnimalPhoto(formData: FormData) {
     redirect(`${redirectBase}?error=upload_failed`);
   }
 
-  const { data: publicUrlData } = supabase.storage.from(ANIMAL_PHOTOS_BUCKET).getPublicUrl(storagePath);
+  const { data: publicUrlData } = supabase.storage
+    .from(ANIMAL_PHOTOS_BUCKET)
+    .getPublicUrl(storagePath);
 
   const { count: existingCount } = await supabase
     .from("animal_fotos")
@@ -250,6 +274,7 @@ export async function uploadAnimalPhoto(formData: FormData) {
   });
 
   if (insertError) {
+    await supabase.storage.from(ANIMAL_PHOTOS_BUCKET).remove([storagePath]);
     console.error("[uploadAnimalPhoto] insert error:", insertError.message);
     redirect(`${redirectBase}?error=upload_failed`);
   }
@@ -282,7 +307,10 @@ export async function setPrimaryAnimalPhoto(formData: FormData) {
     redirect(`${redirectBase}?error=not_authorized`);
   }
 
-  await supabase.from("animal_fotos").update({ is_primary: false }).eq("animal_id", animalId);
+  await supabase
+    .from("animal_fotos")
+    .update({ is_primary: false })
+    .eq("animal_id", animalId);
   const { error } = await supabase
     .from("animal_fotos")
     .update({ is_primary: true })
@@ -332,8 +360,13 @@ export async function deleteAnimalPhoto(formData: FormData) {
     redirect(`${redirectBase}?error=photo_not_found`);
   }
 
-  await supabase.storage.from(ANIMAL_PHOTOS_BUCKET).remove([photo.storage_path]);
-  const { error } = await supabase.from("animal_fotos").delete().eq("id", photoId);
+  await supabase.storage
+    .from(ANIMAL_PHOTOS_BUCKET)
+    .remove([photo.storage_path]);
+  const { error } = await supabase
+    .from("animal_fotos")
+    .delete()
+    .eq("id", photoId);
 
   if (error) {
     redirect(`${redirectBase}?error=delete_failed`);
@@ -349,7 +382,10 @@ export async function deleteAnimalPhoto(formData: FormData) {
       .maybeSingle();
 
     if (nextPrimary) {
-      await supabase.from("animal_fotos").update({ is_primary: true }).eq("id", nextPrimary.id);
+      await supabase
+        .from("animal_fotos")
+        .update({ is_primary: true })
+        .eq("id", nextPrimary.id);
     }
   }
 

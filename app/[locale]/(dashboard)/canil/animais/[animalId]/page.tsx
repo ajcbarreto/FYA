@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/submit-button";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -21,7 +22,10 @@ type AnimalEditPageProps = {
   searchParams: Promise<{ success?: string; error?: string }>;
 };
 
-export default async function AnimalEditPage({ params, searchParams }: AnimalEditPageProps) {
+export default async function AnimalEditPage({
+  params,
+  searchParams,
+}: AnimalEditPageProps) {
   const { locale, animalId } = await params;
   const { success, error } = await searchParams;
 
@@ -45,7 +49,9 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
 
   const { data: animal } = await supabase
     .from("animais")
-    .select("id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao")
+    .select(
+      "id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,compatibilidades",
+    )
     .eq("id", animalId)
     .maybeSingle<{
       id: string;
@@ -58,6 +64,7 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
       porte: string | null;
       status: string;
       descricao: string | null;
+      compatibilidades: string[];
     }>();
 
   if (!animal || animal.canil_id !== shelter.id) {
@@ -74,7 +81,8 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
           detailsTitle: "Dados do animal",
           saveDetails: "Guardar dados",
           dangerTitle: "Zona de perigo",
-          dangerHint: "Apagar o animal remove tambem fotos e pedidos associados.",
+          dangerHint:
+            "Apagar o animal remove tambem fotos e pedidos associados.",
           deleteAnimal: "Apagar animal",
           uploadTitle: "Adicionar foto",
           uploadHint: "JPG, PNG ou WebP ate 5MB.",
@@ -106,7 +114,8 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
           detailsTitle: "Pet details",
           saveDetails: "Save details",
           dangerTitle: "Danger zone",
-          dangerHint: "Deleting the pet also removes its photos and related requests.",
+          dangerHint:
+            "Deleting the pet also removes its photos and related requests.",
           deleteAnimal: "Delete pet",
           uploadTitle: "Add photo",
           uploadHint: "JPG, PNG or WebP up to 5MB.",
@@ -138,7 +147,7 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
     null;
 
   return (
-    <main className="space-y-6">
+    <main id="main-content" tabIndex={-1} className="space-y-6">
       <Link
         href={`/${locale}/canil/animais`}
         className="inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
@@ -147,12 +156,15 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
         {copy.back}
       </Link>
 
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
+      <header className="rounded-3xl border border-border/50 bg-card p-6 sm:p-8">
+        <h1 className="display-title text-4xl sm:text-5xl">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
 
-      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
+      <ToastFeedback
+        message={feedback}
+        variant={success ? "success" : "error"}
+      />
 
       <section className="rounded-3xl border border-border/20 bg-card p-6">
         <h2 className="mb-4 text-lg font-bold">{copy.detailsTitle}</h2>
@@ -170,6 +182,7 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
             porte: animal.porte,
             status: animal.status,
             descricao: animal.descricao,
+            compatibilidades: animal.compatibilidades,
           }}
         />
       </section>
@@ -177,7 +190,10 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
       <section className="rounded-3xl border border-border/20 bg-card p-6">
         <h2 className="text-lg font-bold">{copy.uploadTitle}</h2>
         <p className="mt-1 text-xs text-muted-foreground">{copy.uploadHint}</p>
-        <form action={uploadAnimalPhoto} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <form
+          action={uploadAnimalPhoto}
+          className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center"
+        >
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="animalId" value={animal.id} />
           <input
@@ -187,13 +203,13 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
             required
             className="flex-1 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-primary file:px-4 file:py-2 file:text-xs file:font-bold file:text-primary-foreground"
           />
-          <button
+          <SubmitButton
             type="submit"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground"
           >
             <Upload className="h-4 w-4" />
             {copy.upload}
-          </button>
+          </SubmitButton>
         </form>
       </section>
 
@@ -203,7 +219,10 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {photos.map((photo) => (
-              <article key={photo.id} className="overflow-hidden rounded-2xl border border-border/20">
+              <article
+                key={photo.id}
+                className="overflow-hidden rounded-2xl border border-border/20"
+              >
                 <div className="relative aspect-square bg-muted">
                   {photo.public_url ? (
                     <Image
@@ -211,6 +230,9 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
                       alt={animal.nome}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
+                      unoptimized={photo.public_url.startsWith(
+                        "http://127.0.0.1:",
+                      )}
                       className="object-cover"
                     />
                   ) : null}
@@ -227,26 +249,26 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="animalId" value={animal.id} />
                       <input type="hidden" name="photoId" value={photo.id} />
-                      <button
+                      <SubmitButton
                         type="submit"
                         className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1.5 text-xs font-semibold hover:bg-muted/80"
                       >
                         <Star className="h-3 w-3" />
                         {copy.setPrimary}
-                      </button>
+                      </SubmitButton>
                     </form>
                   )}
                   <form action={deleteAnimalPhoto}>
                     <input type="hidden" name="locale" value={locale} />
                     <input type="hidden" name="animalId" value={animal.id} />
                     <input type="hidden" name="photoId" value={photo.id} />
-                    <button
+                    <SubmitButton
                       type="submit"
                       className="inline-flex items-center gap-1 rounded-full bg-destructive/15 px-3 py-1.5 text-xs font-semibold text-destructive hover:bg-destructive/25"
                     >
                       <Trash2 className="h-3 w-3" />
                       {copy.remove}
-                    </button>
+                    </SubmitButton>
                   </form>
                 </div>
               </article>
@@ -256,18 +278,20 @@ export default async function AnimalEditPage({ params, searchParams }: AnimalEdi
       </section>
 
       <section className="rounded-3xl border border-destructive/30 bg-destructive/5 p-6">
-        <h2 className="text-lg font-bold text-destructive">{copy.dangerTitle}</h2>
+        <h2 className="text-lg font-bold text-destructive">
+          {copy.dangerTitle}
+        </h2>
         <p className="mt-1 text-xs text-muted-foreground">{copy.dangerHint}</p>
         <form action={deleteAnimal} className="mt-4">
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="animalId" value={animal.id} />
-          <button
+          <SubmitButton
             type="submit"
             className="inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-2.5 text-sm font-bold text-destructive-foreground"
           >
             <Trash2 className="h-4 w-4" />
             {copy.deleteAnimal}
-          </button>
+          </SubmitButton>
         </form>
       </section>
     </main>

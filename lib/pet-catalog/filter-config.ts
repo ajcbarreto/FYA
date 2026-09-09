@@ -13,13 +13,20 @@ const defaults: PetCatalogFiltersConfig = {
   ageRanges: ["Baby (0-1)", "Young (1-3)", "Adult (3-7)", "Senior (7+)"],
   sizes: ["Small", "Medium", "Large"],
   genders: ["Male", "Female"],
-  compatibilities: ["Kid Friendly", "Senior Friendly", "Apartment Life", "Well Trained"],
+  compatibilities: [
+    "Kid Friendly",
+    "Senior Friendly",
+    "Apartment Life",
+    "Well Trained",
+  ],
 };
 
 const SETTINGS_KEY = "pet_catalog_filters";
 
 function isStringArray(value: unknown): value is string[] {
-  return Array.isArray(value) && value.every((item) => typeof item === "string");
+  return (
+    Array.isArray(value) && value.every((item) => typeof item === "string")
+  );
 }
 
 function normalizeArray(value: unknown, fallback: string[]) {
@@ -38,7 +45,9 @@ export function parseCommaSeparatedList(value: string) {
     .filter(Boolean);
 }
 
-export function normalizePetCatalogFiltersConfig(value: unknown): PetCatalogFiltersConfig {
+export function normalizePetCatalogFiltersConfig(
+  value: unknown,
+): PetCatalogFiltersConfig {
   if (typeof value !== "object" || value === null) {
     return defaults;
   }
@@ -49,7 +58,10 @@ export function normalizePetCatalogFiltersConfig(value: unknown): PetCatalogFilt
     ageRanges: normalizeArray(candidate.ageRanges, defaults.ageRanges),
     sizes: normalizeArray(candidate.sizes, defaults.sizes),
     genders: normalizeArray(candidate.genders, defaults.genders),
-    compatibilities: normalizeArray(candidate.compatibilities, defaults.compatibilities),
+    compatibilities: normalizeArray(
+      candidate.compatibilities,
+      defaults.compatibilities,
+    ),
   };
 }
 

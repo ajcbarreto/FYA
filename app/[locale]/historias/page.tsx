@@ -10,7 +10,9 @@ type SuccessStoriesPageProps = {
   params: Promise<{ locale: string }>;
 };
 
-export default async function SuccessStoriesPage({ params }: SuccessStoriesPageProps) {
+export default async function SuccessStoriesPage({
+  params,
+}: SuccessStoriesPageProps) {
   const { locale } = await params;
 
   if (!isLocale(locale)) {
@@ -26,8 +28,10 @@ export default async function SuccessStoriesPage({ params }: SuccessStoriesPageP
           eyebrow: "Historias de sucesso",
           title: "Cada adopcao e um final feliz",
           subtitle: "Animais que ja encontraram a sua familia atraves da FYA.",
-          stat: (count: number) => `${count} ${count === 1 ? "amigo encontrou lar" : "amigos encontraram lar"}`,
-          empty: "Ainda nao ha adocoes concluidas registadas. Em breve, as primeiras historias aparecem aqui.",
+          stat: (count: number) =>
+            `${count} ${count === 1 ? "amigo encontrou lar" : "amigos encontraram lar"}`,
+          empty:
+            "Ainda nao ha adocoes concluidas registadas. Em breve, as primeiras historias aparecem aqui.",
           browse: "Explorar animais para adocao",
           foundHome: "encontrou um lar",
           via: "atraves de",
@@ -36,22 +40,26 @@ export default async function SuccessStoriesPage({ params }: SuccessStoriesPageP
           eyebrow: "Success stories",
           title: "Every adoption is a happy ending",
           subtitle: "Pets that have already found their family through FYA.",
-          stat: (count: number) => `${count} ${count === 1 ? "friend found a home" : "friends found a home"}`,
-          empty: "No completed adoptions yet. Soon the first stories will show up here.",
+          stat: (count: number) =>
+            `${count} ${count === 1 ? "friend found a home" : "friends found a home"}`,
+          empty:
+            "No completed adoptions yet. Soon the first stories will show up here.",
           browse: "Browse pets for adoption",
           foundHome: "found a home",
           via: "via",
         };
 
   return (
-    <main className="w-full flex-1 pb-16 pt-10">
+    <main id="main-content" tabIndex={-1} className="w-full flex-1 pb-16 pt-10">
       <section className="mx-auto w-full max-w-7xl px-6 lg:px-8">
         <div className="rounded-3xl bg-secondary p-10 text-center text-white md:p-16">
           <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-bold uppercase tracking-widest">
             <Sparkles className="h-3.5 w-3.5" />
             {copy.eyebrow}
           </p>
-          <h1 className="mx-auto mt-5 max-w-2xl text-4xl font-extrabold tracking-tight md:text-5xl">{copy.title}</h1>
+          <h1 className="mx-auto mt-5 max-w-2xl text-4xl font-extrabold tracking-tight md:text-5xl">
+            {copy.title}
+          </h1>
           <p className="mx-auto mt-4 max-w-xl text-white/85">{copy.subtitle}</p>
           {adopted.length > 0 && (
             <p className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/15 px-5 py-2 text-sm font-bold">

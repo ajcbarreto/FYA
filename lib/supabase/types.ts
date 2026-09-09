@@ -1,9 +1,3 @@
-export type UserRole = "admin" | "user" | "canil";
-
-export type Profile = {
-  id: string;
-  email: string;
-  full_name: string | null;
-  role: UserRole;
-  created_at: string;
-};
+import type { Database } from "./database.types";
+export type UserRole = Database["public"]["Enums"]["app_role"];
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"];

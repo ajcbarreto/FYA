@@ -5,7 +5,12 @@ import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 
-const allowedStatuses = ["disponivel", "reservado", "em_tratamento", "adotado"] as const;
+const allowedStatuses = [
+  "disponivel",
+  "reservado",
+  "em_tratamento",
+  "adotado",
+] as const;
 
 function getLocaleFromForm(formData: FormData) {
   const localeValue = String(formData.get("locale") ?? defaultLocale);
@@ -17,7 +22,10 @@ export async function updateAnimalStatus(formData: FormData) {
   const animalId = String(formData.get("animalId") ?? "");
   const status = String(formData.get("status") ?? "");
 
-  if (!animalId || !allowedStatuses.includes(status as (typeof allowedStatuses)[number])) {
+  if (
+    !animalId ||
+    !allowedStatuses.includes(status as (typeof allowedStatuses)[number])
+  ) {
     redirect(`/${locale}/canil/animais?error=invalid_status`);
   }
 
@@ -84,7 +92,10 @@ export async function updateShelterSettings(formData: FormData) {
     missao: missao || null,
   };
 
-  const { error } = await supabase.from("canis").update(payload).eq("id", shelter.id);
+  const { error } = await supabase
+    .from("canis")
+    .update(payload)
+    .eq("id", shelter.id);
 
   if (error) {
     redirect(`/${locale}/canil/configuracoes?error=save_failed`);

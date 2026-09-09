@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/submit-button";
 import { notFound } from "next/navigation";
 import { Cat, Dog, Home, PawPrint, Sparkles } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
@@ -19,7 +20,8 @@ export default async function MatchPage({ params }: MatchPageProps) {
     ? {
         eyebrow: "Encontra o teu match",
         title: "Qual e o animal certo para ti?",
-        subtitle: "Responde a 3 perguntas rapidas e mostramos-te os animais que melhor encaixam no teu estilo de vida.",
+        subtitle:
+          "Responde a 3 perguntas rapidas e mostramos-te os animais que melhor encaixam no teu estilo de vida.",
         q1: "Que tipo de companheiro procuras?",
         q1Options: [
           { value: "", label: "Indiferente" },
@@ -36,7 +38,10 @@ export default async function MatchPage({ params }: MatchPageProps) {
         q3Options: [
           { value: "pouco", label: "Pouco (trabalho/estudo a tempo inteiro)" },
           { value: "medio", label: "Algum tempo todos os dias" },
-          { value: "muito", label: "Bastante tempo para passeios e brincadeira" },
+          {
+            value: "muito",
+            label: "Bastante tempo para passeios e brincadeira",
+          },
         ],
         submit: "Ver os meus matches",
         hint: "Vamos abrir o catalogo ja filtrado com base nas tuas respostas.",
@@ -44,7 +49,8 @@ export default async function MatchPage({ params }: MatchPageProps) {
     : {
         eyebrow: "Find your match",
         title: "Which pet is right for you?",
-        subtitle: "Answer 3 quick questions and we'll show the pets that best fit your lifestyle.",
+        subtitle:
+          "Answer 3 quick questions and we'll show the pets that best fit your lifestyle.",
         q1: "What kind of companion are you looking for?",
         q1Options: [
           { value: "", label: "No preference" },
@@ -68,20 +74,33 @@ export default async function MatchPage({ params }: MatchPageProps) {
       };
 
   const questions = [
-    { name: "species", label: copy.q1, icon: PawPrint, options: copy.q1Options },
+    {
+      name: "species",
+      label: copy.q1,
+      icon: PawPrint,
+      options: copy.q1Options,
+    },
     { name: "home", label: copy.q2, icon: Home, options: copy.q2Options },
     { name: "time", label: copy.q3, icon: Sparkles, options: copy.q3Options },
   ];
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-6 pb-16 pt-10 lg:px-8">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto w-full max-w-2xl flex-1 px-6 pb-16 pt-10 lg:px-8"
+    >
       <div className="rounded-3xl bg-primary p-8 text-center text-primary-foreground md:p-12">
         <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-bold uppercase tracking-widest">
           <Sparkles className="h-3.5 w-3.5" />
           {copy.eyebrow}
         </p>
-        <h1 className="mx-auto mt-5 max-w-md text-3xl font-extrabold tracking-tight md:text-4xl">{copy.title}</h1>
-        <p className="mx-auto mt-3 max-w-md text-sm text-primary-foreground/85">{copy.subtitle}</p>
+        <h1 className="mx-auto mt-5 max-w-md text-3xl font-extrabold tracking-tight md:text-4xl">
+          {copy.title}
+        </h1>
+        <p className="mx-auto mt-3 max-w-md text-sm text-primary-foreground/85">
+          {copy.subtitle}
+        </p>
         <div className="mt-6 flex items-center justify-center gap-4 text-primary-foreground/80">
           <Dog className="h-7 w-7" />
           <Cat className="h-7 w-7" />
@@ -93,7 +112,10 @@ export default async function MatchPage({ params }: MatchPageProps) {
         {questions.map((question, index) => {
           const Icon = question.icon;
           return (
-            <fieldset key={question.name} className="rounded-2xl border border-border/40 bg-card p-5">
+            <fieldset
+              key={question.name}
+              className="rounded-2xl border border-border/40 bg-card p-5"
+            >
               <legend className="flex items-center gap-2 px-1 text-sm font-bold">
                 <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">
                   {index + 1}
@@ -123,12 +145,12 @@ export default async function MatchPage({ params }: MatchPageProps) {
         })}
 
         <div className="space-y-3 text-center">
-          <button
+          <SubmitButton
             type="submit"
             className="w-full rounded-full bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-lg transition-all hover:brightness-105"
           >
             {copy.submit}
-          </button>
+          </SubmitButton>
           <p className="text-xs text-muted-foreground">{copy.hint}</p>
         </div>
       </form>

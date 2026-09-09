@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/submit-button";
 import { notFound } from "next/navigation";
 import { BadgeCheck, Building2, MapPin, ShieldOff } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
@@ -18,7 +19,10 @@ type ShelterAdminRow = {
   created_at: string;
 };
 
-export default async function AdminSheltersPage({ params, searchParams }: AdminSheltersPageProps) {
+export default async function AdminSheltersPage({
+  params,
+  searchParams,
+}: AdminSheltersPageProps) {
   const { locale } = await params;
   const { success, error } = await searchParams;
 
@@ -39,7 +43,8 @@ export default async function AdminSheltersPage({ params, searchParams }: AdminS
     locale === "pt"
       ? {
           title: "Canis registados",
-          subtitle: "Verifica os canis parceiros para aumentar a confianca dos adotantes.",
+          subtitle:
+            "Verifica os canis parceiros para aumentar a confianca dos adotantes.",
           verified: "Verificado",
           pending: "Pendente",
           verify: "Verificar",
@@ -79,19 +84,25 @@ export default async function AdminSheltersPage({ params, searchParams }: AdminS
         };
 
   const messageMap = copy.messages as Record<string, string>;
-  const feedback = (success && messageMap[success]) || (error && messageMap[error]) || null;
+  const feedback =
+    (success && messageMap[success]) || (error && messageMap[error]) || null;
 
   return (
-    <main className="space-y-6">
-      <ToastFeedback message={feedback} variant={success ? "success" : "error"} />
-      <header className="rounded-3xl border border-border/20 bg-card p-8 shadow-sm">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
+    <main id="main-content" tabIndex={-1} className="space-y-6">
+      <ToastFeedback
+        message={feedback}
+        variant={success ? "success" : "error"}
+      />
+      <header className="rounded-3xl border border-border/50 bg-card p-6 sm:p-8">
+        <h1 className="display-title text-4xl sm:text-5xl">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
 
       <section className="overflow-hidden rounded-3xl border border-border/20 bg-card">
         {shelters.length === 0 ? (
-          <p className="px-6 py-8 text-sm text-muted-foreground">{copy.empty}</p>
+          <p className="px-6 py-8 text-sm text-muted-foreground">
+            {copy.empty}
+          </p>
         ) : (
           <div className="overflow-x-auto stacked-table">
             <table className="w-full min-w-[680px] text-left">
@@ -117,26 +128,42 @@ export default async function AdminSheltersPage({ params, searchParams }: AdminS
                       </p>
                     </td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
-                      {new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short", year: "numeric" }).format(
-                        new Date(shelter.created_at),
-                      )}
+                      {new Intl.DateTimeFormat(locale, {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      }).format(new Date(shelter.created_at))}
                     </td>
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${
-                          shelter.verificado ? "bg-secondary/15 text-secondary" : "bg-muted text-muted-foreground"
+                          shelter.verificado
+                            ? "bg-secondary/15 text-secondary"
+                            : "bg-muted text-muted-foreground"
                         }`}
                       >
-                        {shelter.verificado ? <BadgeCheck className="h-3 w-3" /> : <ShieldOff className="h-3 w-3" />}
+                        {shelter.verificado ? (
+                          <BadgeCheck className="h-3 w-3" />
+                        ) : (
+                          <ShieldOff className="h-3 w-3" />
+                        )}
                         {shelter.verificado ? copy.verified : copy.pending}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <form action={toggleShelterVerification}>
                         <input type="hidden" name="locale" value={locale} />
-                        <input type="hidden" name="shelterId" value={shelter.id} />
-                        <input type="hidden" name="verify" value={shelter.verificado ? "false" : "true"} />
-                        <button
+                        <input
+                          type="hidden"
+                          name="shelterId"
+                          value={shelter.id}
+                        />
+                        <input
+                          type="hidden"
+                          name="verify"
+                          value={shelter.verificado ? "false" : "true"}
+                        />
+                        <SubmitButton
                           type="submit"
                           className={`rounded-full px-4 py-1.5 text-xs font-bold ${
                             shelter.verificado
@@ -145,7 +172,7 @@ export default async function AdminSheltersPage({ params, searchParams }: AdminS
                           }`}
                         >
                           {shelter.verificado ? copy.unverify : copy.verify}
-                        </button>
+                        </SubmitButton>
                       </form>
                     </td>
                   </tr>

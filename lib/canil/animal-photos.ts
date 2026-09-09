@@ -11,22 +11,29 @@ export type AnimalPhotoRow = {
   created_at: string;
 };
 
-export async function listAnimalPhotos(supabase: SupabaseClient, animalId: string) {
+export async function listAnimalPhotos(
+  supabase: SupabaseClient,
+  animalId: string,
+) {
   const { data, error } = await supabase
     .from("animal_fotos")
     .select("id,animal_id,storage_path,public_url,is_primary,created_at")
     .eq("animal_id", animalId)
     .order("created_at", { ascending: false });
 
-  if (error || !data) {
-    if (error) console.error("[listAnimalPhotos] Supabase error:", error.message);
+  if (error) throw new Error("Unable to load data", { cause: error });
+
+  if (!data) {
     return [];
   }
 
   return data as AnimalPhotoRow[];
 }
 
-export async function listPrimaryPhotosForAnimals(supabase: SupabaseClient, animalIds: string[]) {
+export async function listPrimaryPhotosForAnimals(
+  supabase: SupabaseClient,
+  animalIds: string[],
+) {
   if (animalIds.length === 0) return new Map<string, string>();
 
   const { data, error } = await supabase
@@ -35,13 +42,18 @@ export async function listPrimaryPhotosForAnimals(supabase: SupabaseClient, anim
     .in("animal_id", animalIds)
     .order("created_at", { ascending: false });
 
-  if (error || !data) {
-    if (error) console.error("[listPrimaryPhotosForAnimals] Supabase error:", error.message);
+  if (error) throw new Error("Unable to load data", { cause: error });
+
+  if (!data) {
     return new Map<string, string>();
   }
 
   const map = new Map<string, string>();
-  for (const row of data as Array<{ animal_id: string; public_url: string | null; is_primary: boolean }>) {
+  for (const row of data as Array<{
+    animal_id: string;
+    public_url: string | null;
+    is_primary: boolean;
+  }>) {
     if (!row.public_url) continue;
     const existing = map.get(row.animal_id);
     if (row.is_primary || !existing) {

@@ -27,12 +27,17 @@ export type ShelterAnimalRecord = {
   created_at: string;
 };
 
-export async function getShelterForUser(supabase: SupabaseClient, userId: string) {
+export async function getShelterForUser(
+  supabase: SupabaseClient,
+  userId: string,
+) {
   // Apenas o canil de que o utilizador e dono. Sem fallback para outro canil:
   // um canil sem registo proprio nao deve ver dados de terceiros.
   const { data: ownedShelter } = await supabase
     .from("canis")
-    .select("id,owner_profile_id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at")
+    .select(
+      "id,owner_profile_id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at",
+    )
     .eq("owner_profile_id", userId)
     .maybeSingle();
 
@@ -41,7 +46,9 @@ export async function getShelterForUser(supabase: SupabaseClient, userId: string
   const { data: animals } = shelter
     ? await supabase
         .from("animais")
-        .select("id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,created_at")
+        .select(
+          "id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,created_at",
+        )
         .eq("canil_id", shelter.id)
         .order("created_at", { ascending: false })
     : { data: [] as ShelterAnimalRecord[] };

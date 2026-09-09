@@ -35,7 +35,8 @@ export function statusLabel(status: string, locale: string) {
   const n = status.toLowerCase();
   if (n === "disponivel") return isPt(locale) ? "Disponivel" : "Available";
   if (n === "reservado") return isPt(locale) ? "Reservado" : "Reserved";
-  if (n === "em_tratamento") return isPt(locale) ? "Em tratamento" : "In treatment";
+  if (n === "em_tratamento")
+    return isPt(locale) ? "Em tratamento" : "In treatment";
   if (n === "adotado") return isPt(locale) ? "Adotado" : "Adopted";
   return status;
 }
@@ -70,7 +71,10 @@ export function statusOptions(locale: string) {
     { value: "", label: isPt(locale) ? "Qualquer estado" : "Any status" },
     { value: "disponivel", label: isPt(locale) ? "Disponivel" : "Available" },
     { value: "reservado", label: isPt(locale) ? "Reservado" : "Reserved" },
-    { value: "em_tratamento", label: isPt(locale) ? "Em tratamento" : "In treatment" },
+    {
+      value: "em_tratamento",
+      label: isPt(locale) ? "Em tratamento" : "In treatment",
+    },
     { value: "adotado", label: isPt(locale) ? "Adotado" : "Adopted" },
   ];
 }

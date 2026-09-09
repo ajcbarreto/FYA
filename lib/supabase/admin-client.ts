@@ -1,3 +1,5 @@
+import type { Database } from "./database.types";
+import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import { supabaseUrl } from "@/lib/supabase/config";
 
@@ -10,7 +12,7 @@ export function createAdminSupabaseClient() {
   if (!supabaseUrl || !serviceKey) {
     return null;
   }
-  return createClient(supabaseUrl, serviceKey, {
+  return createClient<Database>(supabaseUrl, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }

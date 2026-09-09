@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/submit-button";
 import { notFound } from "next/navigation";
 import { Lock } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
@@ -9,7 +10,10 @@ type ResetPasswordPageProps = {
   searchParams: Promise<{ error?: string }>;
 };
 
-export default async function ResetPasswordPage({ params, searchParams }: ResetPasswordPageProps) {
+export default async function ResetPasswordPage({
+  params,
+  searchParams,
+}: ResetPasswordPageProps) {
   const { locale } = await params;
   const { error } = await searchParams;
 
@@ -46,12 +50,19 @@ export default async function ResetPasswordPage({ params, searchParams }: ResetP
           },
         };
 
-  const feedback = error && copy.errors[error as keyof typeof copy.errors] ? copy.errors[error as keyof typeof copy.errors] : null;
+  const feedback =
+    error && copy.errors[error as keyof typeof copy.errors]
+      ? copy.errors[error as keyof typeof copy.errors]
+      : null;
   const inputClass =
     "h-12 w-full rounded-xl bg-muted px-11 text-sm outline-none focus:ring-2 focus:ring-primary/30";
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16"
+    >
       <ToastFeedback message={feedback} variant="error" />
       <div className="rounded-3xl border border-border/30 bg-card p-8 shadow-sm">
         <h1 className="text-2xl font-extrabold tracking-tight">{copy.title}</h1>
@@ -60,16 +71,29 @@ export default async function ResetPasswordPage({ params, searchParams }: ResetP
         <form action={updatePassword} className="mt-6 space-y-4">
           <input type="hidden" name="locale" value={locale} />
           <div className="space-y-2">
-            <label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <label
+              htmlFor="password"
+              className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+            >
               {copy.passwordLabel}
             </label>
             <div className="relative">
               <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input id="password" name="password" type="password" minLength={6} required className={inputClass} />
+              <input
+                id="password"
+                name="password"
+                type="password"
+                minLength={6}
+                required
+                className={inputClass}
+              />
             </div>
           </div>
           <div className="space-y-2">
-            <label htmlFor="confirm_password" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <label
+              htmlFor="confirm_password"
+              className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+            >
               {copy.confirmLabel}
             </label>
             <div className="relative">
@@ -84,12 +108,12 @@ export default async function ResetPasswordPage({ params, searchParams }: ResetP
               />
             </div>
           </div>
-          <button
+          <SubmitButton
             type="submit"
             className="w-full rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
           >
             {copy.submit}
-          </button>
+          </SubmitButton>
         </form>
       </div>
     </main>

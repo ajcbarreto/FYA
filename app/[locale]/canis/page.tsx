@@ -1,9 +1,13 @@
+import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BadgeCheck, Building2, MapPin, PawPrint, Search } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { countAnimalsByShelter, listPublicShelters } from "@/lib/canil/public-directory";
+import {
+  countAnimalsByShelter,
+  listPublicShelters,
+} from "@/lib/canil/public-directory";
 import { getShelterRatingSummaries } from "@/lib/canil/reviews";
 import { StarRating } from "@/components/star-rating";
 
@@ -12,7 +16,10 @@ type SheltersDirectoryPageProps = {
   searchParams: Promise<{ q?: string }>;
 };
 
-export default async function SheltersDirectoryPage({ params, searchParams }: SheltersDirectoryPageProps) {
+export default async function SheltersDirectoryPage({
+  params,
+  searchParams,
+}: SheltersDirectoryPageProps) {
   const { locale } = await params;
   const { q } = await searchParams;
   const query = (q ?? "").trim();
@@ -22,7 +29,9 @@ export default async function SheltersDirectoryPage({ params, searchParams }: Sh
   }
 
   const supabase = await createServerSupabaseClient();
-  const shelters = await listPublicShelters(supabase, { search: query || undefined });
+  const shelters = await listPublicShelters(supabase, {
+    search: query || undefined,
+  });
   const shelterIds = shelters.map((shelter) => shelter.id);
   const [animalsCount, ratingSummaries] = await Promise.all([
     countAnimalsByShelter(supabase, shelterIds),
@@ -36,7 +45,8 @@ export default async function SheltersDirectoryPage({ params, searchParams }: Sh
           subtitle: "Conhece as organizacoes que dao casa aos animais na FYA.",
           searchPlaceholder: "Procurar por nome, cidade ou missao...",
           empty: "Sem canis encontrados para essa pesquisa.",
-          totalPets: (count: number) => `${count} ${count === 1 ? "animal" : "animais"}`,
+          totalPets: (count: number) =>
+            `${count} ${count === 1 ? "animal" : "animais"}`,
           openCanil: "Ver canil",
           submit: "Procurar",
         }
@@ -45,16 +55,23 @@ export default async function SheltersDirectoryPage({ params, searchParams }: Sh
           subtitle: "Meet the organizations that give pets a home through FYA.",
           searchPlaceholder: "Search by name, city or mission...",
           empty: "No shelters match this search.",
-          totalPets: (count: number) => `${count} ${count === 1 ? "pet" : "pets"}`,
+          totalPets: (count: number) =>
+            `${count} ${count === 1 ? "pet" : "pets"}`,
           openCanil: "Open shelter",
           submit: "Search",
         };
 
   return (
-    <main className="mx-auto w-full max-w-7xl flex-1 px-6 pb-16 pt-10 lg:px-8">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto w-full max-w-7xl flex-1 px-6 pb-16 pt-10 lg:px-8"
+    >
       <header className="mb-10 space-y-3">
         <h1 className="text-4xl font-extrabold tracking-tight">{copy.title}</h1>
-        <p className="max-w-2xl text-sm text-muted-foreground md:text-base">{copy.subtitle}</p>
+        <p className="max-w-2xl text-sm text-muted-foreground md:text-base">
+          {copy.subtitle}
+        </p>
       </header>
 
       <form method="get" className="mb-8 flex gap-2">
@@ -68,12 +85,12 @@ export default async function SheltersDirectoryPage({ params, searchParams }: Sh
             className="h-11 w-full rounded-full bg-muted px-11 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary/30"
           />
         </div>
-        <button
+        <SubmitButton
           type="submit"
           className="h-11 rounded-full bg-primary px-5 text-sm font-bold text-primary-foreground"
         >
           {copy.submit}
-        </button>
+        </SubmitButton>
       </form>
 
       {shelters.length === 0 ? (
@@ -114,14 +131,18 @@ export default async function SheltersDirectoryPage({ params, searchParams }: Sh
                   </p>
                 )}
                 {shelter.missao && (
-                  <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">{shelter.missao}</p>
+                  <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">
+                    {shelter.missao}
+                  </p>
                 )}
                 <div className="mt-5 flex items-center justify-between text-xs font-bold">
                   <span className="inline-flex items-center gap-1 text-secondary">
                     <PawPrint className="h-3.5 w-3.5" />
                     {copy.totalPets(count)}
                   </span>
-                  <span className="text-primary transition-colors group-hover:underline">{copy.openCanil}</span>
+                  <span className="text-primary transition-colors group-hover:underline">
+                    {copy.openCanil}
+                  </span>
                 </div>
               </Link>
             );
