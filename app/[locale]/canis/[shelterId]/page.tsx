@@ -233,7 +233,8 @@ export default async function ShelterPublicPage({
 
       <header className="relative overflow-hidden rounded-[2rem] bg-primary p-6 text-primary-foreground sm:p-10">
         <p className="mb-6 text-xs font-bold uppercase tracking-[0.2em] opacity-70">{locale === "pt" ? "Pessoas que cuidam. Animais que importam." : "People who care. Animals who matter."}</p>
-        <div className="flex items-center gap-5">
+          <div className="flex items-center gap-5">
+          {shelter.image_url && <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl"><Image src={shelter.image_url} alt={shelter.nome} fill className="object-cover" sizes="80px" /></div>}
           <div className="inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/15">
             <Building2 className="h-7 w-7" />
           </div>

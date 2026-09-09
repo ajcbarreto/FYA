@@ -254,6 +254,7 @@ export type Database = {
           verificado: boolean;
           donation_url: string | null;
           donation_message: string | null;
+          image_url: string | null;
         };
         Insert: {
           id?: string;
@@ -267,6 +268,7 @@ export type Database = {
           verificado?: boolean;
           donation_url?: string | null;
           donation_message?: string | null;
+          image_url?: string | null;
         };
         Update: {
           id?: string;
@@ -280,6 +282,7 @@ export type Database = {
           verificado?: boolean;
           donation_url?: string | null;
           donation_message?: string | null;
+          image_url?: string | null;
         };
         Relationships: [
           {

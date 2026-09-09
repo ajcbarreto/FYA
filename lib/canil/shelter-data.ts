@@ -12,6 +12,7 @@ export type ShelterRecord = {
   verificado: boolean;
   donation_url: string | null;
   donation_message: string | null;
+  image_url: string | null;
   created_at: string;
 };
 

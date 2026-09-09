@@ -19,6 +19,7 @@ export async function register(formData: FormData) {
       : `/${locale}/auth/register`;
   const fullName = String(formData.get("full_name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
+  const phone = String(formData.get("phone") ?? formData.get("contact_phone") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const role: UserRole = source === "shelter_registration" ? "canil" : "user";
   const shelterName = String(formData.get("shelter_name") ?? "").trim();
@@ -27,7 +28,7 @@ export async function register(formData: FormData) {
   const contactRole = String(formData.get("contact_role") ?? "").trim();
   const contactPhone = String(formData.get("contact_phone") ?? "").trim();
 
-  if (!fullName || !email || !password || !allowedRoles.includes(role)) {
+  if (!fullName || !email || !phone || !password || !allowedRoles.includes(role)) {
     redirect(
       `${redirectBasePath}?error=${encodeURIComponent(dictionary.auth.invalidData)}`,
     );
@@ -40,6 +41,7 @@ export async function register(formData: FormData) {
   const userMetadata: Record<string, string> = {
     full_name: fullName,
     role,
+    phone,
   };
 
   if (role === "canil") {
@@ -63,11 +65,7 @@ export async function register(formData: FormData) {
     redirect(`${redirectBasePath}?error=${encodeURIComponent(error.message)}`);
   }
 
-  redirect(
-    `${redirectBasePath}?success=${encodeURIComponent(role === "canil"
-      ? (locale === "pt" ? "Pedido recebido. Confirma o teu email. O canil precisa de aprovação antes de publicar animais." : "Request received. Confirm your email. Your shelter needs approval before publishing animals.")
-      : dictionary.auth.accountCreated)}`,
-  );
+  redirect(`/${locale}/auth/check-email?email=${encodeURIComponent(email)}&type=${role === "canil" ? "shelter" : "adopter"}`);
 }
 
 export async function logout(formData: FormData) {

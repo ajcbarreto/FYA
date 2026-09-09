@@ -178,6 +178,10 @@ export default async function CanilSettingsPage({
           </div>
 
           <fieldset className="space-y-4 rounded-2xl bg-muted/50 p-5">
+            <label className="block text-sm">
+              {locale === "pt" ? "Imagem do canil (URL https://)" : "Shelter image (https:// URL)"}
+              <input name="image_url" type="url" maxLength={2000} defaultValue={shelter?.image_url ?? ""} className="mt-2 h-11 w-full rounded-xl border bg-background px-3" placeholder="https://..." />
+            </label>
             <legend className="font-bold">{locale === "pt" ? "Donativos" : "Donations"}</legend>
             <label className="block text-sm">
               {locale === "pt" ? "Link seguro para donativos (https://)" : "Secure donation link (https://)"}

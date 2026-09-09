@@ -3,7 +3,7 @@ import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ArrowRight, Lock, Mail, PawPrint, User } from "lucide-react";
+import { ArrowRight, Lock, Mail, PawPrint, User, Phone } from "lucide-react";
 import { register } from "@/app/auth/register/actions";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
@@ -139,6 +139,16 @@ export default async function RegisterPage({
           </div>
           <form action={register} className="space-y-6">
             <input type="hidden" name="locale" value={locale} />
+            <div className="space-y-2">
+              <label htmlFor="phone" className="ml-1 block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                {locale === "pt" ? "Telemóvel" : "Mobile phone"}
+              </label>
+              <div className="relative">
+                <Phone className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input id="phone" name="phone" type="tel" required placeholder="+351 900 000 000" className="h-13 w-full rounded-xl bg-background px-12 pr-4 text-sm outline-none transition-colors focus:ring-2 focus:ring-primary/30" />
+              </div>
+            </div>
+
             <div className="space-y-2">
               <label
                 htmlFor="full_name"

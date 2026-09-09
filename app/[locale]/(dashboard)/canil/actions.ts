@@ -86,6 +86,8 @@ export async function updateShelterSettings(formData: FormData) {
 
   const donationUrl = String(formData.get("donation_url") ?? "").trim();
   const donationMessage = String(formData.get("donation_message") ?? "").trim();
+  const imageUrl = String(formData.get("image_url") ?? "").trim();
+  if (imageUrl) { try { const url = new URL(imageUrl); if (url.protocol !== "https:") throw new Error(); } catch { redirect(`/${locale}/canil/configuracoes?error=invalid_data`); } }
   if (donationUrl) {
     let valid = false;
     try {
@@ -98,6 +100,7 @@ export async function updateShelterSettings(formData: FormData) {
   const payload = {
     donation_url: donationUrl || null,
     donation_message: donationMessage || null,
+    image_url: imageUrl || null,
     nome,
     localizacao,
     telefone: telefone || null,

@@ -1,6 +1,9 @@
 -- Public support details; existing canis ownership policies govern edits.
 alter table public.canis add column if not exists donation_url text;
 alter table public.canis add column if not exists donation_message text;
+alter table public.canis add column if not exists image_url text;
+alter table public.canis add constraint canis_image_url_https
+  check (image_url is null or image_url ~ '^https://[^[:space:]]+$');
 alter table public.canis add constraint canis_donation_url_https
   check (donation_url is null or donation_url ~ '^https://[^[:space:]]+$');
 
