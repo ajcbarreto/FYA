@@ -189,7 +189,7 @@ export default async function LoginPage({
               <span>{copy.socialIntro}</span>
               <span className="h-px flex-1 bg-border" />
             </div>
-            <SocialLoginButtons locale={locale} />
+            <SocialLoginButtons locale={locale} next={next} />
 
             <p className="mt-8 text-center text-sm text-muted-foreground">
               {copy.registerPrompt}{" "}

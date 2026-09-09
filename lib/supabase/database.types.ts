@@ -211,6 +211,36 @@ export type Database = {
           },
         ];
       };
+      canil_likes: {
+        Row: {
+          canil_id: string;
+          user_profile_id: string;
+        };
+        Insert: {
+          canil_id: string;
+          user_profile_id: string;
+        };
+        Update: {
+          canil_id?: string;
+          user_profile_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "canil_likes_canil_id_fkey";
+            columns: ["canil_id"];
+            isOneToOne: false;
+            referencedRelation: "canis";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "canil_likes_user_profile_id_fkey";
+            columns: ["user_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       canis: {
         Row: {
           id: string;
@@ -222,6 +252,8 @@ export type Database = {
           email_contacto: string | null;
           created_at: string;
           verificado: boolean;
+          donation_url: string | null;
+          donation_message: string | null;
         };
         Insert: {
           id?: string;
@@ -233,6 +265,8 @@ export type Database = {
           email_contacto?: string | null;
           created_at?: string;
           verificado?: boolean;
+          donation_url?: string | null;
+          donation_message?: string | null;
         };
         Update: {
           id?: string;
@@ -244,6 +278,8 @@ export type Database = {
           email_contacto?: string | null;
           created_at?: string;
           verificado?: boolean;
+          donation_url?: string | null;
+          donation_message?: string | null;
         };
         Relationships: [
           {

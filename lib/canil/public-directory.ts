@@ -14,6 +14,8 @@ export type PublicShelter = {
   telefone: string | null;
   email_contacto: string | null;
   verificado: boolean;
+  donation_url: string | null;
+  donation_message: string | null;
   created_at: string;
 };
 
@@ -28,7 +30,7 @@ export async function listPublicShelters(
   let query = supabase
     .from("canis")
     .select(
-      "id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at",
+      "id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at,donation_url,donation_message",
     )
     .order("nome", { ascending: true });
 
@@ -82,7 +84,7 @@ export async function getPublicShelterById(
   const { data, error } = await supabase
     .from("canis")
     .select(
-      "id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at",
+      "id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at,donation_url,donation_message",
     )
     .eq("id", shelterId)
     .maybeSingle();

@@ -84,7 +84,20 @@ export async function updateShelterSettings(formData: FormData) {
     redirect(`/${locale}/canil/configuracoes?error=no_shelter`);
   }
 
+  const donationUrl = String(formData.get("donation_url") ?? "").trim();
+  const donationMessage = String(formData.get("donation_message") ?? "").trim();
+  if (donationUrl) {
+    let valid = false;
+    try {
+      const url = new URL(donationUrl);
+      valid = url.protocol === "https:" && !url.username && !url.password;
+    } catch {}
+    if (!valid || donationUrl.length > 2000) redirect(`/${locale}/canil/configuracoes?error=invalid_data`);
+  }
+  if (donationMessage.length > 1000) redirect(`/${locale}/canil/configuracoes?error=invalid_data`);
   const payload = {
+    donation_url: donationUrl || null,
+    donation_message: donationMessage || null,
     nome,
     localizacao,
     telefone: telefone || null,

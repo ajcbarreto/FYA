@@ -10,6 +10,8 @@ export type ShelterRecord = {
   telefone: string | null;
   email_contacto: string | null;
   verificado: boolean;
+  donation_url: string | null;
+  donation_message: string | null;
   created_at: string;
 };
 
@@ -36,7 +38,7 @@ export async function getShelterForUser(
   const { data: ownedShelter } = await supabase
     .from("canis")
     .select(
-      "id,owner_profile_id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at",
+      "id,owner_profile_id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at,donation_url,donation_message",
     )
     .eq("owner_profile_id", userId)
     .maybeSingle();

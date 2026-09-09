@@ -20,7 +20,7 @@ export async function register(formData: FormData) {
   const fullName = String(formData.get("full_name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
-  const role = String(formData.get("role") ?? "user") as UserRole;
+  const role: UserRole = source === "shelter_registration" ? "canil" : "user";
   const shelterName = String(formData.get("shelter_name") ?? "").trim();
   const shelterLocation = String(formData.get("shelter_location") ?? "").trim();
   const shelterMission = String(formData.get("shelter_mission") ?? "").trim();
@@ -31,6 +31,10 @@ export async function register(formData: FormData) {
     redirect(
       `${redirectBasePath}?error=${encodeURIComponent(dictionary.auth.invalidData)}`,
     );
+  }
+
+  if (role === "canil" && (!shelterName || !shelterLocation || !contactPhone)) {
+    redirect(`${redirectBasePath}?error=${encodeURIComponent(dictionary.auth.invalidData)}`);
   }
 
   const userMetadata: Record<string, string> = {
@@ -60,7 +64,9 @@ export async function register(formData: FormData) {
   }
 
   redirect(
-    `${redirectBasePath}?success=${encodeURIComponent(dictionary.auth.accountCreated)}`,
+    `${redirectBasePath}?success=${encodeURIComponent(role === "canil"
+      ? (locale === "pt" ? "Pedido recebido. Confirma o teu email. O canil precisa de aprovação antes de publicar animais." : "Request received. Confirm your email. Your shelter needs approval before publishing animals.")
+      : dictionary.auth.accountCreated)}`,
   );
 }
 

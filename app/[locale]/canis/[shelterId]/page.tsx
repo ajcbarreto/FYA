@@ -1,3 +1,5 @@
+import { setShelterLike } from "@/app/canil/likes-actions";
+import { Heart, ArrowUpRight } from "lucide-react";
 import { SubmitButton } from "@/components/submit-button";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -99,6 +101,10 @@ export default async function ShelterPublicPage({
       ? getReviewEligibility(supabase, shelter.id, user.id)
       : Promise.resolve({ canReview: false, existingReview: null }),
   ]);
+  const { data: likedRow } = user
+    ? await supabase.from("canil_likes").select("canil_id").eq("canil_id", shelter.id).eq("user_profile_id", user.id).maybeSingle()
+    : { data: null };
+  const liked = Boolean(likedRow);
   const rating = ratingSummaries.get(shelter.id);
   const availableCount = animals.filter(
     (animal) =>
@@ -134,7 +140,7 @@ export default async function ShelterPublicPage({
             adopted: "Adotados",
           },
           notProvided: "Nao definido",
-          reviewsTitle: "Avaliacoes",
+          reviewsTitle: "Comentários e avaliações",
           noReviews: "Este canil ainda nao tem avaliacoes.",
           ratingSummary: (avg: number, count: number) =>
             `${avg.toFixed(1)} de 5 · ${count} ${count === 1 ? "avaliacao" : "avaliacoes"}`,
@@ -152,6 +158,7 @@ export default async function ShelterPublicPage({
             "A tua avaliacao anterior nao foi aprovada. Podes editar e reenviar.",
           loginToReview: "Inicia sessao para avaliar este canil.",
           messages: {
+            like_failed: "Não foi possível guardar o gosto. Tenta novamente.",
             review_pending:
               "Avaliacao enviada. Vai ser revista pelo canil antes de aparecer.",
             invalid_review: "Escolhe uma classificacao valida.",
@@ -175,7 +182,7 @@ export default async function ShelterPublicPage({
             adopted: "Adopted",
           },
           notProvided: "Not provided",
-          reviewsTitle: "Reviews",
+          reviewsTitle: "Comments and reviews",
           noReviews: "This shelter has no reviews yet.",
           ratingSummary: (avg: number, count: number) =>
             `${avg.toFixed(1)} of 5 · ${count} ${count === 1 ? "review" : "reviews"}`,
@@ -193,6 +200,7 @@ export default async function ShelterPublicPage({
             "Your previous review was not approved. You can edit and resend it.",
           loginToReview: "Sign in to review this shelter.",
           messages: {
+            like_failed: "Could not save your like. Please try again.",
             review_pending:
               "Review sent. The shelter will review it before it appears.",
             invalid_review: "Pick a valid rating.",
@@ -223,14 +231,15 @@ export default async function ShelterPublicPage({
         {copy.back}
       </Link>
 
-      <header className="rounded-3xl border border-border/50 bg-card p-6 sm:p-8">
+      <header className="relative overflow-hidden rounded-[2rem] bg-primary p-6 text-primary-foreground sm:p-10">
+        <p className="mb-6 text-xs font-bold uppercase tracking-[0.2em] opacity-70">{locale === "pt" ? "Pessoas que cuidam. Animais que importam." : "People who care. Animals who matter."}</p>
         <div className="flex items-center gap-5">
-          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/15 text-primary">
+          <div className="inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/15">
             <Building2 className="h-7 w-7" />
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-4xl font-extrabold tracking-tight">
+              <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">
                 {shelter.nome}
               </h1>
               {shelter.verificado && (
@@ -240,7 +249,7 @@ export default async function ShelterPublicPage({
                 </span>
               )}
             </div>
-            <p className="mt-1 inline-flex items-center gap-1 text-sm text-muted-foreground">
+            <p className="mt-3 inline-flex items-center gap-1 text-sm opacity-80">
               <MapPin className="h-3.5 w-3.5" />
               {shelter.localizacao}
             </p>
@@ -252,11 +261,30 @@ export default async function ShelterPublicPage({
             )}
           </div>
         </div>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <a href="#animais" className="rounded-full bg-primary-foreground px-5 py-3 text-sm font-bold text-primary">{locale === "pt" ? "Conhecer os animais" : "Meet the animals"}</a>
+          <a href="#apoiar" className="rounded-full border border-white/30 px-5 py-3 text-sm font-semibold">{locale === "pt" ? "Quero ajudar" : "I want to help"}</a>
+          <form action={setShelterLike}>
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="shelterId" value={shelter.id} />
+            <input type="hidden" name="liked" value={String(!liked)} />
+            <SubmitButton aria-pressed={liked} className="inline-flex items-center gap-2 rounded-full border border-white/30 px-5 py-3 text-sm font-semibold">
+              <Heart className="h-4 w-4" fill={liked ? "currentColor" : "none"} />
+              {liked ? (locale === "pt" ? "Gostaste" : "Liked") : (locale === "pt" ? "Gosto" : "Like")}
+            </SubmitButton>
+          </form>
+        </div>
       </header>
+      <nav aria-label={locale === "pt" ? "Nesta página" : "On this page"} className="mt-4 flex gap-6 overflow-x-auto border-b py-4 text-sm font-semibold">
+        <a href="#animais">{locale === "pt" ? "Animais" : "Animals"}</a>
+        <a href="#sobre">{locale === "pt" ? "Sobre nós" : "About us"}</a>
+        <a href="#apoiar">{locale === "pt" ? "Donativos" : "Donations"}</a>
+        <a href="#comentarios">{locale === "pt" ? "Comentários" : "Comments"}</a>
+      </nav>
 
       <section className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
         <article className="space-y-6 lg:col-span-8">
-          <div className="rounded-3xl border border-border/20 bg-card p-6">
+          <div id="sobre" className="scroll-mt-24 rounded-3xl border border-border/20 bg-card p-6">
             <h2 className="text-xl font-bold">{copy.aboutTitle}</h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               {shelter.missao ??
@@ -290,7 +318,7 @@ export default async function ShelterPublicPage({
             </div>
           </div>
 
-          <div className="rounded-3xl border border-border/20 bg-card p-6">
+          <div id="animais" className="scroll-mt-24 rounded-3xl border border-border/20 bg-card p-6">
             <h2 className="text-xl font-bold">{copy.residentsTitle}</h2>
             {animals.length === 0 ? (
               <p className="mt-4 text-sm text-muted-foreground">
@@ -325,7 +353,7 @@ export default async function ShelterPublicPage({
             )}
           </div>
 
-          <div className="rounded-3xl border border-border/20 bg-card p-6">
+          <div id="comentarios" className="scroll-mt-24 rounded-3xl border border-border/20 bg-card p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="inline-flex items-center gap-2 text-xl font-bold">
                 <MessageSquareText className="h-5 w-5 text-primary" />
@@ -380,6 +408,7 @@ export default async function ShelterPublicPage({
                   <textarea
                     name="comentario"
                     rows={3}
+                    maxLength={2000}
                     defaultValue={eligibility.existingReview?.comentario ?? ""}
                     placeholder={copy.commentPlaceholder}
                     className="mt-1 w-full rounded-xl border border-border/30 bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20"
@@ -397,7 +426,7 @@ export default async function ShelterPublicPage({
               </form>
             ) : (
               <p className="mt-4 rounded-2xl border border-border/30 bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
-                {copy.loginToReview}
+                <Link href={`/${locale}/auth/login?next=${encodeURIComponent(`/${locale}/canis/${shelter.id}#comentarios`)}`} className="font-semibold underline underline-offset-4">{copy.loginToReview}</Link>
               </p>
             )}
 
@@ -438,6 +467,20 @@ export default async function ShelterPublicPage({
         </article>
 
         <aside className="space-y-6 lg:col-span-4">
+          <section id="apoiar" className="scroll-mt-24 rounded-3xl border border-primary/15 bg-secondary/10 p-6 sm:p-8">
+            <Heart className="mb-5 h-7 w-7 text-primary" />
+            <p className="text-xs font-bold uppercase tracking-widest text-primary">{locale === "pt" ? "Faz parte desta missão" : "Be part of this mission"}</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight">{locale === "pt" ? "O teu apoio faz a diferença." : "Your support makes a difference."}</h2>
+            <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{shelter.donation_message || (locale === "pt" ? "Ajuda quem cuida deles todos os dias. Contacta o canil para conhecer as necessidades atuais: alimentação, mantas, voluntariado ou apoio veterinário." : "Help the people caring for them every day. Contact the shelter about food, blankets, volunteering or veterinary support.")}</p>
+            {shelter.verificado && shelter.donation_url?.startsWith("https://") ? (
+              <>
+                <a href={shelter.donation_url} target="_blank" rel="noopener noreferrer" className="mt-6 flex items-center justify-between rounded-full bg-primary px-5 py-3 font-semibold text-primary-foreground">
+                  {locale === "pt" ? "Fazer um donativo" : "Make a donation"}<ArrowUpRight className="h-5 w-5" />
+                </a>
+                <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{locale === "pt" ? "Abre a página de donativos indicada pelo canil. O pagamento é realizado fora da FYA." : "Opens the shelter’s donation page. Payment takes place outside FYA."}</p>
+              </>
+            ) : <p className="mt-5 rounded-xl bg-background/70 p-4 text-sm">{locale === "pt" ? "Donativos online ainda não disponíveis. Fala diretamente com o canil para ajudar." : "Online donations are not available yet. Contact the shelter to help."}</p>}
+          </section>
           <div className="rounded-3xl border border-border/20 bg-card p-6">
             <h2 className="text-lg font-bold">{copy.contactTitle}</h2>
             <ul className="mt-4 space-y-3 text-sm">

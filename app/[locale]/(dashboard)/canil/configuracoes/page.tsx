@@ -177,6 +177,17 @@ export default async function CanilSettingsPage({
             />
           </div>
 
+          <fieldset className="space-y-4 rounded-2xl bg-muted/50 p-5">
+            <legend className="font-bold">{locale === "pt" ? "Donativos" : "Donations"}</legend>
+            <label className="block text-sm">
+              {locale === "pt" ? "Link seguro para donativos (https://)" : "Secure donation link (https://)"}
+              <input name="donation_url" type="url" maxLength={2000} defaultValue={shelter?.donation_url ?? ""} className="mt-2 h-11 w-full rounded-xl border bg-background px-3" />
+            </label>
+            <label className="block text-sm">
+              {locale === "pt" ? "Como será utilizado o apoio?" : "How will donations help?"}
+              <textarea name="donation_message" maxLength={1000} rows={3} defaultValue={shelter?.donation_message ?? ""} className="mt-2 w-full rounded-xl border bg-background p-3" />
+            </label>
+          </fieldset>
           <SubmitButton
             type="submit"
             className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"

@@ -20,6 +20,7 @@ export async function submitShelterReview(formData: FormData) {
 
   if (
     !shelterId ||
+    comentario.length > 2000 ||
     !Number.isFinite(ratingValue) ||
     ratingValue < 1 ||
     ratingValue > 5

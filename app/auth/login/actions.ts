@@ -1,6 +1,7 @@
 "use server";
 
 import { safeLocalPath } from "@/lib/auth/redirect";
+import { loginErrorMessage } from "@/lib/auth/login-error";
 import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -31,8 +32,12 @@ export async function login(formData: FormData) {
   });
 
   if (error || !data.user) {
+    console.error("[login] Authentication failed", {
+      code: error?.code ?? "missing_user",
+      status: error?.status,
+    });
     redirect(
-      `/${locale}/auth/login?error=${encodeURIComponent(dictionary.auth.invalidCredentials)}`,
+      `/${locale}/auth/login?error=${encodeURIComponent(loginErrorMessage(error?.code, locale))}`,
     );
   }
 

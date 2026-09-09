@@ -1,3 +1,4 @@
+import { SocialLoginButtons } from "@/components/social-login-buttons";
 import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
 import Image from "next/image";
@@ -127,6 +128,15 @@ export default async function RegisterPage({
             </p>
           )}
 
+          <div className="mb-6 space-y-3">
+            <p className="text-sm text-muted-foreground">
+              {locale === "pt" ? "Cria a tua conta de adotante com:" : "Create your adopter account with:"}
+            </p>
+            <SocialLoginButtons locale={locale} />
+            <p className="text-center text-xs text-muted-foreground">
+              {locale === "pt" ? "ou regista-te com email" : "or register with email"}
+            </p>
+          </div>
           <form action={register} className="space-y-6">
             <input type="hidden" name="locale" value={locale} />
             <div className="space-y-2">
@@ -186,31 +196,12 @@ export default async function RegisterPage({
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label
-                htmlFor="role"
-                className="ml-1 block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground"
-              >
-                {dictionary.auth.accountType}
-              </label>
-              <select
-                id="role"
-                name="role"
-                defaultValue="user"
-                className="h-13 w-full rounded-xl bg-background px-4 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-primary/30"
-              >
-                <option value="user">{dictionary.auth.adopter}</option>
-                <option value="canil">{dictionary.auth.canil}</option>
-              </select>
-              <p className="text-xs text-muted-foreground">
-                <Link
-                  href={`/${locale}/auth/shelter-registration`}
-                  className="font-medium text-secondary hover:underline"
-                >
-                  {dictionary.auth.shelterRegistrationLink}
-                </Link>
-              </p>
-            </div>
+            <input type="hidden" name="role" value="user" />
+            <p className="text-sm text-muted-foreground">
+              <Link href={`/${locale}/auth/shelter-registration`} className="font-medium text-secondary hover:underline">
+                {dictionary.auth.shelterRegistrationLink}
+              </Link>
+            </p>
 
             <label className="flex items-start gap-3 px-1 text-sm text-muted-foreground">
               <input
