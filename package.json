@@ -16,7 +16,9 @@
     "local:seed": "node scripts/seed-local.mjs",
     "local:stop": "supabase stop",
     "test:e2e": "playwright test",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "trello:worker": "node --env-file=.env.local scripts/trello-worker.mjs",
+    "trello:admin": "node --env-file=.env.local scripts/trello-admin.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",

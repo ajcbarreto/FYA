@@ -54,3 +54,7 @@ npm run build
 A CI executa estes comandos e verifica se os tipos gerados estão sincronizados. Depois das migrações, validar com dois adotantes, dois abrigos e um administrador: isolamento de dados, candidatura repetida, mudanças de estado, visitas, fotos, favoritos e reconexão do chat.
 
 Detalhes das alterações e limites da validação estão em `docs/modernizacao-entrega.md`.
+
+## Fila de desenvolvimento Trello
+
+Integração opt-in com webhook assinado, fila Supabase e worker local Codex. Configuração, deployment, estados e recuperação em [docs/trello-codex-automation.md](docs/trello-codex-automation.md).

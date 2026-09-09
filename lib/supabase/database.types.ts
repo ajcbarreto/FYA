@@ -226,17 +226,17 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: "canil_likes_canil_id_fkey";
-            columns: ["canil_id"];
-            isOneToOne: false;
-            referencedRelation: "canis";
-            referencedColumns: ["id"];
-          },
-          {
             foreignKeyName: "canil_likes_user_profile_id_fkey";
             columns: ["user_profile_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "canil_likes_canil_id_fkey";
+            columns: ["canil_id"];
+            isOneToOne: false;
+            referencedRelation: "canis";
             referencedColumns: ["id"];
           },
         ];
@@ -595,6 +595,66 @@ export type Database = {
           },
         ];
       };
+      trello_events: {
+        Row: {
+          event_id: string;
+          card_id: string;
+          received_at: string;
+        };
+        Insert: {
+          event_id: string;
+          card_id: string;
+          received_at?: string;
+        };
+        Update: {
+          event_id?: string;
+          card_id?: string;
+          received_at?: string;
+        };
+        Relationships: [];
+      };
+      trello_jobs: {
+        Row: {
+          card_id: string;
+          state: string;
+          branch: string | null;
+          run_id: string | null;
+          owner: string | null;
+          claimed_at: string | null;
+          attempts: number;
+          next_attempt_at: string;
+          checkpoint: Json;
+          delivery_pending: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          card_id: string;
+          state?: string;
+          branch?: string | null;
+          run_id?: string | null;
+          owner?: string | null;
+          claimed_at?: string | null;
+          attempts?: number;
+          next_attempt_at?: string;
+          checkpoint?: Json;
+          delivery_pending?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          card_id?: string;
+          state?: string;
+          branch?: string | null;
+          run_id?: string | null;
+          owner?: string | null;
+          claimed_at?: string | null;
+          attempts?: number;
+          next_attempt_at?: string;
+          checkpoint?: Json;
+          delivery_pending?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       visitas: {
         Row: {
           id: string;
@@ -663,9 +723,29 @@ export type Database = {
     };
     Views: Record<string, never>;
     Functions: {
+      trello_enqueue: {
+        Args: { p_event: string; p_card: string };
+        Returns: boolean;
+      };
       submit_adoption: {
         Args: { p_animal: string; p_answers: Json; p_message: string };
         Returns: string;
+      };
+      trello_claim: {
+        Args: { p_run: string; p_owner: string };
+        Returns: Database["public"]["Tables"]["trello_jobs"]["Row"][];
+      };
+      trello_save: {
+        Args: {
+          p_card: string;
+          p_run: string;
+          p_state: string;
+          p_branch: string;
+          p_checkpoint: Json;
+          p_delivery: boolean;
+          p_delay: number;
+        };
+        Returns: boolean;
       };
       transition_adoption: {
         Args: { p_request: string; p_status: string; p_notes: string };
