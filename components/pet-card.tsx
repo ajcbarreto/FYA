@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { PetCardPhotos } from "@/components/pet-card-photos";
 import Link from "next/link";
 import { ArrowUpRight, MapPin } from "lucide-react";
 import type { PetCatalogItem } from "@/lib/pet-catalog/db-pets";
@@ -14,30 +14,18 @@ export function PetCard({
   isFavorite?: boolean;
   returnTo?: string;
 }) {
+  const href = `/${locale}/pets/${pet.id}${returnTo ? `?back=${encodeURIComponent(returnTo)}` : ""}`;
   return (
     <article className="pet-card">
-      <Link
-        href={`/${locale}/pets/${pet.id}${returnTo ? `?back=${encodeURIComponent(returnTo)}` : ""}`}
-        className="group block"
-      >
-        <div className="relative aspect-[5/4] overflow-hidden bg-muted">
-          <Image
-            src={pet.imageUrl}
-            alt={
-              pet.imageUrl.includes("placeholder")
-                ? locale === "pt"
-                  ? "Fotografia indisponível"
-                  : "Photo unavailable"
-                : pet.name
-            }
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-          />
-          <span className="absolute bottom-3 left-3 rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-semibold text-primary">
-            {pet.status}
-          </span>
-        </div>
+      <PetCardPhotos
+        key={JSON.stringify([pet.id, pet.imageUrls, pet.imageUrl])}
+        name={pet.name}
+        imageUrls={pet.imageUrls?.length ? pet.imageUrls : [pet.imageUrl]}
+        status={pet.status}
+        locale={locale}
+        href={href}
+      />
+      <Link href={href} className="group block">
         <div className="p-5">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-bold tracking-tight">{pet.name}</h3>

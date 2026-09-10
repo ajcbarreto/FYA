@@ -1,5 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { listPrimaryPhotosForAnimals } from "@/lib/canil/animal-photos";
+import {
+  listPhotosForAnimals,
+  listPrimaryPhotosForAnimals,
+} from "@/lib/canil/animal-photos";
 import {
   sexLabel,
   sizeLabel,
@@ -21,6 +24,7 @@ export type PetCatalogItem = {
   description: string;
   status: string;
   imageUrl: string;
+  imageUrls?: string[];
 };
 
 export type AnimalRow = {
@@ -120,13 +124,17 @@ async function applyPhotoOverrides(
   locale: string,
 ): Promise<PetCatalogItem[]> {
   if (animals.length === 0) return [];
-  const photoMap = await listPrimaryPhotosForAnimals(
+  const photoMap = await listPhotosForAnimals(
     supabase,
     animals.map((animal) => animal.id),
   );
-  return animals.map((animal) =>
-    toCatalogItem(animal, locale, photoMap.get(animal.id)),
-  );
+  return animals.map((animal) => {
+    const imageUrls = photoMap.get(animal.id) ?? [];
+    return {
+      ...toCatalogItem(animal, locale, imageUrls[0]),
+      imageUrls,
+    };
+  });
 }
 
 export async function getCatalogPets(
