@@ -1,3 +1,4 @@
+import { RegistrationPassword } from "@/components/registration-password";
 import { SocialLoginButtons } from "@/components/social-login-buttons";
 import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
@@ -194,14 +195,10 @@ export default async function RegisterPage({
                 {dictionary.auth.password}
               </label>
               <div className="relative">
-                <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  minLength={6}
-                  required
-                  className="h-13 w-full rounded-xl bg-background px-12 pr-4 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-primary/30"
+                <Lock className="pointer-events-none absolute z-10 left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <RegistrationPassword
+                  locale={locale}
+                  className="h-13 w-full rounded-xl bg-background pl-12 pr-12 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-primary/30"
                 />
               </div>
             </div>

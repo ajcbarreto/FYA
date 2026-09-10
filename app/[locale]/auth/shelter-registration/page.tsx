@@ -1,3 +1,4 @@
+import { RegistrationPassword } from "@/components/registration-password";
 import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
 import Image from "next/image";
@@ -304,13 +305,9 @@ export default async function ShelterRegistrationPage({
                 >
                   {dictionary.auth.password}
                 </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  minLength={6}
-                  required
-                  className="h-13 w-full rounded-xl bg-muted px-6 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-secondary/35"
+                <RegistrationPassword
+                  locale={locale}
+                  className="h-13 w-full rounded-xl bg-muted pl-6 pr-12 text-sm outline-none ring-0 transition-colors focus:ring-2 focus:ring-secondary/35"
                 />
               </div>
             </div>
