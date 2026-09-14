@@ -1,8 +1,8 @@
 import { LocaleDocument } from "@/components/locale-document";
+import { NavigationProgress } from "@/components/navigation-progress";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Navbar } from "@/components/navbar";
-import { NavbarSkeleton } from "@/components/navbar-skeleton";
 import { SiteFooter } from "@/components/site-footer";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 
@@ -24,9 +24,10 @@ export default async function LocaleLayout({
   return (
     <>
       <LocaleDocument locale={locale} />
-      <Suspense fallback={<NavbarSkeleton locale={locale as Locale} />}>
-        <Navbar locale={locale as Locale} />
+      <Suspense fallback={null}>
+        <NavigationProgress />
       </Suspense>
+      <Navbar locale={locale as Locale} />
       {children}
       <SiteFooter locale={locale as Locale} />
     </>

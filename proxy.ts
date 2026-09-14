@@ -1,5 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { defaultLocale, isLocale } from "./lib/i18n/config";
+import {
+  isLocale,
+  LOCALE_COOKIE,
+  resolvePreferredLocale,
+  type Locale,
+} from "./lib/i18n/config";
 import { resolveUserRole } from "./lib/auth/role";
 import { createProxySupabaseClient } from "./lib/supabase/proxy-client";
 import { hasSupabaseEnv } from "./lib/supabase/config";
@@ -10,6 +15,16 @@ const protectedRoles: Record<string, UserRole> = {
   canil: "canil",
   admin: "admin",
 };
+
+function withLocaleCookie(response: NextResponse, locale: Locale) {
+  response.cookies.set(LOCALE_COOKIE, locale, {
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+    sameSite: "lax",
+  });
+  return response;
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   if (pathname.startsWith("/auth/callback") || pathname.startsWith("/api/"))
@@ -17,29 +32,41 @@ export async function proxy(request: NextRequest) {
   const segments = pathname.split("/").filter(Boolean);
   const locale = segments[0];
   if (!isLocale(locale)) {
+    const preferred = resolvePreferredLocale(
+      request.headers.get("accept-language"),
+      request.cookies.get(LOCALE_COOKIE)?.value,
+    );
     const url = request.nextUrl.clone();
-    url.pathname = `/${defaultLocale}${pathname}`;
-    return NextResponse.redirect(url);
+    url.pathname = `/${preferred}${pathname}`;
+    return withLocaleCookie(NextResponse.redirect(url), preferred);
   }
-  request.headers.set("x-fya-locale", locale);
-  const next = NextResponse.next({ request: { headers: request.headers } });
+  const activeLocale = locale as Locale;
+  request.headers.set("x-fya-locale", activeLocale);
+  request.headers.set("x-fya-pathname", pathname);
+  const next = withLocaleCookie(
+    NextResponse.next({ request: { headers: request.headers } }),
+    activeLocale,
+  );
   const required = protectedRoles[segments[1]];
   if (!hasSupabaseEnv) {
     return required
-      ? NextResponse.redirect(new URL(`/${locale}/auth/login`, request.url))
+      ? withLocaleCookie(
+          NextResponse.redirect(new URL(`/${activeLocale}/auth/login`, request.url)),
+          activeLocale,
+        )
       : next;
   }
+  if (!required) return next;
   const client = createProxySupabaseClient(request);
   const {
     data: { user },
   } = await client.supabase.auth.getUser();
-  if (!required) return client.response;
   const redirectTo = (path: string) => {
     const response = NextResponse.redirect(new URL(path, request.url));
     client.response.cookies
       .getAll()
       .forEach((cookie) => response.cookies.set(cookie));
-    return response;
+    return withLocaleCookie(response, activeLocale);
   };
   if (!user)
     return redirectTo(
@@ -52,7 +79,7 @@ export async function proxy(request: NextRequest) {
   } catch {
     return redirectTo(`/${locale}/auth/login?error=permissions_unavailable`);
   }
-  return client.response;
+  return withLocaleCookie(client.response, activeLocale);
 }
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],

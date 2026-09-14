@@ -20,32 +20,67 @@ type Dictionary = {
     logout: string;
   };
   home: {
+    hero: {
+      eyebrow: string;
+      titleLine1: string;
+      titleLine2: string;
+      subtitle: string;
+      searchLabel: string;
+      searchPlaceholder: string;
+      searchAriaLabel: string;
+      quickMeetLabel: string;
+      species: {
+        dog: string;
+        cat: string;
+        other: string;
+      };
+      heroImageAlt: string;
+      illustrativeBadge: string;
+      cardTitle: string;
+      cardSubtitle: string;
+    };
+    trustBar: [string, string, string];
+    featured: {
+      eyebrow: string;
+      title: string;
+      viewAll: string;
+      emptyDescription: string;
+      exploreCatalog: string;
+    };
+    journey: {
+      eyebrow: string;
+      title: string;
+      helpChoose: string;
+      steps: [
+        { title: string; text: string },
+        { title: string; text: string },
+        { title: string; text: string },
+      ];
+    };
+  };
+  footer: {
+    tagline: string;
+    findConnection: string;
+    links: {
+      pets: string;
+      shelters: string;
+      stories: string;
+      about: string;
+    };
+    joinTitle: string;
+    joinDescription: string;
+    registerShelter: string;
+    closingLine: string;
+  };
+  aboutFamily: {
+    imageAlt: string;
+    quote: string;
     eyebrow: string;
     title: string;
-    subtitle: string;
-    primaryCta: string;
-    secondaryCta: string;
-    featureTitle: string;
-    features: {
-      adopterTitle: string;
-      adopterDescription: string;
-      shelterTitle: string;
-      shelterDescription: string;
-      secureTitle: string;
-      secureDescription: string;
-    };
-    howItWorksTitle: string;
-    steps: {
-      searchTitle: string;
-      searchDescription: string;
-      connectTitle: string;
-      connectDescription: string;
-      adoptTitle: string;
-      adoptDescription: string;
-    };
-    finalCtaTitle: string;
-    finalCtaDescription: string;
-    finalCtaButton: string;
+    paragraph1: string;
+    paragraph2: string;
+    closingQuote: string;
+    cta: string;
   };
   auth: {
     loginTitle: string;
@@ -200,40 +235,87 @@ const dictionaries: Record<Locale, Dictionary> = {
       logout: "Sair",
     },
     home: {
-      eyebrow: "FYA (Found Your Animal)",
-      title: "FYA (Found Your Animal)",
-      subtitle:
-        "Ligamos animais a familias com uma experiencia simples, segura e preparada para adocao responsavel.",
-      primaryCta: "Registar canil",
-      secondaryCta: "Explorar dashboards",
-      featureTitle: "Porque escolher a FYA",
-      features: {
-        adopterTitle: "Para Adotantes",
-        adopterDescription:
-          "Descoberta inteligente, perfis claros e comunicacao segura com canis.",
-        shelterTitle: "Para Canis",
-        shelterDescription:
-          "Gestao eficiente de animais e candidaturas com foco em processos transparentes.",
-        secureTitle: "Segura e Confiavel",
-        secureDescription:
-          "Perfis verificados e acesso por perfis para proteger cada interacao.",
+      hero: {
+        eyebrow: "Pequenos encontros. Grandes histórias.",
+        titleLine1: "O teu melhor amigo",
+        titleLine2: "está por aqui.",
+        subtitle:
+          "Há uma nova história à tua espera. Conhece animais para adoção e os abrigos que cuidam deles, até encontrarem um lugar a que chamar casa.",
+        searchLabel: "Procurar um animal",
+        searchPlaceholder: "Quem gostavas de conhecer?",
+        searchAriaLabel: "Pesquisar",
+        quickMeetLabel: "Quero conhecer",
+        species: {
+          dog: "Cães",
+          cat: "Gatos",
+          other: "Outros amigos",
+        },
+        heroImageAlt: "Retrato ilustrativo de um cão ao ar livre",
+        illustrativeBadge: "Imagem ilustrativa",
+        cardTitle: "Uma casa muda tudo.",
+        cardSubtitle: "A próxima história pode ser a tua.",
       },
-      howItWorksTitle: "Como funciona",
-      steps: {
-        searchTitle: "1. Pesquisar",
-        searchDescription:
-          "Procura animais e oportunidades alinhadas com o teu perfil.",
-        connectTitle: "2. Conectar",
-        connectDescription:
-          "Fala com canis e acompanha todo o processo num so lugar.",
-        adoptTitle: "3. Adotar",
-        adoptDescription:
-          "Conclui a adocao com mais confianca e acompanhamento.",
+      trustBar: [
+        "Adoção com responsabilidade",
+        "Contacto direto com os abrigos",
+        "Acompanhamento em cada passo",
+      ],
+      featured: {
+        eyebrow: "À procura de uma família",
+        title: "Um encontro que fica.",
+        viewAll: "Conhecer todos",
+        emptyDescription:
+          "Cada adoção começa por conhecer melhor um animal. Explora o catálogo e encontra os próximos companheiros.",
+        exploreCatalog: "Explorar catálogo",
       },
-      finalCtaTitle: "Pronto para encontrar o teu animal?",
-      finalCtaDescription:
-        "Junta-te a adotantes e canis que ja usam a FYA para criar matches reais.",
-      finalCtaButton: "Comecar agora",
+      journey: {
+        eyebrow: "Mais perto de casa",
+        title: "O início de uma boa história.",
+        helpChoose: "Ajuda-me a escolher",
+        steps: [
+          {
+            title: "Encontra uma ligação",
+            text: "Descobre os animais, as suas histórias e as necessidades de cada um.",
+          },
+          {
+            title: "Vamos conversar",
+            text: "Apresenta-te ao abrigo, coloca as tuas dúvidas e combina uma visita.",
+          },
+          {
+            title: "Abre a porta de casa",
+            text: "Prepara a chegada com o abrigo e acompanha cada etapa da adoção.",
+          },
+        ],
+      },
+    },
+    footer: {
+      tagline:
+        "Ajudamos animais e pessoas a escrever a sua próxima história. Juntos.",
+      findConnection: "Encontra uma ligação",
+      links: {
+        pets: "Animais para adoção",
+        shelters: "Conhecer os abrigos",
+        stories: "Novos começos",
+        about: "Sobre nós",
+      },
+      joinTitle: "Faz parte",
+      joinDescription:
+        "Representas um abrigo? Dá a conhecer os animais que esperam por uma família.",
+      registerShelter: "Registar o meu abrigo",
+      closingLine: "Mais encontros. Mais finais felizes.",
+    },
+    aboutFamily: {
+      imageAlt:
+        "Retrato ilustrado da família FYA: o casal e o filho junto ao rio",
+      quote: "Uma família. Uma paixão em comum.",
+      eyebrow: "Sobre nós",
+      title: "O amor pelos animais começa em casa.",
+      paragraph1:
+        "Somos uma família — um casal e o nosso filho — unida pela paixão pelos animais. A FYA nasce dessa ligação e da vontade de a transformar em ajuda para quem mais precisa.",
+      paragraph2:
+        "Queremos dar mais visibilidade aos animais dos canis e abrigos e ajudar os animais abandonados a encontrar uma família. Aproximamos quem cuida deles de quem está pronto para lhes abrir a porta de casa, com tempo, carinho e responsabilidade.",
+      closingQuote: "Porque todos merecem um lugar onde pertencer.",
+      cta: "Conhece quem espera por uma família",
     },
     auth: {
       loginTitle: "Entrar",
@@ -396,40 +478,87 @@ const dictionaries: Record<Locale, Dictionary> = {
       logout: "Sign out",
     },
     home: {
-      eyebrow: "FYA (Found Your Animal)",
-      title: "FYA (Found Your Animal)",
-      subtitle:
-        "We connect pets and families through a simple, secure, and adoption-focused experience.",
-      primaryCta: "Register shelter",
-      secondaryCta: "Browse dashboards",
-      featureTitle: "Why choose FYA",
-      features: {
-        adopterTitle: "For Adopters",
-        adopterDescription:
-          "Smart discovery, clear profiles, and secure communication with shelters.",
-        shelterTitle: "For Shelters",
-        shelterDescription:
-          "Efficient management for pets and applications with transparent workflows.",
-        secureTitle: "Secure and Trusted",
-        secureDescription:
-          "Verified profiles and role-based access to protect every interaction.",
+      hero: {
+        eyebrow: "Small encounters. Big stories.",
+        titleLine1: "Your best friend",
+        titleLine2: "is waiting here.",
+        subtitle:
+          "A new story is waiting for you. Meet animals looking for a home and the shelters caring for them along the way.",
+        searchLabel: "Find an animal",
+        searchPlaceholder: "Who would you like to meet?",
+        searchAriaLabel: "Search",
+        quickMeetLabel: "I'd love to meet",
+        species: {
+          dog: "Dogs",
+          cat: "Cats",
+          other: "Other friends",
+        },
+        heroImageAlt: "Illustrative portrait of a dog outdoors",
+        illustrativeBadge: "Illustrative image",
+        cardTitle: "A home changes everything.",
+        cardSubtitle: "The next story could be yours.",
       },
-      howItWorksTitle: "How it works",
-      steps: {
-        searchTitle: "1. Search",
-        searchDescription:
-          "Find pets and opportunities that match your profile.",
-        connectTitle: "2. Connect",
-        connectDescription:
-          "Talk to shelters and track every step in one place.",
-        adoptTitle: "3. Adopt",
-        adoptDescription:
-          "Complete the adoption journey with confidence and guidance.",
+      trustBar: [
+        "Responsible adoption",
+        "Direct contact with shelters",
+        "Support at every step",
+      ],
+      featured: {
+        eyebrow: "Looking for a family",
+        title: "A connection that lasts.",
+        viewAll: "Meet them all",
+        emptyDescription:
+          "Every adoption starts by getting to know an animal. Explore the catalog to find your next companion.",
+        exploreCatalog: "Explore catalog",
       },
-      finalCtaTitle: "Ready to find your animal?",
-      finalCtaDescription:
-        "Join adopters and shelters already using FYA to create real matches.",
-      finalCtaButton: "Get started today",
+      journey: {
+        eyebrow: "Closer to home",
+        title: "The start of a good story.",
+        helpChoose: "Help me choose",
+        steps: [
+          {
+            title: "Find a connection",
+            text: "Discover animals, their stories and their individual needs.",
+          },
+          {
+            title: "Start a conversation",
+            text: "Introduce yourself to the shelter, ask questions and arrange a visit.",
+          },
+          {
+            title: "Open your door",
+            text: "Prepare for their arrival with the shelter and follow every step.",
+          },
+        ],
+      },
+    },
+    footer: {
+      tagline:
+        "Helping animals and people write their next story. Together.",
+      findConnection: "Find a connection",
+      links: {
+        pets: "Animals for adoption",
+        shelters: "Meet the shelters",
+        stories: "New beginnings",
+        about: "About us",
+      },
+      joinTitle: "Be part of it",
+      joinDescription:
+        "Represent a shelter? Introduce the animals waiting for a family.",
+      registerShelter: "Register my shelter",
+      closingLine: "More connections. More happy endings.",
+    },
+    aboutFamily: {
+      imageAlt:
+        "Illustrated portrait of the FYA family: the couple and their son by the river",
+      quote: "One family. One shared passion.",
+      eyebrow: "About us",
+      title: "Our love for animals starts at home.",
+      paragraph1:
+        "We are a family — a couple and our son — brought together by a love of animals. FYA grows out of that bond and our wish to turn it into help for those who need it most.",
+      paragraph2:
+        "We want to give animals in shelters more visibility and help abandoned animals find a family. We connect the people caring for them with those ready to welcome them home with time, kindness and responsibility.",
+      closingQuote: "Because everyone deserves a place to belong.",
+      cta: "Meet those waiting for a family",
     },
     auth: {
       loginTitle: "Login",

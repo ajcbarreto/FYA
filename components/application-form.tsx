@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Check, LoaderCircle } from "lucide-react";
 import { submitAdoptionRequest } from "@/app/adoption/actions";
+import { notifyNavigationStart } from "@/lib/navigation-events";
 const fieldNames = [
   "housing_type",
   "household_size",
@@ -217,6 +218,7 @@ export function ApplicationForm({
             } catch {
               /* Navigation must succeed even when storage is blocked. */
             }
+            notifyNavigationStart();
             router.push(
               `/${locale}/user/mensagens?conversation=${result.conversationId}&success=request_created`,
             );

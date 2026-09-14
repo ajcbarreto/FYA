@@ -1,3 +1,4 @@
+import { ClientGetForm } from "@/components/client-get-form";
 import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -74,7 +75,7 @@ export default async function SheltersDirectoryPage({
         </p>
       </header>
 
-      <form method="get" className="mb-8 flex gap-2">
+      <ClientGetForm action={`/${locale}/canis`} className="mb-8 flex gap-2">
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -91,7 +92,7 @@ export default async function SheltersDirectoryPage({
         >
           {copy.submit}
         </SubmitButton>
-      </form>
+      </ClientGetForm>
 
       {shelters.length === 0 ? (
         <p className="rounded-3xl border border-border/30 bg-card p-10 text-center text-sm text-muted-foreground">

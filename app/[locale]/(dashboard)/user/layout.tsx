@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { getAuthUser } from "@/lib/supabase/get-user";
 import { UserSidebar } from "@/components/user-sidebar";
 
 type UserLayoutProps = {
@@ -18,10 +18,7 @@ export default async function UserLayout({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   if (!user) {
     redirect(`/${locale}/auth/login?next=/user`);

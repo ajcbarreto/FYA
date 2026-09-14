@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { getAuthUser } from "@/lib/supabase/get-user";
 import { resolveUserRole } from "@/lib/auth/role";
 import { AdminSidebar } from "@/components/admin-sidebar";
 
@@ -19,12 +19,9 @@ export default async function AdminLayout({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthUser();
 
-  if (!user) {
+  if (!user || !supabase) {
     redirect(`/${locale}/auth/login?next=/admin`);
   }
 

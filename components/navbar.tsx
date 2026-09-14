@@ -1,146 +1,19 @@
+import { Suspense } from "react";
 import { Brand } from "@/components/brand";
-import { hasSupabaseEnv } from "@/lib/supabase/config";
 import Link from "next/link";
-import { Bell, Heart, MessageCircle } from "lucide-react";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { resolveUserRole } from "@/lib/auth/role";
-import { getUnreadNotificationsCount } from "@/lib/notifications/db";
-import { getUnreadMessagesCount } from "@/lib/adoption/db";
-import type { UserRole } from "@/lib/supabase/types";
-import { AccountDropdown } from "@/components/account-dropdown";
-import { MobileMenu, type MobileLink } from "@/components/mobile-menu";
+import { NavbarActions } from "@/components/navbar-actions";
+import { NavbarActionsSkeleton } from "@/components/navbar-actions-skeleton";
+import { NavbarDashboardLink } from "@/components/navbar-dashboard-link";
 
 type NavbarProps = {
   locale: Locale;
 };
 
-export async function Navbar({ locale }: NavbarProps) {
+export function Navbar({ locale }: NavbarProps) {
   const dictionary = getDictionary(locale);
-  const supabase = hasSupabaseEnv ? await createServerSupabaseClient() : null;
-  const {
-    data: { user },
-  } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
-
-  let role: UserRole | null = null;
-  let fullName: string | null = null;
-  let email: string | null = null;
-  let unreadNotifications = 0;
-  let unreadMessages = 0;
-
-  if (user && supabase) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("full_name,email")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    fullName = profile?.full_name ?? null;
-    email = profile?.email ?? user.email ?? null;
-    [role, unreadNotifications, unreadMessages] = await Promise.all([
-      resolveUserRole(supabase, user),
-      getUnreadNotificationsCount(supabase, user.id),
-      getUnreadMessagesCount(supabase, user.id),
-    ]);
-  }
-
-  const roleDashboardHref =
-    role === "admin"
-      ? `/${locale}/admin`
-      : role === "canil"
-        ? `/${locale}/canil`
-        : `/${locale}/user`;
-  const roleDashboardLabel =
-    role === "admin"
-      ? dictionary.nav.admin
-      : role === "canil"
-        ? dictionary.nav.canilDashboard
-        : dictionary.nav.userDashboard;
-  const roleSettingsHref =
-    role === "admin"
-      ? `/${locale}/admin/configuracoes`
-      : role === "canil"
-        ? `/${locale}/canil/configuracoes`
-        : `/${locale}/user/configuracoes`;
-  const roleSettingsLabel =
-    role === "canil"
-      ? dictionary.nav.canilSettings
-      : dictionary.nav.userSettings;
-  const roleLabel =
-    role === "admin"
-      ? locale === "pt"
-        ? "Administrador"
-        : "Administrator"
-      : role === "canil"
-        ? "Canil"
-        : locale === "pt"
-          ? "Adotante"
-          : "Adopter";
-  const userDisplayName =
-    fullName?.trim() ||
-    (email?.includes("@") ? email.split("@")[0] : null) ||
-    (locale === "pt" ? "Conta" : "Account");
-  const userInitial = userDisplayName.charAt(0).toUpperCase();
-  const menuCopy =
-    locale === "pt"
-      ? {
-          openMenu: "Abrir menu da conta",
-          panel: "Meu painel",
-          settings: "Configuracoes",
-          logout: "Terminar sessao",
-        }
-      : {
-          openMenu: "Open account menu",
-          panel: "My dashboard",
-          settings: "Settings",
-          logout: "Sign out",
-        };
-
-  const mobileLinks: MobileLink[] = [
-    { href: `/${locale}`, label: dictionary.nav.home },
-    { href: `/${locale}/pets`, label: dictionary.nav.pets },
-    { href: `/${locale}/canis`, label: dictionary.nav.shelters },
-    { href: `/${locale}/historias`, label: dictionary.nav.stories },
-  ];
-  if (user) {
-    mobileLinks.push({
-      href: `/${locale}/notificacoes`,
-      label: dictionary.nav.notifications,
-    });
-  }
-  if (role === "user") {
-    mobileLinks.push(
-      { href: `/${locale}/user`, label: dictionary.nav.userDashboard },
-      {
-        href: `/${locale}/user/favoritos`,
-        label: dictionary.nav.userFavorites,
-      },
-      { href: `/${locale}/user/pedidos`, label: dictionary.nav.userRequests },
-      { href: `/${locale}/user/mensagens`, label: dictionary.nav.userMessages },
-    );
-  } else if (role === "canil") {
-    mobileLinks.push(
-      { href: `/${locale}/canil`, label: dictionary.nav.canilDashboard },
-      {
-        href: `/${locale}/canil/configuracoes`,
-        label: dictionary.nav.canilSettings,
-      },
-    );
-  } else if (role === "admin") {
-    mobileLinks.push({ href: `/${locale}/admin`, label: dictionary.nav.admin });
-  }
-  if (!user) {
-    mobileLinks.push(
-      { href: `/${locale}/auth/login`, label: dictionary.nav.login },
-      { href: `/${locale}/auth/register`, label: dictionary.nav.register },
-    );
-  }
-  const mobileMenuCopy =
-    locale === "pt"
-      ? { open: "Abrir menu", close: "Fechar menu" }
-      : { open: "Open menu", close: "Close menu" };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
@@ -178,97 +51,16 @@ export async function Navbar({ locale }: NavbarProps) {
             >
               {dictionary.nav.stories}
             </Link>
-
-            {user && (
-              <Link
-                href={roleDashboardHref}
-                className="rounded-full bg-muted px-4 py-2 text-primary"
-              >
-                {roleDashboardLabel}
-              </Link>
-            )}
+            <Suspense fallback={null}>
+              <NavbarDashboardLink locale={locale} />
+            </Suspense>
           </div>
 
           <div className="flex items-center gap-2">
             <LanguageSwitcher locale={locale} />
-
-            {role === "user" && (
-              <Link
-                href={`/${locale}/user/favoritos`}
-                aria-label={dictionary.nav.userFavorites}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
-              >
-                <Heart className="h-5 w-5" />
-              </Link>
-            )}
-
-            {user && (role === "user" || role === "canil") && (
-              <Link
-                href={`/${locale}/${role === "canil" ? "canil" : "user"}/mensagens`}
-                aria-label={dictionary.nav.userMessages}
-                className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
-              >
-                <MessageCircle className="h-5 w-5" />
-                {unreadMessages > 0 && (
-                  <span className="absolute right-0 top-0 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-white ring-2 ring-background">
-                    {unreadMessages > 9 ? "9+" : unreadMessages}
-                  </span>
-                )}
-              </Link>
-            )}
-
-            {user && (
-              <Link
-                href={`/${locale}/notificacoes`}
-                aria-label={dictionary.nav.notifications}
-                className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
-              >
-                <Bell className="h-5 w-5" />
-                {unreadNotifications > 0 && (
-                  <span className="absolute right-0 top-0 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground ring-2 ring-background">
-                    {unreadNotifications > 9 ? "9+" : unreadNotifications}
-                  </span>
-                )}
-              </Link>
-            )}
-
-            {!user && (
-              <Link
-                href={`/${locale}/auth/login`}
-                className="hidden h-10 items-center rounded-lg px-4 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:inline-flex"
-              >
-                {dictionary.nav.login}
-              </Link>
-            )}
-            {!user && (
-              <Link
-                href={`/${locale}/auth/register`}
-                className="inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                {dictionary.nav.register}
-              </Link>
-            )}
-
-            {user && (
-              <AccountDropdown
-                locale={locale}
-                displayName={userDisplayName}
-                email={email}
-                initial={userInitial}
-                roleLabel={roleLabel}
-                dashboardHref={roleDashboardHref}
-                dashboardLabel={roleDashboardLabel}
-                settingsHref={roleSettingsHref}
-                settingsLabel={roleSettingsLabel}
-                menuCopy={menuCopy}
-              />
-            )}
-
-            <MobileMenu
-              links={mobileLinks}
-              openLabel={mobileMenuCopy.open}
-              closeLabel={mobileMenuCopy.close}
-            />
+            <Suspense fallback={<NavbarActionsSkeleton />}>
+              <NavbarActions locale={locale} />
+            </Suspense>
           </div>
         </div>
       </nav>

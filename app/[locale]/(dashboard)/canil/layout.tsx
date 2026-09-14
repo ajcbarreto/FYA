@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { getAuthUser } from "@/lib/supabase/get-user";
 import { CanilSidebar } from "@/components/canil-sidebar";
 
 type CanilLayoutProps = {
@@ -18,10 +18,7 @@ export default async function CanilLayout({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   if (!user) {
     redirect(`/${locale}/auth/login?next=/canil`);

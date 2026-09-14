@@ -1,23 +1,23 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
+import { Suspense } from "react";
 import {
   Search,
   ArrowUpRight,
   SlidersHorizontal,
-  X,
-  PawPrint,
 } from "lucide-react";
+import { CatalogPetResults } from "@/components/catalog-pet-results";
+import { ClientGetForm } from "@/components/client-get-form";
+import { CatalogResultsSkeleton } from "@/components/skeletons/catalog-results-skeleton";
 import { isLocale } from "@/lib/i18n/config";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getCatalogPets, getCatalogPetsCount } from "@/lib/pet-catalog/db-pets";
-import { getFavoriteAnimalIds } from "@/lib/favorites/db";
 import {
   getPetCatalogFiltersConfig,
   normalizePetCatalogFiltersConfig,
 } from "@/lib/pet-catalog/filter-config";
 import { configuredOptions } from "@/lib/pet-catalog/options";
-import { PetCard } from "@/components/pet-card";
+
 export default async function Catalog({
   params,
   searchParams,
@@ -31,8 +31,8 @@ export default async function Catalog({
   const values = await searchParams;
   const value = (key: string) =>
     typeof values[key] === "string" ? values[key]!.trim().slice(0, 120) : "";
-  const q = value("q"),
-    location = value("location");
+  const q = value("q");
+  const location = value("location");
   const supabase = hasSupabaseEnv ? await createServerSupabaseClient() : null;
   const config = supabase
     ? await getPetCatalogFiltersConfig(supabase)
@@ -87,30 +87,7 @@ export default async function Catalog({
   if (q) urlParams.set("q", q);
   if (location) urlParams.set("location", location);
   for (const [k, v] of Object.entries(selected)) if (v) urlParams.set(k, v);
-  const href = (page: number) => {
-    const p = new URLSearchParams(urlParams);
-    if (page > 1) p.set("page", String(page));
-    return `/${locale}/pets${p.size ? `?${p}` : ""}`;
-  };
-  const total = supabase ? await getCatalogPetsCount(supabase, options) : 0;
-  const pages = Math.max(1, Math.ceil(total / 16));
-  const requested = Math.max(1, Number.parseInt(value("page"), 10) || 1);
-  const page = Math.min(requested, pages);
-  if (requested !== page) redirect(href(page));
-  const [pets, auth] = supabase
-    ? await Promise.all([
-        getCatalogPets(supabase, locale, { ...options, limit: 16, page }),
-        supabase.auth.getUser(),
-      ])
-    : [[], { data: { user: null } }];
-  const favorites =
-    supabase && auth.data.user
-      ? await getFavoriteAnimalIds(supabase, auth.data.user.id)
-      : new Set<string>();
-  const active = Array.from(urlParams.entries());
-  const pageNumbers = Array.from(new Set([1, page - 1, page, page + 1, pages]))
-    .filter((n) => n > 0 && n <= pages)
-    .sort((a, b) => a - b);
+
   return (
     <main id="main-content" tabIndex={-1} className="page-shell">
       <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
@@ -141,7 +118,7 @@ export default async function Catalog({
             : "These results follow your preferred species and, where relevant, apartment compatibility confirmed by the shelter. Discuss your available time and each animal’s needs with the team; size does not determine their routine."}
         </p>
       )}
-      <form method="get" className="surface mb-8 space-y-5">
+      <ClientGetForm action={`/${locale}/pets`} className="surface mb-8 space-y-5">
         <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
           <label className="relative">
             <span className="sr-only">
@@ -209,40 +186,7 @@ export default async function Catalog({
             ))}
           </div>
         </details>
-      </form>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm font-semibold">
-          {total}{" "}
-          {pt
-            ? total === 1
-              ? "animal encontrado"
-              : "animais encontrados"
-            : total === 1
-              ? "animal found"
-              : "animals found"}
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {active.map(([key, v]) => {
-            const p = new URLSearchParams(urlParams);
-            p.delete(key);
-            const label =
-              selects
-                .find((s) => s.name === key)
-                ?.options.find((o) => o.value === v)?.label ?? v;
-            return (
-              <Link
-                key={key}
-                href={`/${locale}/pets?${p}`}
-                className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-2 text-xs"
-                aria-label={`${pt ? "Remover" : "Remove"} ${label}`}
-              >
-                {label}
-                <X className="size-3" />
-              </Link>
-            );
-          })}
-        </div>
-      </div>
+      </ClientGetForm>
       {!hasSupabaseEnv && (
         <p
           role="status"
@@ -253,67 +197,15 @@ export default async function Catalog({
             : "The catalog is temporarily unavailable. Please try again later."}
         </p>
       )}
-      {pets.length ? (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {pets.map((pet) => (
-            <PetCard
-              key={pet.id}
-              pet={pet}
-              locale={locale}
-              isFavorite={favorites.has(pet.id)}
-              returnTo={href(page)}
-            />
-          ))}
-        </div>
-      ) : (
-        hasSupabaseEnv && (
-          <div className="surface py-16 text-center">
-            <PawPrint className="mx-auto mb-5 size-10 text-secondary" />
-            <h2 className="text-2xl font-semibold">
-              {pt
-                ? "Ainda não encontrámos esse amigo."
-                : "We haven't found that friend yet."}
-            </h2>
-            <p className="mx-auto mt-3 max-w-md text-muted-foreground">
-              {pt
-                ? "Experimenta uma pesquisa mais ampla ou remove alguns filtros."
-                : "Try a broader search or remove a few filters."}
-            </p>
-            {active.length > 0 && (
-              <Link href={`/${locale}/pets`} className="button-secondary mt-6">
-                {pt ? "Limpar filtros" : "Clear filters"}
-              </Link>
-            )}
-          </div>
-        )
-      )}
-      {pages > 1 && (
-        <nav
-          aria-label={pt ? "Paginação" : "Pagination"}
-          className="mt-10 flex flex-wrap justify-center gap-2"
-        >
-          {page > 1 && (
-            <Link href={href(page - 1)} className="button-secondary">
-              {pt ? "Anterior" : "Previous"}
-            </Link>
-          )}
-          {pageNumbers.map((n) => (
-            <Link
-              key={n}
-              href={href(n)}
-              aria-current={n === page ? "page" : undefined}
-              className={n === page ? "button-primary" : "button-secondary"}
-            >
-              {n}
-            </Link>
-          ))}
-          {page < pages && (
-            <Link href={href(page + 1)} className="button-secondary">
-              {pt ? "Seguinte" : "Next"}
-            </Link>
-          )}
-        </nav>
-      )}
+      <Suspense fallback={<CatalogResultsSkeleton />}>
+        <CatalogPetResults
+          locale={locale}
+          options={options}
+          urlParamsString={urlParams.toString()}
+          requestedPage={value("page")}
+          selects={selects}
+        />
+      </Suspense>
     </main>
   );
 }

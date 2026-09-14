@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Heart, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 import { setFavorite } from "@/app/favorites/actions";
+import { notifyNavigationStart } from "@/lib/navigation-events";
 export function FavoriteButton({
   animalId,
   locale,
@@ -39,6 +40,7 @@ export function FavoriteButton({
           try {
             const result = await setFavorite(animalId, !favorite, locale);
             if (result.error === "login") {
+              notifyNavigationStart();
               router.push(
                 `/${locale}/auth/login?next=${encodeURIComponent(redirectTo.replace(new RegExp(`^/${locale}`), ""))}`,
               );

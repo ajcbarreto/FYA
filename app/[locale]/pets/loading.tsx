@@ -1,10 +1,7 @@
-import { RouteLoading } from "@/components/route-loading";
+import { CatalogPageSkeleton } from "@/components/skeletons/catalog-page-skeleton";
+import { getLocaleFromHeaders } from "@/lib/i18n/locale-from-headers";
 
-export default function PetsLoading() {
-  return (
-    <RouteLoading
-      title="A carregar catalogo..."
-      subtitle="Estamos a buscar os pets disponiveis."
-    />
-  );
+export default async function PetsLoading() {
+  const locale = await getLocaleFromHeaders();
+  return <CatalogPageSkeleton locale={locale} />;
 }

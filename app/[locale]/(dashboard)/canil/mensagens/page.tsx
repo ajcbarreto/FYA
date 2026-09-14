@@ -3,8 +3,10 @@ import { countAdoptionRows, getConversationById } from "@/lib/adoption/db";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { ClientGetForm } from "@/components/client-get-form";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { getAuthUser } from "@/lib/supabase/get-user";
 import { getShelterForUser } from "@/lib/canil/shelter-data";
 import {
   getApplicationAnswersForConversation,
@@ -44,12 +46,9 @@ export default async function CanilMessagesPage({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthUser();
 
-  if (!user) {
+  if (!user || !supabase) {
     redirect(`/${locale}/auth/login?next=/canil/mensagens`);
   }
 
@@ -172,7 +171,7 @@ export default async function CanilMessagesPage({
             selectedConversationId ? "hidden" : "block"
           }`}
         >
-          <form method="get" className="mb-4">
+          <ClientGetForm action={`/${locale}/canil/mensagens`} className="mb-4">
             <input
               type="search"
               name="q"
@@ -182,7 +181,7 @@ export default async function CanilMessagesPage({
               }
               className="h-11 w-full rounded-lg border border-border/40 bg-background px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20"
             />
-          </form>
+          </ClientGetForm>
           <div className="space-y-1.5">
             {visibleConversations.length === 0 ? (
               <p className="px-2 py-4 text-sm text-muted-foreground">
@@ -190,7 +189,7 @@ export default async function CanilMessagesPage({
               </p>
             ) : (
               visibleConversations.map((conversation) => (
-                <a
+                <Link
                   key={conversation.id}
                   href={`/${locale}/canil/mensagens?page=${page}&conversation=${conversation.id}`}
                   className={`block w-full rounded-lg px-4 py-3 text-left transition-colors ${
@@ -216,7 +215,7 @@ export default async function CanilMessagesPage({
                   <p className="mt-1 truncate text-sm text-muted-foreground">
                     {conversation.canilName}
                   </p>
-                </a>
+                </Link>
               ))
             )}
           </div>
@@ -231,7 +230,7 @@ export default async function CanilMessagesPage({
             <>
               <div className="flex items-center gap-3 border-b border-border/20 pb-4">
                 <Link
-                  href={`/${locale}/canil/mensagens`}
+                  href={`/${locale}/canil/mensagens?page=${page}`}
                   className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground xl:hidden"
                   aria-label={copy.searchPlaceholder}
                 >

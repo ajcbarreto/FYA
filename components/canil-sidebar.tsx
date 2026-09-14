@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { isDashboardLinkActive } from "@/lib/dashboard-navigation";
+import { DashboardLinkStatus } from "@/components/dashboard-link-status";
 import type { ComponentType } from "react";
 import {
   Home,
@@ -90,7 +92,7 @@ export function CanilSidebar({ locale }: CanilSidebarProps) {
   ];
 
   return (
-    <aside className="w-full rounded-2xl border border-border/25 bg-card p-3 lg:sticky lg:top-24 lg:h-fit lg:w-72 lg:p-4">
+    <aside className="min-w-0 w-full shrink-0 rounded-2xl border border-border/25 bg-card p-3 lg:sticky lg:top-24 lg:h-fit lg:w-72 lg:p-4">
       <div className="mb-1 hidden px-3 py-2 lg:mb-4 lg:block">
         <h2 className="text-lg font-bold text-primary">
           FYA (Found Your Animal)
@@ -106,8 +108,11 @@ export function CanilSidebar({ locale }: CanilSidebarProps) {
       >
         {items.map((item) => {
           const Icon = item.icon;
-          const active =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const active = isDashboardLinkActive(
+            pathname,
+            item.href,
+            `/${locale}/canil`,
+          );
 
           return (
             <Link
@@ -121,8 +126,9 @@ export function CanilSidebar({ locale }: CanilSidebarProps) {
                   : "text-muted-foreground hover:bg-muted hover:text-primary"
               }`}
             >
-              <Icon className="h-4 w-4" />
+              <Icon aria-hidden className="h-4 w-4 shrink-0" />
               <span className="font-semibold">{item.label}</span>
+              <DashboardLinkStatus />
             </Link>
           );
         })}
