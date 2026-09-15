@@ -1,13 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import {
-  ArrowUpRight,
-  MapPin,
-  Heart,
-  ShieldCheck,
-  Info,
-} from "lucide-react";
+import { ArrowUpRight, MapPin, Heart, ShieldCheck, Info } from "lucide-react";
 import type { Locale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAuthUser } from "@/lib/supabase/get-user";
@@ -27,26 +21,26 @@ type PetDetailBodyProps = {
 export async function PetDetailBody({ locale, petId }: PetDetailBodyProps) {
   const pt = locale === "pt";
   const supabase = await createServerSupabaseClient();
-  const { user } = await getAuthUser();
-  const [pet, related, photos] = await Promise.all([
-    getCachedPetById(supabase, petId, locale),
-    getRelatedPets(supabase, petId, locale),
-    listAnimalPhotos(supabase, petId),
-  ]);
+  const [pet, related, photos, favorites, animal, { user }] = await Promise.all(
+    [
+      getCachedPetById(supabase, petId, locale),
+      getRelatedPets(supabase, petId, locale),
+      listAnimalPhotos(supabase, petId),
+      getAuthUser().then(({ user }) =>
+        user ? getFavoriteAnimalIds(supabase, user.id) : new Set<string>(),
+      ),
+      supabase.from("animais").select("status").eq("id", petId).single(),
+      getAuthUser(),
+    ],
+  );
 
   if (!pet) notFound();
 
-  const [favorites, shelter, animal] = await Promise.all([
-    user
-      ? getFavoriteAnimalIds(supabase, user.id)
-      : Promise.resolve(new Set<string>()),
-    supabase
-      .from("canis")
-      .select("verificado")
-      .eq("id", pet.shelterId)
-      .single(),
-    supabase.from("animais").select("status").eq("id", petId).single(),
-  ]);
+  const shelter = await supabase
+    .from("canis")
+    .select("verificado")
+    .eq("id", pet.shelterId)
+    .single();
 
   if (shelter.error || animal.error) {
     throw new Error("Unable to verify animal availability");

@@ -3,7 +3,7 @@ import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { Heart } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { getAuthUser } from "@/lib/supabase/get-user";
 import { getFavoritesForUser } from "@/lib/favorites/db";
 import { FavoriteButton } from "@/components/favorite-button";
 
@@ -20,12 +20,9 @@ export default async function UserFavoritesPage({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthUser();
 
-  if (!user) {
+  if (!user || !supabase) {
     redirect(`/${locale}/auth/login?next=/user/favoritos`);
   }
 

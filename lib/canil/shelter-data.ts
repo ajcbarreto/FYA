@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { speciesLabel, statusLabel } from "@/lib/i18n/animals";
+import { getOwnedShelter } from "./owned-shelter";
+export { getOwnedShelter } from "./owned-shelter";
 
 export type ShelterRecord = {
   id: string;
@@ -34,17 +36,7 @@ export async function getShelterForUser(
   supabase: SupabaseClient,
   userId: string,
 ) {
-  // Apenas o canil de que o utilizador e dono. Sem fallback para outro canil:
-  // um canil sem registo proprio nao deve ver dados de terceiros.
-  const { data: ownedShelter } = await supabase
-    .from("canis")
-    .select(
-      "id,owner_profile_id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at,donation_url,donation_message",
-    )
-    .eq("owner_profile_id", userId)
-    .maybeSingle();
-
-  const shelter = (ownedShelter as ShelterRecord | null) ?? null;
+  const shelter = await getOwnedShelter(supabase, userId);
 
   const { data: animals } = shelter
     ? await supabase

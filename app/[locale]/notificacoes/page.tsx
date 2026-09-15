@@ -2,7 +2,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { notFound, redirect } from "next/navigation";
 import { Bell, BellOff, Check, FileText, Heart } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { getAuthUser } from "@/lib/supabase/get-user";
 import {
   listNotifications,
   localizeNotification,
@@ -25,12 +25,9 @@ export default async function NotificationsPage({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthUser();
 
-  if (!user) {
+  if (!user || !supabase) {
     redirect(`/${locale}/auth/login?next=/notificacoes`);
   }
 

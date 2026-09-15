@@ -1,8 +1,8 @@
 import { SubmitButton } from "@/components/submit-button";
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getShelterForUser } from "@/lib/canil/shelter-data";
+import { getAuthUser } from "@/lib/supabase/get-user";
+import { getOwnedShelter } from "@/lib/canil/shelter-data";
 import { updateShelterSettings } from "@/app/[locale]/(dashboard)/canil/actions";
 import { ToastFeedback } from "@/components/toast-feedback";
 
@@ -22,16 +22,13 @@ export default async function CanilSettingsPage({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthUser();
 
-  if (!user) {
+  if (!user || !supabase) {
     redirect(`/${locale}/auth/login?next=/canil/configuracoes`);
   }
 
-  const { shelter } = await getShelterForUser(supabase, user.id);
+  const shelter = await getOwnedShelter(supabase, user.id);
   const copy =
     locale === "pt"
       ? {
@@ -179,17 +176,44 @@ export default async function CanilSettingsPage({
 
           <fieldset className="space-y-4 rounded-2xl bg-muted/50 p-5">
             <label className="block text-sm">
-              {locale === "pt" ? "Imagem do canil (URL https://)" : "Shelter image (https:// URL)"}
-              <input name="image_url" type="url" maxLength={2000} defaultValue={shelter?.image_url ?? ""} className="mt-2 h-11 w-full rounded-xl border bg-background px-3" placeholder="https://..." />
+              {locale === "pt"
+                ? "Imagem do canil (URL https://)"
+                : "Shelter image (https:// URL)"}
+              <input
+                name="image_url"
+                type="url"
+                maxLength={2000}
+                defaultValue={shelter?.image_url ?? ""}
+                className="mt-2 h-11 w-full rounded-xl border bg-background px-3"
+                placeholder="https://..."
+              />
             </label>
-            <legend className="font-bold">{locale === "pt" ? "Donativos" : "Donations"}</legend>
+            <legend className="font-bold">
+              {locale === "pt" ? "Donativos" : "Donations"}
+            </legend>
             <label className="block text-sm">
-              {locale === "pt" ? "Link seguro para donativos (https://)" : "Secure donation link (https://)"}
-              <input name="donation_url" type="url" maxLength={2000} defaultValue={shelter?.donation_url ?? ""} className="mt-2 h-11 w-full rounded-xl border bg-background px-3" />
+              {locale === "pt"
+                ? "Link seguro para donativos (https://)"
+                : "Secure donation link (https://)"}
+              <input
+                name="donation_url"
+                type="url"
+                maxLength={2000}
+                defaultValue={shelter?.donation_url ?? ""}
+                className="mt-2 h-11 w-full rounded-xl border bg-background px-3"
+              />
             </label>
             <label className="block text-sm">
-              {locale === "pt" ? "Como será utilizado o apoio?" : "How will donations help?"}
-              <textarea name="donation_message" maxLength={1000} rows={3} defaultValue={shelter?.donation_message ?? ""} className="mt-2 w-full rounded-xl border bg-background p-3" />
+              {locale === "pt"
+                ? "Como será utilizado o apoio?"
+                : "How will donations help?"}
+              <textarea
+                name="donation_message"
+                maxLength={1000}
+                rows={3}
+                defaultValue={shelter?.donation_message ?? ""}
+                className="mt-2 w-full rounded-xl border bg-background p-3"
+              />
             </label>
           </fieldset>
           <SubmitButton

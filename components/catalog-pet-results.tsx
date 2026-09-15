@@ -4,9 +4,11 @@ import { redirect } from "next/navigation";
 import { PetCard } from "@/components/pet-card";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { getAuthUser } from "@/lib/supabase/get-user";
+import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getCatalogPets, getCatalogPetsCount } from "@/lib/pet-catalog/db-pets";
 import { getFavoriteAnimalIds } from "@/lib/favorites/db";
 import type { Locale } from "@/lib/i18n/config";
+import { loadPaginatedData } from "@/lib/pagination";
 
 type CatalogSelect = {
   name: string;
@@ -49,26 +51,21 @@ export async function CatalogPetResults({
     return null;
   }
 
-  const { supabase, user } = await getAuthUser();
-  if (!supabase) {
-    return null;
-  }
-
-  const total = await getCatalogPetsCount(supabase, options);
-  const pages = Math.max(1, Math.ceil(total / 16));
-  const requested = Math.max(1, Number.parseInt(requestedPage, 10) || 1);
-  const page = Math.min(requested, pages);
-
-  if (requested !== page) {
-    redirect(href(page));
-  }
-
-  const [pets, favorites] = await Promise.all([
-    getCatalogPets(supabase, locale, { ...options, limit: 16, page }),
-    user
-      ? getFavoriteAnimalIds(supabase, user.id)
-      : Promise.resolve(new Set<string>()),
+  const supabase = await createServerSupabaseClient();
+  const [result, favorites] = await Promise.all([
+    loadPaginatedData({
+      requestedPage,
+      pageSize: 16,
+      count: () => getCatalogPetsCount(supabase, options),
+      load: (page) =>
+        getCatalogPets(supabase, locale, { ...options, limit: 16, page }),
+    }),
+    getAuthUser().then(({ user }) =>
+      user ? getFavoriteAnimalIds(supabase, user.id) : new Set<string>(),
+    ),
   ]);
+  if (result.redirectPage !== null) redirect(href(result.redirectPage));
+  const { total, pages, page, items: pets } = result;
 
   const active = Array.from(urlParams.entries());
   const pageNumbers = Array.from(new Set([1, page - 1, page, page + 1, pages]))

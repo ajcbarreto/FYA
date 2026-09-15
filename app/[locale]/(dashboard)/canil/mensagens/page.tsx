@@ -1,3 +1,4 @@
+import { loadPaginatedData } from "@/lib/pagination";
 import { ListPagination } from "@/components/list-pagination";
 import { countAdoptionRows, getConversationById } from "@/lib/adoption/db";
 import Link from "next/link";
@@ -5,9 +6,8 @@ import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { ClientGetForm } from "@/components/client-get-form";
 import { isLocale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAuthUser } from "@/lib/supabase/get-user";
-import { getShelterForUser } from "@/lib/canil/shelter-data";
+import { getOwnedShelter } from "@/lib/canil/shelter-data";
 import {
   getApplicationAnswersForConversation,
   getConversationsForCanil,
@@ -52,29 +52,21 @@ export default async function CanilMessagesPage({
     redirect(`/${locale}/auth/login?next=/canil/mensagens`);
   }
 
-  const { shelter } = await getShelterForUser(supabase, user.id);
+  const shelter = await getOwnedShelter(supabase, user.id);
   if (!shelter) {
     redirect(`/${locale}/canil?error=no_shelter`);
   }
 
-  const total = await countAdoptionRows(
-    supabase,
-    "conversas_adocao",
-    "canil_id",
-    shelter.id,
-  );
-  const requestedPage = Math.max(
-    1,
-    Number.parseInt((await searchParams).page ?? "1", 10) || 1,
-  );
-  const page = Math.min(requestedPage, Math.max(1, Math.ceil(total / 25)));
-  if (requestedPage !== page)
-    redirect(`/${locale}/canil/mensagens?page=${page}`);
-  const conversationRows = await getConversationsForCanil(
-    supabase,
-    shelter.id,
-    page,
-  );
+  const result = await loadPaginatedData({
+    requestedPage: (await searchParams).page,
+    pageSize: 25,
+    count: () =>
+      countAdoptionRows(supabase, "conversas_adocao", "canil_id", shelter.id),
+    load: (page) => getConversationsForCanil(supabase, shelter.id, page),
+  });
+  if (result.redirectPage !== null)
+    redirect(`/${locale}/canil/mensagens?page=${result.redirectPage}`);
+  const { total, page, items: conversationRows } = result;
   if (
     selectedConversationId &&
     !conversationRows.some((row) => row.id === selectedConversationId)
@@ -104,16 +96,18 @@ export default async function CanilMessagesPage({
       conversations[0] ??
       null)
     : (conversations[0] ?? null);
-  const messages = activeConversation
-    ? await getMessagesByConversationId(supabase, activeConversation.id)
-    : [];
-  const application = activeConversation
-    ? await getApplicationAnswersForConversation(supabase, {
-        pedidoId: activeConversation.pedidoId,
-        animalId: activeConversation.animalId,
-        applicantId: activeConversation.applicantId,
-      })
-    : null;
+  const [messages, application] = await Promise.all([
+    activeConversation
+      ? getMessagesByConversationId(supabase, activeConversation.id)
+      : Promise.resolve([]),
+    activeConversation
+      ? getApplicationAnswersForConversation(supabase, {
+          pedidoId: activeConversation.pedidoId,
+          animalId: activeConversation.animalId,
+          applicantId: activeConversation.applicantId,
+        })
+      : Promise.resolve(null),
+  ]);
 
   const copy =
     locale === "pt"

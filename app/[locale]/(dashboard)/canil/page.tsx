@@ -9,7 +9,7 @@ import {
   PawPrint,
 } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { getAuthUser } from "@/lib/supabase/get-user";
 import {
   getShelterForUser,
   localizeAnimalStatus,
@@ -30,12 +30,9 @@ export default async function CanilDashboardPage({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthUser();
 
-  if (!user) {
+  if (!user || !supabase) {
     redirect(`/${locale}/auth/login?next=/canil`);
   }
 

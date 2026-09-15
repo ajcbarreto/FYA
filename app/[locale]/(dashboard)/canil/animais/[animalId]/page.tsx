@@ -4,8 +4,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, Star, Trash2, Upload } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getShelterForUser } from "@/lib/canil/shelter-data";
+import { getAuthUser } from "@/lib/supabase/get-user";
+import { getOwnedShelter } from "@/lib/canil/shelter-data";
 import { listAnimalPhotos } from "@/lib/canil/animal-photos";
 import { AnimalForm } from "@/components/animal-form";
 import { ToastFeedback } from "@/components/toast-feedback";
@@ -33,16 +33,13 @@ export default async function AnimalEditPage({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthUser();
 
-  if (!user) {
+  if (!user || !supabase) {
     redirect(`/${locale}/auth/login?next=/canil/animais/${animalId}`);
   }
 
-  const { shelter } = await getShelterForUser(supabase, user.id);
+  const shelter = await getOwnedShelter(supabase, user.id);
   if (!shelter) {
     redirect(`/${locale}/canil/animais?error=no_shelter`);
   }

@@ -1,9 +1,10 @@
+import { loadPaginatedData } from "@/lib/pagination";
 import { ListPagination } from "@/components/list-pagination";
 import { countAdoptionRows } from "@/lib/adoption/db";
 import { AdoptionProgress } from "@/components/adoption-progress";
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { getAuthUser } from "@/lib/supabase/get-user";
 import {
   getAdoptionRequestsForUser,
   getRowAnimal,
@@ -30,28 +31,27 @@ export default async function UserRequestsPage({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthUser();
 
-  if (!user) {
+  if (!user || !supabase) {
     redirect(`/${locale}/auth/login?next=/user/pedidos`);
   }
 
-  const total = await countAdoptionRows(
-    supabase,
-    "pedidos_adocao",
-    "applicant_profile_id",
-    user.id,
-  );
-  const requestedPage = Math.max(
-    1,
-    Number.parseInt((await searchParams).page ?? "1", 10) || 1,
-  );
-  const page = Math.min(requestedPage, Math.max(1, Math.ceil(total / 25)));
-  if (requestedPage !== page) redirect(`/${locale}/user/pedidos?page=${page}`);
-  const requests = await getAdoptionRequestsForUser(supabase, user.id, page);
+  const result = await loadPaginatedData({
+    requestedPage: (await searchParams).page,
+    pageSize: 25,
+    count: () =>
+      countAdoptionRows(
+        supabase,
+        "pedidos_adocao",
+        "applicant_profile_id",
+        user.id,
+      ),
+    load: (page) => getAdoptionRequestsForUser(supabase, user.id, page),
+  });
+  if (result.redirectPage !== null)
+    redirect(`/${locale}/user/pedidos?page=${result.redirectPage}`);
+  const { total, page, items: requests } = result;
   const visitsByPedido = await getVisitsByPedido(
     supabase,
     requests.map((request) => request.id),

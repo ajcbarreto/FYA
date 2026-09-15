@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { getAuthUser } from "@/lib/supabase/get-user";
 /** Owners see the same real public profile as adopters, avoiding duplicated placeholder content. */
 export default async function ShelterProfile({
   params,
@@ -9,11 +9,8 @@ export default async function ShelterProfile({
 }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect(`/${locale}/auth/login?next=/canil/perfil`);
+  const { supabase, user } = await getAuthUser();
+  if (!user || !supabase) redirect(`/${locale}/auth/login?next=/canil/perfil`);
   const { data, error } = await supabase
     .from("canis")
     .select("id")

@@ -2,8 +2,8 @@ import { SubmitButton } from "@/components/submit-button";
 import { notFound, redirect } from "next/navigation";
 import { Check, MessageSquareText, X } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getShelterForUser } from "@/lib/canil/shelter-data";
+import { getAuthUser } from "@/lib/supabase/get-user";
+import { getOwnedShelter } from "@/lib/canil/shelter-data";
 import {
   getReviewsForModeration,
   reviewAuthorName,
@@ -29,16 +29,13 @@ export default async function CanilReviewsPage({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthUser();
 
-  if (!user) {
+  if (!user || !supabase) {
     redirect(`/${locale}/auth/login?next=/canil/avaliacoes`);
   }
 
-  const { shelter } = await getShelterForUser(supabase, user.id);
+  const shelter = await getOwnedShelter(supabase, user.id);
   const reviews = shelter
     ? await getReviewsForModeration(supabase, shelter.id)
     : [];

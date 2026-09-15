@@ -17,6 +17,9 @@ import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getCatalogPets } from "@/lib/pet-catalog/db-pets";
 import { AboutFamily } from "@/components/about-family";
 import { ClientGetForm } from "@/components/client-get-form";
+import { Suspense } from "react";
+import { PetCardSkeleton } from "@/components/skeletons/pet-card-skeleton";
+import type { Locale } from "@/lib/i18n/config";
 import { PetCard } from "@/components/pet-card";
 
 const speciesLinks = [
@@ -37,12 +40,6 @@ export default async function Home({
 
   const dictionary = getDictionary(locale);
   const { hero, trustBar, featured, journey } = dictionary.home;
-
-  const pets = hasSupabaseEnv
-    ? await getCatalogPets(await createServerSupabaseClient(), locale, {
-        limit: 4,
-      })
-    : [];
 
   return (
     <main id="main-content" tabIndex={-1}>
@@ -154,24 +151,17 @@ export default async function Home({
             <ArrowUpRight className="size-4" />
           </Link>
         </div>
-        {pets.length > 0 ? (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {pets.map((pet) => (
-              <PetCard key={pet.id} pet={pet} locale={locale} />
-            ))}
-          </div>
-        ) : (
-          <div className="surface flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-            <PawPrint className="size-10 text-secondary" />
-            <p className="flex-1 text-muted-foreground">
-              {featured.emptyDescription}
-            </p>
-            <Link href={`/${locale}/pets`} className="button-primary">
-              {featured.exploreCatalog}
-              <ArrowRight className="size-4" />
-            </Link>
-          </div>
-        )}
+        <Suspense
+          fallback={
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {Array.from({ length: 4 }, (_, i) => (
+                <PetCardSkeleton key={i} />
+              ))}
+            </div>
+          }
+        >
+          <FeaturedPets locale={locale} />
+        </Suspense>
       </section>
       <section className="page-shell pt-4">
         <div className="rounded-[2rem] bg-primary px-6 py-10 text-primary-foreground sm:p-12">
@@ -213,5 +203,37 @@ export default async function Home({
       </section>
       <AboutFamily locale={locale} />
     </main>
+  );
+}
+
+async function FeaturedPets({ locale }: { locale: Locale }) {
+  const { featured } = getDictionary(locale).home;
+  const pets = hasSupabaseEnv
+    ? await getCatalogPets(await createServerSupabaseClient(), locale, {
+        limit: 4,
+      })
+    : [];
+
+  return (
+    <>
+      {pets.length > 0 ? (
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {pets.map((pet) => (
+            <PetCard key={pet.id} pet={pet} locale={locale} />
+          ))}
+        </div>
+      ) : (
+        <div className="surface flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+          <PawPrint className="size-10 text-secondary" />
+          <p className="flex-1 text-muted-foreground">
+            {featured.emptyDescription}
+          </p>
+          <Link href={`/${locale}/pets`} className="button-primary">
+            {featured.exploreCatalog}
+            <ArrowRight className="size-4" />
+          </Link>
+        </div>
+      )}
+    </>
   );
 }

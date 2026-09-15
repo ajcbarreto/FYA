@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { getAuthUser } from "@/lib/supabase/get-user";
 import { updateAccountName } from "@/app/account/actions";
 import { SubmitButton } from "@/components/submit-button";
 import { ToastFeedback } from "@/components/toast-feedback";
@@ -16,11 +16,9 @@ export default async function Settings({
   if (!isLocale(locale)) notFound();
   const pt = locale === "pt";
   const { success, error } = await searchParams;
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect(`/${locale}/auth/login?next=/user/configuracoes`);
+  const { supabase, user } = await getAuthUser();
+  if (!user || !supabase)
+    redirect(`/${locale}/auth/login?next=/user/configuracoes`);
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("full_name,email")

@@ -1,3 +1,4 @@
+import { loadPaginatedData } from "@/lib/pagination";
 import { ListPagination } from "@/components/list-pagination";
 import { countAdoptionRows, getConversationById } from "@/lib/adoption/db";
 import Link from "next/link";
@@ -5,7 +6,6 @@ import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { ClientGetForm } from "@/components/client-get-form";
 import { isLocale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import {
   getConversationsForUser,
@@ -49,24 +49,21 @@ export default async function UserMessagesPage({
     redirect(`/${locale}/auth/login?next=/user/mensagens`);
   }
 
-  const total = await countAdoptionRows(
-    supabase,
-    "conversas_adocao",
-    "applicant_profile_id",
-    user.id,
-  );
-  const requestedPage = Math.max(
-    1,
-    Number.parseInt((await searchParams).page ?? "1", 10) || 1,
-  );
-  const page = Math.min(requestedPage, Math.max(1, Math.ceil(total / 25)));
-  if (requestedPage !== page)
-    redirect(`/${locale}/user/mensagens?page=${page}`);
-  const conversationRows = await getConversationsForUser(
-    supabase,
-    user.id,
-    page,
-  );
+  const result = await loadPaginatedData({
+    requestedPage: (await searchParams).page,
+    pageSize: 25,
+    count: () =>
+      countAdoptionRows(
+        supabase,
+        "conversas_adocao",
+        "applicant_profile_id",
+        user.id,
+      ),
+    load: (page) => getConversationsForUser(supabase, user.id, page),
+  });
+  if (result.redirectPage !== null)
+    redirect(`/${locale}/user/mensagens?page=${result.redirectPage}`);
+  const { total, page, items: conversationRows } = result;
   if (
     selectedConversationId &&
     !conversationRows.some((row) => row.id === selectedConversationId)

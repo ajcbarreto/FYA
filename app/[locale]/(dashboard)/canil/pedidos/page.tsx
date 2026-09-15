@@ -1,11 +1,12 @@
+import { loadPaginatedData } from "@/lib/pagination";
 import { ListPagination } from "@/components/list-pagination";
 import { countAdoptionRows } from "@/lib/adoption/db";
 import { SubmitButton } from "@/components/submit-button";
 import { requestTransitions } from "@/lib/adoption/status";
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getShelterForUser } from "@/lib/canil/shelter-data";
+import { getAuthUser } from "@/lib/supabase/get-user";
+import { getOwnedShelter } from "@/lib/canil/shelter-data";
 import {
   getAdoptionRequestsForCanil,
   getRowAnimal,
@@ -34,37 +35,27 @@ export default async function CanilRequestsPage({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthUser();
 
-  if (!user) {
+  if (!user || !supabase) {
     redirect(`/${locale}/auth/login?next=/canil/pedidos`);
   }
 
-  const { shelter } = await getShelterForUser(supabase, user.id);
+  const shelter = await getOwnedShelter(supabase, user.id);
   if (!shelter) {
     redirect(`/${locale}/canil?error=no_shelter`);
   }
 
-  const total = await countAdoptionRows(
-    supabase,
-    "pedidos_adocao",
-    "canil_id",
-    shelter.id,
-  );
-  const requestedPage = Math.max(
-    1,
-    Number.parseInt((await searchParams).page ?? "1", 10) || 1,
-  );
-  const page = Math.min(requestedPage, Math.max(1, Math.ceil(total / 25)));
-  if (requestedPage !== page) redirect(`/${locale}/canil/pedidos?page=${page}`);
-  const requests = await getAdoptionRequestsForCanil(
-    supabase,
-    shelter.id,
-    page,
-  );
+  const result = await loadPaginatedData({
+    requestedPage: (await searchParams).page,
+    pageSize: 25,
+    count: () =>
+      countAdoptionRows(supabase, "pedidos_adocao", "canil_id", shelter.id),
+    load: (page) => getAdoptionRequestsForCanil(supabase, shelter.id, page),
+  });
+  if (result.redirectPage !== null)
+    redirect(`/${locale}/canil/pedidos?page=${result.redirectPage}`);
+  const { total, page, items: requests } = result;
   const visitsByPedido = await getVisitsByPedido(
     supabase,
     requests.map((request) => request.id),
