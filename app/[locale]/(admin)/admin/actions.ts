@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePublicCatalog } from "@/lib/pet-catalog/revalidate";
+
 import { validFilterConfig } from "@/lib/pet-catalog/options";
 
 import { revalidatePath } from "next/cache";
@@ -82,6 +84,7 @@ export async function updatePlatformSettings(formData: FormData) {
     redirect(`/${locale}/admin/configuracoes?error=platform_failed`);
   }
 
+  revalidatePublicCatalog();
   revalidatePath(`/${locale}/admin/configuracoes`);
   redirect(`/${locale}/admin/configuracoes?success=platform_saved`);
 }
@@ -105,6 +108,7 @@ export async function toggleShelterVerification(formData: FormData) {
     redirect(`/${locale}/admin/canis?error=verification_failed`);
   }
 
+  revalidatePublicCatalog();
   revalidatePath(`/${locale}/admin/canis`);
   revalidatePath(`/${locale}/admin`);
   redirect(
@@ -170,6 +174,7 @@ export async function updatePetCatalogFilters(formData: FormData) {
     );
   }
 
+  revalidatePublicCatalog();
   revalidatePath(`/${locale}/admin/configuracoes`);
   redirect(
     `/${locale}/admin/configuracoes?success=${encodeURIComponent(dictionary.admin.success)}`,

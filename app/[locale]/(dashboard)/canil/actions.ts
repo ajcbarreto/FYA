@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePublicCatalog } from "@/lib/pet-catalog/revalidate";
+
 import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
@@ -54,6 +56,7 @@ export async function updateAnimalStatus(formData: FormData) {
     redirect(`/${locale}/canil/animais?error=save_failed`);
   }
 
+  revalidatePublicCatalog();
   redirect(`/${locale}/canil/animais?success=updated`);
 }
 
@@ -117,5 +120,6 @@ export async function updateShelterSettings(formData: FormData) {
     redirect(`/${locale}/canil/configuracoes?error=save_failed`);
   }
 
+  revalidatePublicCatalog();
   redirect(`/${locale}/canil/configuracoes?success=saved`);
 }

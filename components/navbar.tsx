@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Brand } from "@/components/brand";
-import Link from "next/link";
+import { NavigationLink as Link } from "@/components/navigation-link";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";

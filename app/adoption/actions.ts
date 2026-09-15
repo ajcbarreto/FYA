@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePublicCatalog } from "@/lib/pet-catalog/revalidate";
+
 import { after } from "next/server";
 import { deliverEmailOutbox } from "@/lib/email/outbox";
 import { redirect } from "next/navigation";
@@ -100,6 +102,7 @@ export async function updateRequestStatus(formData: FormData) {
       console.error("Email delivery deferred to scheduled retry");
     }
   });
+  revalidatePublicCatalog();
   redirect(`/${locale}/canil/pedidos?success=updated`);
 }
 

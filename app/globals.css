@@ -231,66 +231,36 @@
     @apply fixed left-4 top-4 z-[200] -translate-y-24 rounded-xl bg-primary px-5 py-3 text-white focus:translate-y-0;
   }
 }
-.sketch-block {
-  position: relative;
-  overflow: hidden;
-  border: 1.5px dashed color-mix(in oklch, var(--primary) 22%, var(--border));
-  background:
-    repeating-linear-gradient(
-      -12deg,
-      transparent,
-      transparent 7px,
-      color-mix(in oklch, var(--foreground) 4%, transparent) 7px,
-      color-mix(in oklch, var(--foreground) 4%, transparent) 8px
-    ),
-    color-mix(in oklch, var(--muted) 70%, transparent);
-  animation:
-    sketch-radius 5s ease-in-out infinite,
-    sketch-opacity 2.6s ease-in-out infinite;
-}
-
-.sketch-block::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 35%,
-    color-mix(in oklch, var(--background) 75%, transparent) 50%,
-    transparent 65%
-  );
-  background-size: 220% 100%;
-  animation: sketch-shimmer 1.8s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes sketch-shimmer {
-  0% {
-    background-position: 200% 0;
+@layer components {
+  .sketch-block {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    background-color: #e6e6e6;
   }
-  100% {
-    background-position: -200% 0;
+
+  .dark .sketch-block {
+    background-color: #353535;
+  }
+
+  .sketch-block::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 45%), transparent);
+    transform: translateX(-100%);
+    animation: skeleton-shimmer 1.6s ease-in-out infinite;
+    animation-delay: inherit;
+    pointer-events: none;
+  }
+
+  .dark .sketch-block::after {
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 8%), transparent);
   }
 }
 
-@keyframes sketch-radius {
-  0%,
-  100% {
-    border-radius: 1rem 1.08rem 0.92rem 1.04rem;
-  }
-  50% {
-    border-radius: 1.06rem 0.94rem 1.1rem 0.98rem;
-  }
-}
-
-@keyframes sketch-opacity {
-  0%,
-  100% {
-    opacity: 0.82;
-  }
-  50% {
-    opacity: 1;
-  }
+@keyframes skeleton-shimmer {
+  to { transform: translateX(100%); }
 }
 
 .navigation-progress-bar {

@@ -1,21 +1,14 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Suspense } from "react";
-import {
-  Search,
-  ArrowUpRight,
-  SlidersHorizontal,
-} from "lucide-react";
+import { Search, ArrowUpRight, SlidersHorizontal } from "lucide-react";
 import { CatalogPetResults } from "@/components/catalog-pet-results";
 import { ClientGetForm } from "@/components/client-get-form";
 import { CatalogResultsSkeleton } from "@/components/skeletons/catalog-results-skeleton";
 import { isLocale } from "@/lib/i18n/config";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import {
-  getPetCatalogFiltersConfig,
-  normalizePetCatalogFiltersConfig,
-} from "@/lib/pet-catalog/filter-config";
+import { getPublicCatalogFilters } from "@/lib/pet-catalog/public-data";
+import { normalizePetCatalogFiltersConfig } from "@/lib/pet-catalog/filter-config";
 import { configuredOptions } from "@/lib/pet-catalog/options";
 
 export default async function Catalog({
@@ -33,9 +26,8 @@ export default async function Catalog({
     typeof values[key] === "string" ? values[key]!.trim().slice(0, 120) : "";
   const q = value("q");
   const location = value("location");
-  const supabase = hasSupabaseEnv ? await createServerSupabaseClient() : null;
-  const config = supabase
-    ? await getPetCatalogFiltersConfig(supabase)
+  const config = hasSupabaseEnv
+    ? await getPublicCatalogFilters()
     : normalizePetCatalogFiltersConfig(null);
   const selects = [
     {
@@ -118,7 +110,10 @@ export default async function Catalog({
             : "These results follow your preferred species and, where relevant, apartment compatibility confirmed by the shelter. Discuss your available time and each animal’s needs with the team; size does not determine their routine."}
         </p>
       )}
-      <ClientGetForm action={`/${locale}/pets`} className="surface mb-8 space-y-5">
+      <ClientGetForm
+        action={`/${locale}/pets`}
+        className="surface mb-8 space-y-5"
+      >
         <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
           <label className="relative">
             <span className="sr-only">

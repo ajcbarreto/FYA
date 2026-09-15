@@ -5,7 +5,10 @@ import { PetCard } from "@/components/pet-card";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getCatalogPets, getCatalogPetsCount } from "@/lib/pet-catalog/db-pets";
+import {
+  getPublicCatalogPets,
+  getPublicCatalogCount,
+} from "@/lib/pet-catalog/public-data";
 import { getFavoriteAnimalIds } from "@/lib/favorites/db";
 import type { Locale } from "@/lib/i18n/config";
 import { loadPaginatedData } from "@/lib/pagination";
@@ -56,9 +59,9 @@ export async function CatalogPetResults({
     loadPaginatedData({
       requestedPage,
       pageSize: 16,
-      count: () => getCatalogPetsCount(supabase, options),
+      count: () => getPublicCatalogCount(options),
       load: (page) =>
-        getCatalogPets(supabase, locale, { ...options, limit: 16, page }),
+        getPublicCatalogPets(locale, { ...options, limit: 16, page }),
     }),
     getAuthUser().then(({ user }) =>
       user ? getFavoriteAnimalIds(supabase, user.id) : new Set<string>(),

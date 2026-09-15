@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePublicCatalog } from "@/lib/pet-catalog/revalidate";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
@@ -136,6 +138,7 @@ export async function createAnimal(formData: FormData) {
     redirect(`/${locale}/canil/animais/novo?error=save_failed`);
   }
 
+  revalidatePublicCatalog();
   revalidatePath(`/${locale}/canil/animais`);
   redirect(`/${locale}/canil/animais/${created.id}?success=created`);
 }
@@ -174,6 +177,7 @@ export async function updateAnimal(formData: FormData) {
     redirect(`${redirectBase}?error=save_failed`);
   }
 
+  revalidatePublicCatalog();
   revalidatePath(redirectBase);
   revalidatePath(`/${locale}/canil/animais`);
   redirect(`${redirectBase}?success=updated`);
@@ -211,6 +215,7 @@ export async function deleteAnimal(formData: FormData) {
     redirect(`/${locale}/canil/animais?error=delete_failed`);
   }
 
+  revalidatePublicCatalog();
   revalidatePath(`/${locale}/canil/animais`);
   redirect(`/${locale}/canil/animais?success=animal_deleted`);
 }
@@ -279,6 +284,7 @@ export async function uploadAnimalPhoto(formData: FormData) {
     redirect(`${redirectBase}?error=upload_failed`);
   }
 
+  revalidatePublicCatalog();
   revalidatePath(redirectBase);
   redirect(`${redirectBase}?success=uploaded`);
 }
@@ -321,6 +327,7 @@ export async function setPrimaryAnimalPhoto(formData: FormData) {
     redirect(`${redirectBase}?error=update_failed`);
   }
 
+  revalidatePublicCatalog();
   revalidatePath(redirectBase);
   redirect(`${redirectBase}?success=primary_set`);
 }
@@ -389,6 +396,7 @@ export async function deleteAnimalPhoto(formData: FormData) {
     }
   }
 
+  revalidatePublicCatalog();
   revalidatePath(redirectBase);
   redirect(`${redirectBase}?success=deleted`);
 }

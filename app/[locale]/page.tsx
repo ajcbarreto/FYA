@@ -13,8 +13,7 @@ import {
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
-import { getCatalogPets } from "@/lib/pet-catalog/db-pets";
+import { getPublicCatalogPets } from "@/lib/pet-catalog/public-data";
 import { AboutFamily } from "@/components/about-family";
 import { ClientGetForm } from "@/components/client-get-form";
 import { Suspense } from "react";
@@ -209,7 +208,7 @@ export default async function Home({
 async function FeaturedPets({ locale }: { locale: Locale }) {
   const { featured } = getDictionary(locale).home;
   const pets = hasSupabaseEnv
-    ? await getCatalogPets(await createServerSupabaseClient(), locale, {
+    ? await getPublicCatalogPets(locale, {
         limit: 4,
       })
     : [];

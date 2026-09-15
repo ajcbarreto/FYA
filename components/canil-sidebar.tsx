@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { NavigationLink as Link } from "@/components/navigation-link";
 import { usePathname } from "next/navigation";
 import { isDashboardLinkActive } from "@/lib/dashboard-navigation";
 import { DashboardLinkStatus } from "@/components/dashboard-link-status";
