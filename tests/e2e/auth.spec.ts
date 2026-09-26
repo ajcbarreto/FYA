@@ -6,20 +6,41 @@ test("registration, email confirmation and login for adopter and shelter", async
 }) => {
   for (const role of ["user", "canil"]) {
     const email = `registration-${role}-${Date.now()}@fya.test`;
-    await page.goto("/pt/auth/register");
+    await page.goto(
+      role === "canil" ? "/pt/auth/shelter-registration" : "/pt/auth/register",
+    );
     await page.locator("[name=full_name]").fill("Registo de teste");
     await page.locator("[name=email]").fill(email);
     await page.locator("[name=password]").fill("Fya-registration-2026!");
-    await page.locator("[name=role]").selectOption(role);
-    await page.locator("main input[type=checkbox]").check();
-    await page.locator("main form button[type=submit]").click();
-    await expect(page).toHaveURL(/success=/);
+    if (role === "canil") {
+      await page.locator("[name=shelter_name]").fill("Canil de teste");
+      await page.locator("[name=shelter_location]").fill("Lisboa");
+      await page.locator("[name=shelter_mission]").fill("Missão de teste");
+      await page.locator("[name=contact_role]").fill("Responsável");
+      await page.locator("[name=contact_phone]").fill("910000000");
+      await page.locator("[name=declaration]").check();
+    } else await page.locator("[name=phone]").fill("910000000");
+    await page.locator("[name=terms]").check();
+    await page
+      .locator("main form")
+      .filter({
+        has: page.locator("input[name=email], input[name=confirm_password]"),
+      })
+      .locator("button[type=submit]")
+      .click();
+    await expect(page).toHaveURL(/auth\/check-email/);
     const confirmation = await mailLink(email, "Confirm");
     await page.goto(confirmation);
     await page.goto("/pt/auth/login");
     await page.locator("[name=email]").fill(email);
     await page.locator("[name=password]").fill("Fya-registration-2026!");
-    await page.locator("main form button[type=submit]").click();
+    await page
+      .locator("main form")
+      .filter({
+        has: page.locator("input[name=email], input[name=confirm_password]"),
+      })
+      .locator("button[type=submit]")
+      .click();
     await expect(page).toHaveURL(
       new RegExp(`/pt/${role === "user" ? "user" : "canil"}$`),
     );
@@ -33,7 +54,13 @@ test("invalid login, persistent session, route isolation and logout", async ({
   await page.goto("/pt/auth/login");
   await page.locator("[name=email]").fill(accounts.adopter.email);
   await page.locator("[name=password]").fill("Wrong-password-123");
-  await page.locator("main form button[type=submit]").click();
+  await page
+    .locator("main form")
+    .filter({
+      has: page.locator("input[name=email], input[name=confirm_password]"),
+    })
+    .locator("button[type=submit]")
+    .click();
   await expect(page).toHaveURL(/error=/);
   await login(page, "adopter");
   await page.reload();
@@ -59,18 +86,36 @@ test("password recovery through local mailbox", async ({ page }) => {
   if (error) throw error;
   await page.goto("/pt/auth/forgot-password");
   await page.locator("[name=email]").fill(email);
-  await page.locator("main form button[type=submit]").click();
+  await page
+    .locator("main form")
+    .filter({
+      has: page.locator("input[name=email], input[name=confirm_password]"),
+    })
+    .locator("button[type=submit]")
+    .click();
   await expect(page).toHaveURL(/success=sent/);
   await page.goto(await mailLink(email, "Reset"));
   await expect(page).toHaveURL(/\/pt\/auth\/reset-password/);
   await page.locator("[name=password]").fill("Changed-password-2026!");
   await page.locator("[name=confirm_password]").fill("Changed-password-2026!");
-  await page.locator("main form button[type=submit]").click();
+  await page
+    .locator("main form")
+    .filter({
+      has: page.locator("input[name=email], input[name=confirm_password]"),
+    })
+    .locator("button[type=submit]")
+    .click();
   await expect(page).toHaveURL(/success=password_updated/);
   await page.context().clearCookies();
   await page.goto("/pt/auth/login");
   await page.locator("[name=email]").fill(email);
   await page.locator("[name=password]").fill("Changed-password-2026!");
-  await page.locator("main form button[type=submit]").click();
+  await page
+    .locator("main form")
+    .filter({
+      has: page.locator("input[name=email], input[name=confirm_password]"),
+    })
+    .locator("button[type=submit]")
+    .click();
   await expect(page).toHaveURL(/\/pt\/user$/);
 });

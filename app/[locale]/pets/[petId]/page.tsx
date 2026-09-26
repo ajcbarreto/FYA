@@ -50,6 +50,12 @@ export default async function PetDetails({ params, searchParams }: Props) {
         <ArrowLeft className="size-4" />
         {pt ? "Explorar animais" : "Explore animals"}
       </Link>
+      <Link
+        className="mb-6 ml-5 inline-block text-sm underline"
+        href={`/${locale}/pets/${petId}/imprimir`}
+      >
+        {pt ? "Ficha imprimível e QR" : "Printable profile and QR"}
+      </Link>
       <Suspense fallback={<PetDetailBodySkeleton locale={locale} />}>
         <PetDetailBody locale={locale} petId={petId} />
       </Suspense>

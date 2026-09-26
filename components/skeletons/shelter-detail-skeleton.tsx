@@ -10,10 +10,10 @@ export function ShelterDetailBodySkeleton({ locale }: { locale: Locale }) {
       aria-busy="true"
       aria-label={pt ? "A carregar canil" : "Loading shelter"}
     >
-      <div className="overflow-hidden rounded-[2rem] bg-primary/10 p-6 sm:p-10">
-        <div className="flex items-center gap-5">
+      <div className="overflow-hidden rounded-3xl bg-primary/10 p-5 sm:p-8 lg:p-10">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
           <SketchSkeleton className="size-20 rounded-2xl" />
-          <div className="flex-1 space-y-3">
+          <div className="w-full min-w-0 flex-1 space-y-3">
             <SketchSkeleton className="h-10 w-2/5" />
             <SketchSkeleton className="h-4 w-1/4" delay={40} />
             <SketchSkeleton className="h-4 w-1/3" delay={80} />
@@ -64,7 +64,7 @@ export function ShelterDetailSkeleton({ locale }: { locale: Locale }) {
     <main
       id="main-content"
       tabIndex={-1}
-      className="mx-auto w-full max-w-7xl flex-1 px-6 pb-16 pt-8 lg:px-8"
+      className="mx-auto w-full max-w-7xl flex-1 px-5 pb-16 pt-8 sm:px-8"
       aria-busy="true"
       aria-label={pt ? "A carregar canil" : "Loading shelter"}
     >

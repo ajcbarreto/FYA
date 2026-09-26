@@ -66,12 +66,15 @@ try {
   source += "}; Views: Record<string, never>; Functions: {\n";
   const functions = (
     await db.query(
-      `select p.proname,p.proargnames,t.typname result,p.proretset,array(select a.typname from unnest(p.proargtypes) with ordinality k(num,pos) join pg_type a on a.oid=k.num order by k.pos) args from pg_proc p join pg_namespace n on n.oid=p.pronamespace join pg_type t on t.oid=p.prorettype where n.nspname='public' and t.typname<>'trigger'`,
+      `select p.proname,p.proargnames,p.pronargdefaults,t.typname result,p.proretset,array(select a.typname from unnest(p.proargtypes) with ordinality k(num,pos) join pg_type a on a.oid=k.num order by k.pos) args from pg_proc p join pg_namespace n on n.oid=p.pronamespace join pg_type t on t.oid=p.prorettype where n.nspname='public' and t.typname<>'trigger'`,
     )
   ).rows;
   for (const f of functions) {
     const args = (f.proargnames ?? [])
-      .map((n, i) => `${JSON.stringify(n)}: ${types(f.args[i])}`)
+      .map(
+        (n, i) =>
+          `${JSON.stringify(n)}${i >= f.args.length - f.pronargdefaults ? "?" : ""}: ${types(f.args[i])}`,
+      )
       .join(";");
     const result = columns.some((c) => c.table_name === f.result)
       ? `Database["public"]["Tables"]["${f.result}"]["Row"]`

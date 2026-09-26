@@ -6,14 +6,9 @@ export async function getOwnedShelter(
   supabase: SupabaseClient,
   userId: string,
 ) {
-  const { data, error } = await supabase
-    .from("canis")
-    .select(
-      "id,owner_profile_id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at,donation_url,donation_message",
-    )
-    .eq("owner_profile_id", userId)
-    .maybeSingle();
-
+  const { data, error } = await supabase.rpc("my_shelters");
   if (error) throw new Error("Unable to load shelter", { cause: error });
-  return (data as ShelterRecord | null) ?? null;
+  // The RPC derives membership from auth.uid(), never from a supplied profile id.
+  if (!userId) return null;
+  return (data?.[0] as ShelterRecord | undefined) ?? null;
 }

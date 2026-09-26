@@ -6,6 +6,8 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import type { UserRole } from "@/lib/supabase/types";
 
+import { registrationAcceptance, TERMS_VERSION } from "@/lib/records/legal";
+
 const allowedRoles: UserRole[] = ["user", "canil"];
 
 export async function register(formData: FormData) {
@@ -28,7 +30,7 @@ export async function register(formData: FormData) {
   const contactRole = String(formData.get("contact_role") ?? "").trim();
   const contactPhone = String(formData.get("contact_phone") ?? "").trim();
 
-  if (!fullName || !email || !phone || !password || !allowedRoles.includes(role)) {
+  if (!registrationAcceptance(formData) || !fullName || !email || !phone || !password || !allowedRoles.includes(role)) {
     redirect(
       `${redirectBasePath}?error=${encodeURIComponent(dictionary.auth.invalidData)}`,
     );
@@ -39,6 +41,7 @@ export async function register(formData: FormData) {
   }
 
   const userMetadata: Record<string, string> = {
+    terms_version: TERMS_VERSION,
     full_name: fullName,
     role,
     phone,
@@ -57,6 +60,7 @@ export async function register(formData: FormData) {
     email,
     password,
     options: {
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/auth/callback?next=/${locale}/${role === "canil" ? "canil" : "user"}`,
       data: userMetadata,
     },
   });

@@ -2,7 +2,10 @@ import { expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 export const accounts = JSON.parse(
-  readFileSync(".local-test/accounts.json", "utf8"),
+  readFileSync(
+    process.env.FYA_E2E_ACCOUNTS ?? ".local-test/accounts.json",
+    "utf8",
+  ),
 ) as Record<
   string,
   { email: string; password: string; id: string; shelterId?: string }
@@ -16,7 +19,13 @@ export async function login(page: Page, name: string) {
   await page.goto("/pt/auth/login");
   await page.locator("[name=email]").fill(accounts[name].email);
   await page.locator("[name=password]").fill(accounts[name].password);
-  await page.locator("main form button[type=submit]").click();
+  await page
+    .locator("main form")
+    .filter({
+      has: page.locator("input[name=email], input[name=confirm_password]"),
+    })
+    .locator("button[type=submit]")
+    .click();
   await expect(page).toHaveURL(
     new RegExp(
       `/pt/${name === "admin" ? "admin" : name.includes("shelter") ? "canil" : "user"}$`,
@@ -28,7 +37,9 @@ export async function mailLink(email: string, subject: string) {
   await expect
     .poll(async () => {
       const body = await (
-        await fetch("http://127.0.0.1:54324/api/v1/messages")
+        await fetch(
+          `${process.env.FYA_E2E_MAIL_URL ?? "http://127.0.0.1:54324"}/api/v1/messages`,
+        )
       ).json();
       messageId = body.messages?.find(
         (m: { ID: string; Subject: string; To: { Address: string }[] }) =>
@@ -38,7 +49,9 @@ export async function mailLink(email: string, subject: string) {
     })
     .toBe(true);
   const body = await (
-    await fetch(`http://127.0.0.1:54324/api/v1/message/${messageId}`)
+    await fetch(
+      `${process.env.FYA_E2E_MAIL_URL ?? "http://127.0.0.1:54324"}/api/v1/message/${messageId}`,
+    )
   ).json();
   const match = body.HTML.match(/href="([^"]*\/auth\/v1\/verify[^" ]*)"/);
   if (!match) throw new Error("No verification URL in captured email");

@@ -46,11 +46,7 @@ export async function updateAnimalStatus(formData: FormData) {
     redirect(`/${locale}/canil/animais?error=no_shelter`);
   }
 
-  const { error } = await supabase
-    .from("animais")
-    .update({ status })
-    .eq("id", animalId)
-    .eq("canil_id", shelter.id);
+  const { error } = await supabase.rpc("manage_animal", { p_animal: animalId, p_operation: status });
 
   if (error) {
     redirect(`/${locale}/canil/animais?error=save_failed`);

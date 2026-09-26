@@ -75,6 +75,7 @@ export default async function Settings({
           {pt ? "Guardar alterações" : "Save changes"}
         </SubmitButton>
       </form>
+      <Link className="underline" href={`/${locale}/conta/privacidade`}>{pt ? "Os meus dados e pedidos de privacidade" : "My data and privacy requests"}</Link>
       <section className="surface max-w-xl">
         <h2 className="font-semibold">
           {pt ? "Segurança da conta" : "Account security"}

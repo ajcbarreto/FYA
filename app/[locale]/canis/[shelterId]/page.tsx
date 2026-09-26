@@ -31,7 +31,7 @@ export async function generateMetadata({
     return {
       title:
         locale === "pt"
-          ? "Canil nao encontrado | FYA"
+          ? "Canil não encontrado | FYA"
           : "Shelter not found | FYA",
     };
   }
@@ -40,7 +40,7 @@ export async function generateMetadata({
   const description =
     shelter.missao?.trim().slice(0, 160) ||
     (locale === "pt"
-      ? `Conhece o canil ${shelter.nome} em ${shelter.localizacao} e os animais para adocao.`
+      ? `Conhece o canil ${shelter.nome} em ${shelter.localizacao} e os animais para adoção.`
       : `Discover ${shelter.nome} shelter in ${shelter.localizacao} and its pets available for adoption.`);
 
   return {
@@ -67,7 +67,7 @@ export default async function ShelterPublicPage({
     <main
       id="main-content"
       tabIndex={-1}
-      className="mx-auto w-full max-w-7xl flex-1 px-6 pb-16 pt-8 lg:px-8"
+      className="mx-auto w-full max-w-7xl flex-1 px-5 pb-16 pt-8 sm:px-8"
     >
       <Link
         href={`/${locale}/canis`}

@@ -95,6 +95,10 @@ export async function NavbarActions({ locale }: NavbarActionsProps) {
     mobileLinks.push(
       { href: `/${locale}/canil`, label: dictionary.nav.canilDashboard },
       {
+        href: `/${locale}/canil/mensagens`,
+        label: dictionary.nav.userMessages,
+      },
+      {
         href: `/${locale}/canil/configuracoes`,
         label: dictionary.nav.canilSettings,
       },
@@ -121,19 +125,21 @@ export async function NavbarActions({ locale }: NavbarActionsProps) {
         <Link
           href={`/${locale}/user/favoritos`}
           aria-label={dictionary.nav.userFavorites}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
+          className="hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
         >
           <Heart className="h-5 w-5" />
         </Link>
       )}
 
       {user && (
-        <NavbarBadgeLinks
-          locale={locale}
-          role={role}
-          messagesLabel={dictionary.nav.userMessages}
-          notificationsLabel={dictionary.nav.notifications}
-        />
+        <div className="hidden items-center gap-2 sm:flex">
+          <NavbarBadgeLinks
+            locale={locale}
+            role={role}
+            messagesLabel={dictionary.nav.userMessages}
+            notificationsLabel={dictionary.nav.notifications}
+          />
+        </div>
       )}
 
       {!user && (
@@ -148,7 +154,7 @@ export async function NavbarActions({ locale }: NavbarActionsProps) {
       {!user && (
         <Link
           href={`/${locale}/auth/register`}
-          className="inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+          className="hidden h-10 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 sm:inline-flex"
         >
           {dictionary.nav.register}
         </Link>

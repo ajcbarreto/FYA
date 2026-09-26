@@ -11,7 +11,7 @@ export default function ErrorPage({
   return (
     <main id="main-content" className="page-shell">
       <div className="surface mx-auto my-12 max-w-lg text-center">
-        <h1 className="display-title text-4xl">
+        <h1 className="page-title">
           {pt ? "Vamos tentar outra vez." : "Let's try that again."}
         </h1>
         <p className="my-5 text-muted-foreground">

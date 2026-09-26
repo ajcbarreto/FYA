@@ -1,10 +1,10 @@
 import { loadEnvFile } from "node:process";
 import { createClient } from "@supabase/supabase-js";
 import { execFileSync } from "node:child_process";
-import { writeFileSync } from "node:fs";
-loadEnvFile(".env.test.local");
+import { writeFileSync, mkdirSync } from "node:fs";
+loadEnvFile(process.env.FYA_E2E_ENV ?? ".env.test.local");
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-if (url !== "http://127.0.0.1:54321")
+if (!["http://127.0.0.1:54321", "http://127.0.0.1:54331"].includes(url))
   throw new Error("Seed is restricted to the dedicated local instance");
 const admin = createClient(url, process.env.SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false },
@@ -47,7 +47,7 @@ execFileSync(
   [
     "exec",
     "-i",
-    "supabase_db_fya-local",
+    url.endsWith(":54331") ? "supabase_db_fya-launch-test" : "supabase_db_fya-local",
     "psql",
     "-U",
     "postgres",
@@ -70,7 +70,8 @@ for (const name of ["shelter", "other-shelter"])
   accounts[name].shelterId = shelters.find(
     (s) => s.owner_profile_id === accounts[name].id,
   )?.id;
-writeFileSync(".local-test/accounts.json", JSON.stringify(accounts, null, 2), {
+mkdirSync(".local-test", { recursive: true });
+writeFileSync(process.env.FYA_E2E_ACCOUNTS ?? ".local-test/accounts.json", JSON.stringify(accounts, null, 2), {
   mode: 0o600,
 });
 console.log(

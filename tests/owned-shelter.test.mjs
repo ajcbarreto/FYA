@@ -1,47 +1,32 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { getOwnedShelter } from "../lib/canil/owned-shelter.ts";
-
-function client(result) {
-  const calls = [];
-  const query = {
-    select() {
-      return query;
-    },
-    eq(...args) {
-      calls.push(args);
-      return query;
-    },
-    async maybeSingle() {
-      return result;
+test("shelter selection uses only the membership-scoped RPC", async () => {
+  let calls = 0;
+  const shelter = { id: "allowed" };
+  const db = {
+    rpc: async (name) => {
+      assert.equal(name, "my_shelters");
+      calls++;
+      return { data: [shelter], error: null };
     },
   };
-  return {
-    calls,
-    from(table) {
-      calls.push(table);
-      return query;
-    },
-  };
-}
-
-test("ownership lookup makes one scoped query without loading animals", async () => {
-  const shelter = { id: "shelter", owner_profile_id: "owner" };
-  const db = client({ data: shelter, error: null });
-  assert.deepEqual(await getOwnedShelter(db, "owner"), shelter);
-  assert.deepEqual(db.calls, ["canis", ["owner_profile_id", "owner"]]);
+  assert.deepEqual(await getOwnedShelter(db, "user"), shelter);
+  assert.equal(calls, 1);
 });
-
-test("missing ownership never falls back to another shelter", async () => {
-  const db = client({ data: null, error: null });
-  assert.equal(await getOwnedShelter(db, "new-owner"), null);
-  assert.equal(db.calls.length, 2);
+test("missing membership never falls back to a public shelter", async () => {
+  assert.equal(
+    await getOwnedShelter(
+      { rpc: async () => ({ data: [], error: null }) },
+      "user",
+    ),
+    null,
+  );
 });
-
 test("database errors are not mistaken for missing ownership", async () => {
-  const error = { message: "connection unavailable" };
+  const error = { message: "unavailable" };
   await assert.rejects(
-    getOwnedShelter(client({ data: null, error }), "owner"),
-    (failure) => failure.cause === error,
+    getOwnedShelter({ rpc: async () => ({ data: null, error }) }, "user"),
+    (e) => e.cause === error,
   );
 });

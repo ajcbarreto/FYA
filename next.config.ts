@@ -1,9 +1,12 @@
 import type { NextConfig } from "next";
 
-const localStorage =
-  process.env.NEXT_PUBLIC_SUPABASE_URL === "http://127.0.0.1:54321";
+const localStorage = [
+  "http://127.0.0.1:54321",
+  "http://127.0.0.1:54331",
+].includes(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "");
 
 const nextConfig: NextConfig = {
+  experimental: { serverActions: { bodySizeLimit: "12mb" } },
   distDir: process.env.NEXT_DIST_DIR || ".next",
   images: {
     dangerouslyAllowLocalIP: localStorage,
@@ -13,7 +16,7 @@ const nextConfig: NextConfig = {
             {
               protocol: "http" as const,
               hostname: "127.0.0.1",
-              port: "54321",
+              port: new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).port,
               pathname: "/storage/v1/object/public/**",
             },
           ]

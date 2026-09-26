@@ -58,8 +58,7 @@ export async function updatePlatformSettings(formData: FormData) {
   const defaultAdoptionFee = String(
     formData.get("defaultAdoptionFee") ?? "",
   ).trim();
-  const requireVerificationToPublish =
-    String(formData.get("requireVerificationToPublish") ?? "") === "on";
+  const requireVerificationToPublish = true;
 
   if (!platformName) {
     redirect(`/${locale}/admin/configuracoes?error=invalid_platform`);

@@ -357,6 +357,7 @@ export default async function ShelterRegistrationPage({
             </label>
           </section>
 
+          <label className="flex items-start gap-3"><input type="checkbox" name="terms" required/><span>{locale === "pt" ? "Li e aceito as condições do piloto." : "I have read and accept the pilot terms."} <Link className="underline" href={`/${locale}/termos`}>{locale === "pt" ? "Condições" : "Terms"}</Link> · <Link className="underline" href={`/${locale}/privacidade`}>{locale === "pt" ? "Privacidade" : "Privacy"}</Link></span></label>
           <div className="flex flex-col items-center justify-end gap-4 md:flex-row">
             <button
               type="button"

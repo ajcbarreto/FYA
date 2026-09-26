@@ -229,11 +229,8 @@ export async function getUnreadMessagesCount(
   supabase: SupabaseClient,
   userId: string,
 ) {
-  const { data: shelters } = await supabase
-    .from("canis")
-    .select("id")
-    .eq("owner_profile_id", userId);
-  const shelterIds = (shelters ?? []).map((row) => row.id);
+  const { data: shelters } = await supabase.rpc("my_shelters");
+  const shelterIds = (shelters ?? []).map((row: { id: string }) => row.id);
   let query = supabase
     .from("conversas_adocao")
     .select("id")

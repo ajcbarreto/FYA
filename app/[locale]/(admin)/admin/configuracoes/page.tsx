@@ -48,7 +48,7 @@ export default async function AdminSettingsPage({
             "Texto livre mostrado no detalhe do animal (ex: 150 EUR). Deixa vazio para nao mostrar.",
           requireVerification: "Exigir canil verificado para publicar animais",
           requireVerificationHint:
-            "Se ativo, um canil so consegue criar novos animais depois de ser verificado pelo admin.",
+            "A publicação exige sempre verificação. Os registos internos podem ser criados antes.",
           save: "Guardar configuracoes",
           messages: {
             platform_saved: "Configuracoes da plataforma guardadas.",
@@ -68,7 +68,7 @@ export default async function AdminSettingsPage({
             "Free text shown on the pet detail page (e.g. 150 EUR). Leave empty to hide.",
           requireVerification: "Require verified shelter to publish animals",
           requireVerificationHint:
-            "When enabled, a shelter can only create new animals after being verified by an admin.",
+            "Publishing always requires verification. Internal records can be created beforehand.",
           save: "Save settings",
           messages: {
             platform_saved: "Platform settings saved.",
@@ -163,7 +163,8 @@ export default async function AdminSettingsPage({
             <input
               type="checkbox"
               name="requireVerificationToPublish"
-              defaultChecked={platform.requireVerificationToPublish}
+              checked
+              disabled
               className="mt-0.5 h-4 w-4 rounded border-border"
             />
             <span>

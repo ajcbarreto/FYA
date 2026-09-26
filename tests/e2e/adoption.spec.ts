@@ -14,13 +14,11 @@ test("administrator verifies shelter; shelter creates, edits, uploads and remove
     .eq("id", accounts.shelter.shelterId!);
   await login(a, "admin");
   await a.goto("/pt/admin/canis");
-  const verifyForm = a
-    .locator("form")
-    .filter({
-      has: a.locator(
-        `input[name=shelterId][value="${accounts.shelter.shelterId}"]`,
-      ),
-    });
+  const verifyForm = a.locator("form").filter({
+    has: a.locator(
+      `input[name=shelterId][value="${accounts.shelter.shelterId}"]`,
+    ),
+  });
   await verifyForm.locator("button").click();
   await expect(a).toHaveURL(/success=shelter_verified/);
   await login(s, "shelter");
@@ -41,16 +39,14 @@ test("administrator verifies shelter; shelter creates, edits, uploads and remove
   await s.getByRole("button", { name: "Guardar dados" }).click();
   await expect(s).toHaveURL(/success=/);
   const photo = s.locator("form").filter({ has: s.locator("[name=photo]") });
-  await s
-    .locator("[name=photo]")
-    .setInputFiles({
-      name: "test-animal.png",
-      mimeType: "image/png",
-      buffer: Buffer.from(
-        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a1ioAAAAASUVORK5CYII=",
-        "base64",
-      ),
-    });
+  await s.locator("[name=photo]").setInputFiles({
+    name: "test-animal.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEElEQVR4nGNQKg8FIgYIBQAZSgO5V3NlIgAAAABJRU5ErkJggg==",
+      "base64",
+    ),
+  });
   await photo.locator("button").click();
   await expect(s).toHaveURL(/success=uploaded/);
   const { data: photos } = await admin
@@ -74,8 +70,8 @@ test("administrator verifies shelter; shelter creates, edits, uploads and remove
     .toBe(true);
   await s.goto(`/pt/canil/animais/${id}`);
   s.on("dialog", (dialog) => dialog.accept());
-  await s.getByRole("button", { name: /Eliminar animal/ }).click();
-  await expect(s).toHaveURL(/\/canil\/animais\?success=deleted/);
+  await s.getByRole("button", { name: /Arquivar animal/ }).click();
+  await expect(s).toHaveURL(/\/canil\/animais\?success=animal_deleted/);
   await adminContext.close();
   await shelterContext.close();
 });
@@ -96,6 +92,9 @@ test("favorites, draft, application, two-way realtime chat, reconnect, visit and
   await expect(
     u.getByRole("button", { name: "Remover dos favoritos" }),
   ).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    u.getByRole("button", { name: "Remover dos favoritos" }),
+  ).toBeEnabled();
   await u.reload();
   await expect(
     u.getByRole("button", { name: "Remover dos favoritos" }),
@@ -161,7 +160,9 @@ test("favorites, draft, application, two-way realtime chat, reconnect, visit and
     .locator("..")
     .getByRole("button")
     .click();
-  await expect(u.getByRole("alert")).toContainText("Mensagem não enviada");
+  await expect(u.locator("main").getByRole("alert")).toContainText(
+    "Mensagem não enviada",
+  );
   await expect(u.locator("main textarea")).toHaveValue(
     "Mensagem recuperada após falha",
   );
@@ -181,7 +182,7 @@ test("favorites, draft, application, two-way realtime chat, reconnect, visit and
     .eq("conversa_id", conversation.id)
     .eq("conteudo", "Mensagem recuperada após falha");
   expect(count).toBe(1);
-  await s.goto("/pt/canil/pedidos");
+  await s.goto(`/pt/canil/pedidos?q=${encodeURIComponent(animal.nome)}`);
   const statusForm = s
     .locator("form")
     .filter({ has: s.locator(`input[name=requestId][value="${request.id}"]`) });
@@ -192,21 +193,34 @@ test("favorites, draft, application, two-way realtime chat, reconnect, visit and
   const visit = u
     .locator("form")
     .filter({ has: u.locator(`input[name=pedidoId][value="${request.id}"]`) });
+  await u.locator("tr").filter({ has: visit }).locator("summary").click();
   const when = new Date(Date.now() + 86400000).toISOString().slice(0, 16);
-  await visit.locator("[name=scheduledAt]").fill(when);
+  await visit.locator("input[type=datetime-local]").fill(when);
   await visit.locator("button").click();
   await expect(u).toHaveURL(/success=/);
   await s.reload();
   const row = s
     .locator("tr")
     .filter({ has: s.locator(`input[name=requestId][value="${request.id}"]`) });
-  await row.locator("summary").click();
+  await row.getByText("Questionario e visitas", { exact: true }).click();
   await row.getByRole("button", { name: "Confirmar", exact: true }).click();
   await expect(s).toHaveURL(/success=/);
   for (const status of ["aprovado", "concluido"]) {
     await statusForm.locator("select").selectOption(status);
     await statusForm.locator("button").click();
     await expect(s).toHaveURL(/success=/);
+    await expect
+      .poll(async () => {
+        const { data, error } = await admin
+          .from("pedidos_adocao")
+          .select("status")
+          .eq("id", request.id)
+          .single();
+        if (error) throw error;
+        return data.status;
+      })
+      .toBe(status);
+    await expect(statusForm.locator("button")).toBeEnabled();
   }
   const { data: done } = await admin
     .from("animais")

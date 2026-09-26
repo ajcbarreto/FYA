@@ -74,7 +74,13 @@ export async function proxy(request: NextRequest) {
     );
   try {
     const role = await resolveUserRole(client.supabase, user);
-    if (role !== required && role !== "admin")
+    let teamAccess = false;
+    if (required === "canil" && role !== "canil" && role !== "admin") {
+      const { data, error } = await client.supabase.rpc("my_shelters");
+      if (error) throw error;
+      teamAccess = Boolean(data?.length);
+    }
+    if (role !== required && role !== "admin" && !teamAccess)
       return redirectTo(`/${locale}?error=unauthorized`);
   } catch {
     return redirectTo(`/${locale}/auth/login?error=permissions_unavailable`);

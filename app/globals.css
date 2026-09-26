@@ -167,6 +167,7 @@
   h2,
   h3 {
     text-wrap: balance;
+    overflow-wrap: anywhere;
   }
   p {
     text-wrap: pretty;
@@ -204,10 +205,20 @@
     @apply text-xs font-bold uppercase tracking-[.18em] text-secondary;
   }
   .display-title {
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading);
     font-weight: 400;
     letter-spacing: -0.055em;
     line-height: 1.04;
+  }
+  .page-title {
+    @apply text-3xl sm:text-4xl;
+    font-family: var(--font-heading);
+    font-weight: 400;
+    letter-spacing: -0.04em;
+    line-height: 1.15;
+  }
+  .dashboard-shell {
+    @apply mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-5 py-8 sm:px-8 lg:flex-row;
   }
   .button-primary {
     @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90;
@@ -219,7 +230,23 @@
     @apply inline-flex size-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-muted;
   }
   .field {
-    @apply min-h-12 w-full rounded-xl border border-input bg-card px-3 py-2.5 text-sm text-foreground outline-none transition-shadow focus:ring-2 focus:ring-ring/25;
+    @apply mt-1 block min-h-12 min-w-0 w-full rounded-xl border border-input bg-card px-3 py-2.5 text-base text-foreground transition-shadow focus-visible:ring-2 focus-visible:ring-ring/25 sm:text-sm;
+  }
+  textarea.field {
+    @apply min-h-28 resize-y leading-relaxed;
+  }
+  .support-panel {
+    @apply min-w-0 space-y-4 rounded-2xl border border-border bg-card p-4 sm:p-6;
+    overflow-wrap: anywhere;
+  }
+  .support-form label {
+    @apply block text-sm font-medium leading-6;
+  }
+  .support-form label:has(input[type="checkbox"]) {
+    @apply flex min-h-11 items-start gap-3;
+  }
+  .support-form input[type="checkbox"] {
+    @apply mt-1 size-5 shrink-0 rounded;
   }
   .surface {
     @apply rounded-3xl border border-border/60 bg-card p-6 shadow-[0_5px_25px_-18px_#214e4340];
@@ -247,7 +274,12 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 45%), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 45%),
+      transparent
+    );
     transform: translateX(-100%);
     animation: skeleton-shimmer 1.6s ease-in-out infinite;
     animation-delay: inherit;
@@ -255,12 +287,19 @@
   }
 
   .dark .sketch-block::after {
-    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 8%), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 8%),
+      transparent
+    );
   }
 }
 
 @keyframes skeleton-shimmer {
-  to { transform: translateX(100%); }
+  to {
+    transform: translateX(100%);
+  }
 }
 
 .navigation-progress-bar {
@@ -288,5 +327,55 @@
   }
 }
 
-html { scroll-padding-top: 5.5rem; }
-main { scroll-margin-top: 5.5rem; }
+html {
+  scroll-padding-top: 5.5rem;
+}
+main {
+  scroll-margin-top: 5.5rem;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+  body:has(.animal-print-sheet) {
+    background: white !important;
+    color: #203e38 !important;
+  }
+  body:has(.animal-print-sheet) > header,
+  body:has(.animal-print-sheet) header,
+  body:has(.animal-print-sheet) footer,
+  body:has(.animal-print-sheet) nav,
+  body:has(.animal-print-sheet) .no-print,
+  body:has(.animal-print-sheet) [data-sonner-toaster],
+  body:has(.animal-print-sheet) > a {
+    display: none !important;
+  }
+  body:has(.animal-print-sheet) main {
+    padding: 0;
+    margin: 0;
+    max-width: none;
+  }
+  .animal-print-sheet {
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    width: 100%;
+    max-width: none;
+    font-size: 11pt;
+  }
+  .animal-print-sheet h1 {
+    font-size: 30pt;
+  }
+  .animal-print-sheet .animal-print-photo {
+    height: 75mm;
+  }
+  .animal-print-sheet [data-testid="animal-qr"] {
+    width: 38mm;
+    height: 38mm;
+  }
+  .animal-print-sheet img {
+    print-color-adjust: exact;
+  }
+}

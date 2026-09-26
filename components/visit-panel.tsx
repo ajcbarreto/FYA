@@ -1,3 +1,4 @@
+import { LocalDateTime } from "@/components/local-datetime";
 import { SubmitButton } from "@/components/submit-button";
 import { CalendarClock } from "lucide-react";
 import { proposeVisit, updateVisitStatus } from "@/app/adoption/visits-actions";
@@ -14,6 +15,7 @@ type VisitPanelProps = {
   visits: VisitRow[];
   audience: "user" | "canil";
   canPropose?: boolean;
+  slots?: { starts_at: string; capacity: number }[];
 };
 
 export function VisitPanel({
@@ -22,6 +24,7 @@ export function VisitPanel({
   visits,
   audience,
   canPropose = false,
+  slots = [],
 }: VisitPanelProps) {
   const isPt = locale === "pt";
   const t = {
@@ -114,12 +117,20 @@ export function VisitPanel({
           <input type="hidden" name="pedidoId" value={pedidoId} />
           <label className="flex flex-col gap-1 font-semibold text-muted-foreground">
             {t.propose}
-            <input
-              type="datetime-local"
-              name="scheduledAt"
-              required
-              className="h-9 rounded-lg border border-border/30 bg-background px-2 text-xs outline-none focus:ring-2 focus:ring-primary/20"
-            />
+            {slots.length ? (
+              <select name="scheduledAt" required className="field">
+                <option value="">
+                  {isPt ? "Escolher horário" : "Choose a slot"}
+                </option>
+                {slots.map((slot) => (
+                  <option key={slot.starts_at} value={slot.starts_at}>
+                    {formatVisitDate(slot.starts_at, locale)}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <LocalDateTime name="scheduledAt" />
+            )}
           </label>
           <SubmitButton
             type="submit"

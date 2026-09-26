@@ -1,3 +1,4 @@
+import { getOwnedShelter } from "@/lib/canil/owned-shelter";
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { getAuthUser } from "@/lib/supabase/get-user";
@@ -11,12 +12,7 @@ export default async function ShelterProfile({
   if (!isLocale(locale)) notFound();
   const { supabase, user } = await getAuthUser();
   if (!user || !supabase) redirect(`/${locale}/auth/login?next=/canil/perfil`);
-  const { data, error } = await supabase
-    .from("canis")
-    .select("id")
-    .eq("owner_profile_id", user.id)
-    .maybeSingle();
-  if (error) throw new Error("Unable to load shelter", { cause: error });
+  const data = await getOwnedShelter(supabase,user.id);
   if (!data) redirect(`/${locale}/canil?error=no_shelter`);
   redirect(`/${locale}/canis/${data.id}`);
 }

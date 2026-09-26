@@ -1,8 +1,24 @@
 import type { MetadataRoute } from "next";
-import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { createPublicSupabaseClient } from "@/lib/supabase/public-client";
+import { supabaseUrl, supabasePublishableKey } from "@/lib/supabase/config";
 import { locales } from "@/lib/i18n/config";
 
-const STATIC_PATHS = ["", "/pets", "/canis", "/historias", "/match"];
+const STATIC_PATHS = [
+  "",
+  "/pets",
+  "/canis",
+  "/historias",
+  "/match",
+  "/ajuda",
+  "/para-canis",
+  ...[
+    "registar-animal",
+    "documentos-dossier",
+    "candidaturas-respostas",
+    "equipa-tarefas-visitas",
+    "entrega-acompanhamento",
+  ].map((slug) => `/ajuda/${slug}`),
+];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = (
@@ -20,7 +36,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   try {
-    const supabase = await createServerSupabaseClient();
+    const supabase = createPublicSupabaseClient(
+      supabaseUrl,
+      supabasePublishableKey,
+    );
     const [{ data: animals }, { data: shelters }] = await Promise.all([
       supabase.from("animais").select("id").limit(2000),
       supabase.from("canis").select("id").limit(2000),

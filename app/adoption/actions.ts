@@ -1,5 +1,6 @@
 "use server";
 
+import { queueQuery, type QueueSearch } from "@/lib/records/request-queue";
 import { revalidatePublicCatalog } from "@/lib/pet-catalog/revalidate";
 
 import { after } from "next/server";
@@ -64,6 +65,11 @@ export async function updateRequestStatus(formData: FormData) {
   const requestId = String(formData.get("requestId") ?? "");
   const status = String(formData.get("status") ?? "");
   const notes = String(formData.get("notes") ?? "").trim();
+  const filters = queueQuery(
+    Object.fromEntries(
+      new URLSearchParams(String(formData.get("filters") ?? "")),
+    ) as QueueSearch,
+  );
 
   if (
     !requestId ||
@@ -81,10 +87,7 @@ export async function updateRequestStatus(formData: FormData) {
     redirect(`/${locale}/auth/login?next=/canil/pedidos`);
   }
 
-  const role = await getCurrentProfileRole(supabase, user.id);
-  if (role !== "canil" && role !== "admin") {
-    redirect(`/${locale}/canil/pedidos?error=unauthorized`);
-  }
+  // The RPC authorises the owner, editors and administrators in the database.
 
   const { error } = await supabase.rpc("transition_adoption", {
     p_request: requestId,
@@ -103,7 +106,7 @@ export async function updateRequestStatus(formData: FormData) {
     }
   });
   revalidatePublicCatalog();
-  redirect(`/${locale}/canil/pedidos?success=updated`);
+  redirect(`/${locale}/canil/pedidos?${filters}&success=updated`);
 }
 
 export async function sendAdoptionMessage(

@@ -55,7 +55,7 @@ export default async function CanilPetsPage({
           },
           success: {
             updated: "Estado do animal atualizado com sucesso.",
-            animal_deleted: "Animal removido.",
+            animal_deleted: "Animal arquivado.",
           },
           errors: {
             invalid_status: "Estado invalido.",
@@ -84,7 +84,7 @@ export default async function CanilPetsPage({
           },
           success: {
             updated: "Pet status was updated successfully.",
-            animal_deleted: "Pet removed.",
+            animal_deleted: "Animal archived.",
           },
           errors: {
             invalid_status: "Invalid status.",
@@ -239,7 +239,7 @@ export default async function CanilPetsPage({
                           className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-2 text-xs font-bold text-muted-foreground hover:bg-muted/80"
                         >
                           <ImagePlus className="h-3 w-3" />
-                          {locale === "pt" ? "Fotos" : "Photos"}
+                          {locale === "pt" ? "Ficha e fotos" : "Record and photos"}
                         </Link>
                       </div>
                     </td>

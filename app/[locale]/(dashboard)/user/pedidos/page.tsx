@@ -1,3 +1,5 @@
+import { withdrawApplication } from "@/app/records/operations-actions";
+import { SubmitButton } from "@/components/submit-button";
 import { loadPaginatedData } from "@/lib/pagination";
 import { ListPagination } from "@/components/list-pagination";
 import { countAdoptionRows } from "@/lib/adoption/db";
@@ -56,6 +58,8 @@ export default async function UserRequestsPage({
     supabase,
     requests.map((request) => request.id),
   );
+  const { data: slots, error: slotsError } = await supabase.from("visit_slots").select("canil_id,starts_at,capacity").in("canil_id", [...new Set(requests.map(r=>r.canil_id))]).gt("starts_at",new Date().toISOString()).order("starts_at");
+  if (slotsError) throw new Error("Unable to load available visits");
   const copy =
     locale === "pt"
       ? {
@@ -170,12 +174,14 @@ export default async function UserRequestsPage({
                               visits={visitsByPedido.get(request.id) ?? []}
                               audience="user"
                               canPropose={canPropose}
+                              slots={(slots??[]).filter(s=>s.canil_id===request.canil_id)}
                             />
                           </div>
                         </details>
                       </td>
                       <td className="px-6 py-4 text-sm font-semibold">
                         {localizeRequestStatus(request.status, locale)}
+                        {!["concluido","rejeitado"].includes(request.status) && <form action={withdrawApplication} className="mt-2"><input type="hidden" name="locale" value={locale}/><input type="hidden" name="requestId" value={request.id}/><SubmitButton className="text-xs text-destructive">{locale === "pt" ? "Retirar candidatura" : "Withdraw application"}</SubmitButton></form>}
                         <AdoptionProgress
                           status={request.status}
                           locale={locale}

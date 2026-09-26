@@ -58,6 +58,41 @@ export function CanilSidebar({ locale }: CanilSidebarProps) {
         };
 
   const items: NavItem[] = [
+    {
+      href: `/${locale}/canil/apoios`,
+      label: locale === "pt" ? "Apoios e donativos" : "Support and donations",
+      icon: PawPrint,
+    },
+    {
+      href: `/${locale}/canil/primeiros-passos`,
+      label: locale === "pt" ? "Primeiros passos" : "Getting started",
+      icon: Home,
+    },
+    {
+      href: `/${locale}/canil/agenda`,
+      label: locale === "pt" ? "Agenda" : "Calendar",
+      icon: FileText,
+    },
+    {
+      href: `/${locale}/ajuda`,
+      label: locale === "pt" ? "Centro de ajuda" : "Help centre",
+      icon: FileText,
+    },
+    {
+      href: `/${locale}/canil/operacao`,
+      label: locale === "pt" ? "Trabalho do dia" : "Daily work",
+      icon: FileText,
+    },
+    {
+      href: `/${locale}/canil/equipa`,
+      label: locale === "pt" ? "Equipa e canis" : "Team and shelters",
+      icon: Building2,
+    },
+    {
+      href: `/${locale}/canil/importar`,
+      label: locale === "pt" ? "Importar e exportar" : "Import and export",
+      icon: PawPrint,
+    },
     { href: `/${locale}/canil`, label: copy.links.dashboard, icon: Home },
     {
       href: `/${locale}/canil/perfil`,

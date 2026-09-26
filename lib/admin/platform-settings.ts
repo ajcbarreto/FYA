@@ -13,7 +13,7 @@ const defaults: PlatformSettings = {
   contactEmail: "contacto@fya.local",
   supportEmail: "apoio@fya.local",
   defaultAdoptionFee: "",
-  requireVerificationToPublish: false,
+  requireVerificationToPublish: true,
 };
 
 const SETTINGS_KEY = "platform_settings";
@@ -59,9 +59,8 @@ export async function getPlatformSettings(
     .eq("key", SETTINGS_KEY)
     .maybeSingle();
 
-  if (error || !data) {
-    return defaults;
-  }
+  if (error) throw new Error("Unable to load platform settings", { cause: error });
+  if (!data) return defaults;
 
   return normalizePlatformSettings(data.value);
 }

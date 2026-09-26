@@ -79,8 +79,8 @@ export default async function AnimalEditPage({
           saveDetails: "Guardar dados",
           dangerTitle: "Zona de perigo",
           dangerHint:
-            "Apagar o animal remove tambem fotos e pedidos associados.",
-          deleteAnimal: "Apagar animal",
+            "Arquivar retira o animal do catálogo e preserva os registos e pedidos.",
+          deleteAnimal: "Arquivar animal",
           uploadTitle: "Adicionar foto",
           uploadHint: "JPG, PNG ou WebP ate 5MB.",
           upload: "Carregar foto",
@@ -112,8 +112,8 @@ export default async function AnimalEditPage({
           saveDetails: "Save details",
           dangerTitle: "Danger zone",
           dangerHint:
-            "Deleting the pet also removes its photos and related requests.",
-          deleteAnimal: "Delete pet",
+            "Archiving removes the animal from the catalogue and preserves records and requests.",
+          deleteAnimal: "Archive pet",
           uploadTitle: "Add photo",
           uploadHint: "JPG, PNG or WebP up to 5MB.",
           upload: "Upload photo",
@@ -157,6 +157,8 @@ export default async function AnimalEditPage({
         <h1 className="display-title text-4xl sm:text-5xl">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>
       </header>
+
+      <Link className="inline-flex rounded-full bg-primary px-5 py-3 font-bold text-primary-foreground" href={`/${locale}/canil/animais/${animalId}/registos`}>{locale === "pt" ? "Abrir centro de registos e documentos" : "Open records and documents"}</Link>
 
       <ToastFeedback
         message={feedback}

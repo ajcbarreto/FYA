@@ -213,9 +213,11 @@ export default async function RegisterPage({
             <label className="flex items-start gap-3 px-1 text-sm text-muted-foreground">
               <input
                 type="checkbox"
+                name="terms"
+                required
                 className="mt-1 h-4 w-4 rounded border-border text-secondary focus:ring-secondary"
               />
-              <span>{copy.terms}</span>
+              <span>{copy.terms} <Link className="underline" href={`/${locale}/termos`}>{locale === "pt" ? "Condições do piloto" : "Pilot terms"}</Link> · <Link className="underline" href={`/${locale}/privacidade`}>{locale === "pt" ? "Privacidade" : "Privacy"}</Link></span>
             </label>
 
             <SubmitButton

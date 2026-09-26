@@ -20,7 +20,7 @@ export function ListPagination({
       {page > 1 && (
         <Link
           className="rounded-full border border-border px-3 py-2"
-          href={`${base}?page=${page - 1}`}
+          href={`${base}${base.includes("?") ? "&" : "?"}page=${page - 1}`}
         >
           {locale === "pt" ? "Anterior" : "Previous"}
         </Link>
@@ -31,7 +31,7 @@ export function ListPagination({
       {page < pages && (
         <Link
           className="rounded-full border border-border px-3 py-2"
-          href={`${base}?page=${page + 1}`}
+          href={`${base}${base.includes("?") ? "&" : "?"}page=${page + 1}`}
         >
           {locale === "pt" ? "Seguinte" : "Next"}
         </Link>

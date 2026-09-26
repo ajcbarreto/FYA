@@ -16,7 +16,7 @@ Os scripts na raiz de `supabase/` são históricos. A instalação atual usa exc
 
 ### Base nova de desenvolvimento
 
-Aplicar `202609070000_baseline.sql` e depois `202609070001_hardening.sql` na mesma instância Supabase, pela ordem indicada. Não criar utilizadores nem expor a base entre as duas migrações: a segunda aplica as restrições finais. O schema `auth`, o Storage e os papéis `anon`, `authenticated` e `service_role` são fornecidos pelo Supabase.
+Aplicar todas as migrações de `supabase/migrations/` por ordem do nome, começando em `202609070000_baseline.sql`, na mesma instância Supabase. Não criar utilizadores nem expor a base entre as duas migrações: a segunda aplica as restrições finais. O schema `auth`, o Storage e os papéis `anon`, `authenticated` e `service_role` são fornecidos pelo Supabase.
 
 Depois, criar contas de teste pelo Auth. Contas públicas nunca podem criar administradores; um administrador inicial deve ser provisionado pela administração da base. Os seeds de demonstração são opcionais e só devem ser usados em bases descartáveis. Não são parte das migrações.
 
@@ -54,3 +54,19 @@ npm run build
 A CI executa estes comandos e verifica se os tipos gerados estão sincronizados. Depois das migrações, validar com dois adotantes, dois abrigos e um administrador: isolamento de dados, candidatura repetida, mudanças de estado, visitas, fotos, favoritos e reconexão do chat.
 
 Detalhes das alterações e limites da validação estão em `docs/modernizacao-entrega.md`.
+
+## Centro de registos e operação
+
+A entrega de setembro de 2026 acrescenta registos privados, documentos e dossiers de adoção, equipas, tarefas, agenda, importação CSV, checklist de entrega e pedidos de privacidade. Não inclui devoluções, por decisão de produto.
+
+Seguir [a documentação de entrega e ativação](docs/entrega-centro-registos.md) antes de publicar. Executar `npm run check:launch` para identificar configuração em falta; este comando não certifica prontidão jurídica ou operacional.
+
+As novas migrações criam tabelas e alteram permissões e funções existentes; devem ser testadas numa cópia da base e aplicadas antes do código. Acesso em equipa passa pela RPC `my_shelters`; fotografias públicas e documentos privados usam buckets separados. Nunca tornar `animal-documents` público.
+
+## Ajuda e divulgação
+
+Centro de ajuda PT/EN, primeiros passos do canil, cronologia privada, ficha imprimível com QR e captação de pedidos de piloto. Ver [a entrega de ajuda e divulgação](docs/entrega-ajuda-divulgacao.md), incluindo a migração adicional e os limites de ativação. As artes para redes sociais e os guiões de vídeo estão preparados; as contas e os vídeos não foram publicados.
+
+## Apoios e donativos
+
+Campanhas, necessidades, promessas privadas e receções confirmadas pelos canis. Pagamentos através de ligações externas; Stripe fica para a fase final. Ver [funcionamento, ativação e limites](docs/entrega-apoios-donativos.md).

@@ -123,13 +123,12 @@ export async function createAnimal(formData: FormData) {
   }
 
   const platform = await getPlatformSettings(supabase);
-  if (platform.requireVerificationToPublish && !shelter.verificado) {
-    redirect(`/${locale}/canil/animais/novo?error=needs_verification`);
-  }
+  const published = shelter.verificado;
+  void platform;
 
   const { data: created, error } = await supabase
     .from("animais")
-    .insert({ ...input, canil_id: shelter.id })
+    .insert({ ...input, published, canil_id: shelter.id })
     .select("id")
     .maybeSingle();
 
@@ -167,11 +166,7 @@ export async function updateAnimal(formData: FormData) {
     redirect(`${redirectBase}?error=not_authorized`);
   }
 
-  const { error } = await supabase
-    .from("animais")
-    .update(input)
-    .eq("id", animalId)
-    .eq("canil_id", ownership.shelter.id);
+  const { error } = await supabase.rpc("save_animal_details", { p_animal: animalId, p_data: input });
 
   if (error) {
     redirect(`${redirectBase}?error=save_failed`);
@@ -205,11 +200,7 @@ export async function deleteAnimal(formData: FormData) {
     redirect(`/${locale}/canil/animais?error=not_authorized`);
   }
 
-  const { error } = await supabase
-    .from("animais")
-    .delete()
-    .eq("id", animalId)
-    .eq("canil_id", ownership.shelter.id);
+  const { error } = await supabase.rpc("manage_animal", { p_animal: animalId, p_operation: "archive" });
 
   if (error) {
     redirect(`/${locale}/canil/animais?error=delete_failed`);

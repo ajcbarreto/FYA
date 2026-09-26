@@ -43,6 +43,16 @@ export function AdminSidebar({ locale }: AdminSidebarProps) {
 
   const items: NavItem[] = [
     {
+      href: `/${locale}/admin/pilotos`,
+      label: locale === "pt" ? "Pedidos de piloto" : "Pilot requests",
+      icon: Building2,
+    },
+    {
+      href: `/${locale}/admin/privacidade`,
+      label: locale === "pt" ? "Privacidade" : "Privacy",
+      icon: Users,
+    },
+    {
       href: `/${locale}/admin`,
       label: copy.links.dashboard,
       icon: LayoutDashboard,

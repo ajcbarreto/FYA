@@ -1,8 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 import { loadEnvFile } from "node:process";
-loadEnvFile(".env.test.local");
+loadEnvFile(process.env.FYA_E2E_ENV ?? ".env.test.local");
 process.env.NEXT_DIST_DIR = ".next-e2e";
-if (process.env.NEXT_PUBLIC_SUPABASE_URL !== "http://127.0.0.1:54321")
+if (!["http://127.0.0.1:54321", "http://127.0.0.1:54331"].includes(process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""))
   throw new Error("E2E requires the local test database");
 export default defineConfig({
   testDir: "./tests/e2e",

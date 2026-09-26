@@ -135,6 +135,24 @@ export default async function CanilDashboardPage({
         </p>
       </header>
 
+      <aside className="rounded-2xl border border-primary/30 bg-muted p-5">
+        <h2 className="text-xl font-bold">
+          {locale === "pt"
+            ? "A preparar o teu canil?"
+            : "Setting up your shelter?"}
+        </h2>
+        <p className="my-2">
+          {locale === "pt"
+            ? "Acompanha os primeiros passos, desde o perfil até ao primeiro anúncio."
+            : "Follow the first steps, from your profile to your first listing."}
+        </p>
+        <Link
+          className="font-semibold underline"
+          href={`/${locale}/canil/primeiros-passos`}
+        >
+          {locale === "pt" ? "Ver o meu progresso" : "View my progress"} →
+        </Link>
+      </aside>
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-3xl border border-border/20 bg-card p-6">
           <div className="mb-4 inline-flex rounded-full bg-primary/15 p-3 text-primary">
