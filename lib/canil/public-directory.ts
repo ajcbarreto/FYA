@@ -6,19 +6,8 @@ import {
 } from "@/lib/pet-catalog/db-pets";
 import { listPrimaryPhotosForAnimals } from "@/lib/canil/animal-photos";
 
-export type PublicShelter = {
-  id: string;
-  nome: string;
-  localizacao: string;
-  missao: string | null;
-  telefone: string | null;
-  email_contacto: string | null;
-  verificado: boolean;
-  donation_url: string | null;
-  donation_message: string | null;
-  image_url: string | null;
-  created_at: string;
-};
+import type { PublicShelter } from "./public-shelter";
+export { getPublicShelterById, type PublicShelter } from "./public-shelter";
 
 type ShelterAnimalCountRow = {
   canil_id: string;
@@ -76,26 +65,6 @@ export async function countAnimalsByShelter(
     result.set(row.canil_id, (result.get(row.canil_id) ?? 0) + 1);
   }
   return result;
-}
-
-export async function getPublicShelterById(
-  supabase: SupabaseClient,
-  shelterId: string,
-) {
-  const { data, error } = await supabase
-    .from("canis")
-    .select(
-      "id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at,donation_url,donation_message,image_url",
-    )
-    .eq("id", shelterId)
-    .maybeSingle();
-
-  if (error) {
-    console.error("[getPublicShelterById] Supabase error:", error.message);
-    return null;
-  }
-
-  return (data as PublicShelter | null) ?? null;
 }
 
 export async function getAnimalsForPublicShelter(
