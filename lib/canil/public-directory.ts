@@ -6,7 +6,7 @@ import {
 } from "@/lib/pet-catalog/db-pets";
 import { listPrimaryPhotosForAnimals } from "@/lib/canil/animal-photos";
 
-import type { PublicShelter } from "./public-shelter";
+import { readPublicShelterQuery, type PublicShelter } from "./public-shelter";
 export { getPublicShelterById, type PublicShelter } from "./public-shelter";
 
 type ShelterAnimalCountRow = {
@@ -17,30 +17,23 @@ export async function listPublicShelters(
   supabase: SupabaseClient,
   options: { search?: string } = {},
 ) {
-  let query = supabase
-    .from("canis")
-    .select(
-      "id,nome,localizacao,missao,telefone,email_contacto,verificado,created_at,donation_url,donation_message,image_url",
-    )
-    .order("nome", { ascending: true });
-
-  const search = options.search?.trim();
-  if (search) {
-    const escaped = search.replaceAll("%", "\\%").replaceAll("_", "\\_");
-    query = query.or(
-      `nome.ilike.%${escaped}%,localizacao.ilike.%${escaped}%,missao.ilike.%${escaped}%`,
-    );
-  }
-
-  const { data, error } = await query;
-
-  if (error) throw new Error("Unable to load data", { cause: error });
-
-  if (!data) {
-    return [];
-  }
-
-  return data as PublicShelter[];
+  return (
+    (await readPublicShelterQuery<PublicShelter[]>(async (selection) => {
+      let query = supabase
+        .from("canis")
+        .select(selection)
+        .order("nome", { ascending: true });
+      const search = options.search?.trim();
+      if (search) {
+        const escaped = search.replaceAll("%", "\\%").replaceAll("_", "\\_");
+        query = query.or(
+          `nome.ilike.%${escaped}%,localizacao.ilike.%${escaped}%,missao.ilike.%${escaped}%`,
+        );
+      }
+      const { data, error } = await query;
+      return { data: data as unknown as PublicShelter[] | null, error };
+    })) ?? []
+  );
 }
 
 export async function countAnimalsByShelter(

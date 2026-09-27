@@ -50,3 +50,56 @@ test("invalid keys, missing migrations and network errors never become a false 4
     );
   }
 });
+
+test("missing optional image column retries list and detail without losing shelters", async () => {
+  const { readPublicShelterQuery } =
+    await import("../lib/canil/public-shelter.ts");
+  for (const data of [
+    { id: "a", nome: "Abrigo" },
+    [{ id: "a", nome: "Abrigo" }],
+    null,
+  ]) {
+    const selections = [];
+    const result = await readPublicShelterQuery(async (selection) => {
+      selections.push(selection);
+      return selections.length === 1
+        ? {
+            data: null,
+            error: {
+              code: "42703",
+              message: "column canis.image_url does not exist",
+            },
+          }
+        : { data, error: null };
+    });
+    assert.equal(selections.length, 2);
+    assert.equal(selections[0].includes("image_url"), true);
+    assert.equal(selections[1].includes("image_url"), false);
+    assert.equal(selections[1].includes("donation_url"), true);
+    assert.deepEqual(
+      result,
+      data === null
+        ? null
+        : Array.isArray(data)
+          ? [{ ...data[0], image_url: null }]
+          : { ...data, image_url: null },
+    );
+  }
+});
+test("a failed photography fallback propagates the second error", async () => {
+  const { readPublicShelterQuery } =
+    await import("../lib/canil/public-shelter.ts");
+  let calls = 0;
+  const error = { message: "Invalid API key" };
+  await assert.rejects(
+    readPublicShelterQuery(async () => ({
+      data: null,
+      error:
+        ++calls === 1
+          ? { code: "42703", message: "column canis.image_url does not exist" }
+          : error,
+    })),
+    (e) => e.cause === error,
+  );
+  assert.equal(calls, 2);
+});
