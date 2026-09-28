@@ -28,6 +28,9 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
         <Link
           key={code}
           href={localizedPath(code, nextPath)}
+          // Switching language is rare; prefetching both variants of every
+          // page doubles requests and 404s when a translation is missing.
+          prefetch={false}
           aria-current={locale === code ? "true" : undefined}
           aria-label={localeMetadata[code].name}
           className={`rounded-md px-3 py-1.5 transition-colors ${

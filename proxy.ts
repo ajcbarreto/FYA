@@ -9,6 +9,8 @@ import { resolveUserRole } from "./lib/auth/role";
 import { hasSecondFactor, mfaPath } from "./lib/auth/mfa";
 import { createProxySupabaseClient } from "./lib/supabase/proxy-client";
 import { hasSupabaseEnv } from "./lib/supabase/config";
+import { publicResourceExists } from "./lib/routing/public-resource";
+import { publicResourceFor } from "./lib/routing/public-resource-path";
 import type { UserRole } from "./lib/supabase/types";
 
 const protectedRoles: Record<string, UserRole> = {
@@ -48,6 +50,31 @@ export async function proxy(request: NextRequest) {
     NextResponse.next({ request: { headers: request.headers } }),
     activeLocale,
   );
+  const resource = publicResourceFor(segments.slice(1));
+  if (resource) {
+    const client =
+      hasSupabaseEnv && resource.kind === "record"
+        ? createProxySupabaseClient(request)
+        : null;
+    const exists = await publicResourceExists(
+      resource,
+      activeLocale,
+      client?.supabase ?? null,
+    );
+    if (!exists) {
+      // No route matches /{locale}/404, so the root not-found page renders
+      // with the site layout and the status set here.
+      const response = NextResponse.rewrite(
+        new URL(`/${activeLocale}/404`, request.url),
+        { status: 404, request: { headers: request.headers } },
+      );
+      client?.response.cookies
+        .getAll()
+        .forEach((cookie) => response.cookies.set(cookie));
+      return withLocaleCookie(response, activeLocale);
+    }
+    if (client) return withLocaleCookie(client.response, activeLocale);
+  }
   const required = protectedRoles[segments[1]];
   if (!hasSupabaseEnv) {
     return required

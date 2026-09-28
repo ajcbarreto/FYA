@@ -8,11 +8,6 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
   ),
-  title: {
-    default: "FYA (Found Your Animal)",
-    template: "%s",
-  },
-  description: "FYA - Found Your Animal, plataforma de adoção de animais",
   icons: {
     icon: "/favicon.ico",
   },
