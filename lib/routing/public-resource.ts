@@ -6,8 +6,8 @@ import type { PublicResource } from "@/lib/routing/public-resource-path";
 /**
  * Checked in the proxy, before the page streams, so a missing resource gets a
  * real HTTP 404 instead of a streamed not-found page with status 200.
- * Without a client, or when the query fails, only the id format is checked and
- * the page keeps the final say (a failed query surfaces as the page's error).
+ * Without a client (Supabase not configured) no record can exist. When the
+ * query fails the page keeps the final say and surfaces the error itself.
  */
 export async function publicResourceExists(
   resource: PublicResource,
@@ -17,7 +17,7 @@ export async function publicResourceExists(
   if (resource.kind === "guide")
     return helpGuides(locale).some((guide) => guide.slug === resource.slug);
   if (!validId(resource.id)) return false;
-  if (!supabase) return true;
+  if (!supabase) return false;
   const selection =
     resource.table === "animais"
       ? "id,canis!inner(id)"

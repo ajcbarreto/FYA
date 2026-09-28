@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Heart, PawPrint } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { getAdoptedPets } from "@/lib/pet-catalog/db-pets";
 import { staticPageMetadata } from "@/lib/seo/metadata";
 import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
@@ -29,8 +30,10 @@ export default async function SuccessStoriesPage({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const adopted = await getAdoptedPets(supabase, locale, 36);
+  // Without Supabase configured (local previews) show the empty state.
+  const adopted = hasSupabaseEnv
+    ? await getAdoptedPets(await createServerSupabaseClient(), locale, 36)
+    : [];
 
   const copy =
     locale === "pt"
@@ -102,7 +105,7 @@ export default async function SuccessStoriesPage({
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 xl:grid-cols-4">
-            {adopted.map((pet) => (
+            {adopted.map((pet, index) => (
               <article
                 key={pet.id}
                 className="overflow-hidden rounded-2xl border border-border/40 bg-card"
@@ -112,6 +115,11 @@ export default async function SuccessStoriesPage({
                     src={pet.imageUrl}
                     alt={pet.name}
                     fill
+                    loading={
+                      index < 4 || pet.imageUrl.includes("placeholder")
+                        ? "eager"
+                        : undefined
+                    }
                     sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 25vw"
                     className="object-cover"
                   />

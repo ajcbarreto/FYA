@@ -82,7 +82,7 @@ export async function PetDetailBody({
               src={gallery[0] ?? pet.imageUrl}
               alt={pet.name}
               fill
-              priority
+              preload
               sizes="(max-width:1024px) 100vw, 55vw"
               className="object-cover"
             />

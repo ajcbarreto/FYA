@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { getCachedPetById } from "@/lib/pet-catalog/cached-pets";
 import { PetDetailBody } from "@/components/pet-detail-body";
 import { PetDetailBodySkeleton } from "@/components/skeletons/pet-detail-skeleton";
@@ -16,7 +17,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, petId } = await params;
-  if (!isLocale(locale)) return {};
+  if (!isLocale(locale) || !hasSupabaseEnv) return {};
   const pet = await getCachedPetById(
     await createServerSupabaseClient(),
     petId,
@@ -46,7 +47,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PetDetails({ params, searchParams }: Props) {
   const { locale, petId } = await params;
-  if (!isLocale(locale) || !/^[0-9a-f-]{36}$/i.test(petId)) notFound();
+  // Without Supabase configured no animal can exist.
+  if (!isLocale(locale) || !hasSupabaseEnv || !/^[0-9a-f-]{36}$/i.test(petId))
+    notFound();
 
   const back = (await searchParams)?.back;
   const catalogPath =

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { BadgeCheck, Building2, MapPin, PawPrint, Search } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { hasSupabaseEnv } from "@/lib/supabase/config";
 import {
   countAnimalsByShelter,
   listPublicShelters,
@@ -39,15 +40,19 @@ export default async function SheltersDirectoryPage({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const shelters = await listPublicShelters(supabase, {
-    search: query || undefined,
-  });
+  // Without Supabase configured (local previews) the directory is empty
+  // instead of failing, like the pets catalog.
+  const supabase = hasSupabaseEnv ? await createServerSupabaseClient() : null;
+  const shelters = supabase
+    ? await listPublicShelters(supabase, { search: query || undefined })
+    : [];
   const shelterIds = shelters.map((shelter) => shelter.id);
-  const [animalsCount, ratingSummaries] = await Promise.all([
-    countAnimalsByShelter(supabase, shelterIds),
-    getShelterRatingSummaries(supabase, shelterIds),
-  ]);
+  const [animalsCount, ratingSummaries] = supabase
+    ? await Promise.all([
+        countAnimalsByShelter(supabase, shelterIds),
+        getShelterRatingSummaries(supabase, shelterIds),
+      ])
+    : [new Map<string, number>(), new Map()];
 
   const copy =
     locale === "pt"

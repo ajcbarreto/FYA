@@ -310,8 +310,13 @@ export async function ShelterDetailBody({
               </p>
             ) : (
               <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                {animals.slice(0, 6).map((pet) => (
-                  <ShelterAnimalCard key={pet.id} pet={pet} locale={locale} />
+                {animals.slice(0, 6).map((pet, index) => (
+                  <ShelterAnimalCard
+                    key={pet.id}
+                    pet={pet}
+                    locale={locale}
+                    eager={index < 3}
+                  />
                 ))}
               </div>
             )}
@@ -596,9 +601,11 @@ export async function ShelterDetailBody({
 function ShelterAnimalCard({
   pet,
   locale,
+  eager,
 }: {
   pet: PetCatalogItem;
   locale: Locale;
+  eager?: boolean;
 }) {
   return (
     <Link
@@ -610,6 +617,9 @@ function ShelterAnimalCard({
           src={pet.imageUrl}
           alt={pet.name}
           fill
+          loading={
+            eager || pet.imageUrl.includes("placeholder") ? "eager" : undefined
+          }
           sizes="(max-width: 639px) 90vw, (max-width: 1023px) 45vw, (max-width: 1279px) 30vw, 20vw"
           className="object-cover"
         />

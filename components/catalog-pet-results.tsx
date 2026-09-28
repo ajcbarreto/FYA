@@ -114,9 +114,10 @@ export async function CatalogPetResults({
 
       {pets.length ? (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {pets.map((pet) => (
+          {pets.map((pet, index) => (
             <PetCard
               key={pet.id}
+              eager={index < 4}
               pet={pet}
               locale={locale}
               isFavorite={favorites.has(pet.id)}

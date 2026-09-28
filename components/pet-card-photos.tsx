@@ -11,12 +11,14 @@ export function PetCardPhotos({
   status,
   locale,
   href,
+  eager,
 }: {
   name: string;
   imageUrls: string[];
   status: string;
   locale: string;
   href: string;
+  eager?: boolean;
 }) {
   const [index, setIndex] = useState(0);
   const pt = locale === "pt";
@@ -41,6 +43,11 @@ export function PetCardPhotos({
                 : name
           }
           fill
+          // The placeholder is one shared file fetched once, so lazy loading
+          // it saves nothing and makes Next.js flag it as a lazy LCP image.
+          loading={
+            eager || imageUrl.includes("placeholder") ? "eager" : undefined
+          }
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />

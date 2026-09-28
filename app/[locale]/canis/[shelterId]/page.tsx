@@ -5,6 +5,7 @@ import { ShelterDetailBody } from "@/components/shelter-detail-body";
 import { ShelterDetailBodySkeleton } from "@/components/skeletons/shelter-detail-skeleton";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { getCachedPublicShelterById } from "@/lib/canil/cached-shelter";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { describe } from "@/lib/seo/site";
@@ -20,7 +21,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string; shelterId: string }>;
 }): Promise<Metadata> {
   const { locale, shelterId } = await params;
-  if (!isLocale(locale)) return {};
+  if (!isLocale(locale) || !hasSupabaseEnv) return {};
 
   const supabase = await createServerSupabaseClient();
   const shelter = await getCachedPublicShelterById(supabase, shelterId);
@@ -52,7 +53,8 @@ export default async function ShelterPublicPage({
   const { locale, shelterId } = await params;
   const { success, error } = await searchParams;
 
-  if (!isLocale(locale)) {
+  // Without Supabase configured no shelter can exist.
+  if (!isLocale(locale) || !hasSupabaseEnv) {
     notFound();
   }
 
