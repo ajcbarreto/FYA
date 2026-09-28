@@ -58,3 +58,35 @@ export async function openNotification(formData: FormData) {
     : `/${locale}/notificacoes`;
   redirect(target);
 }
+
+/** Called from the navbar panel: marks without redirecting away. */
+export async function markNotificationsReadInPlace(notificationId?: string) {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false };
+  }
+
+  let query = supabase
+    .from("notificacoes")
+    .update({ lida: true })
+    .eq("user_profile_id", user.id)
+    .eq("lida", false);
+
+  if (notificationId) {
+    query = query.eq("id", notificationId);
+  }
+
+  const { error } = await query;
+
+  if (error) {
+    console.error("[markNotificationsReadInPlace]", error.message);
+    return { ok: false };
+  }
+
+  revalidatePath("/[locale]/notificacoes", "page");
+  return { ok: true };
+}

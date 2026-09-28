@@ -132,7 +132,7 @@ export async function NavbarActions({ locale }: NavbarActionsProps) {
       )}
 
       {user && (
-        <div className="hidden items-center gap-2 sm:flex">
+        <div className="flex items-center gap-2">
           <NavbarBadgeLinks
             locale={locale}
             role={role}

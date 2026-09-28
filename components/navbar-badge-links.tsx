@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, MessageCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { MessageCircle } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { NotificationsBell } from "@/components/notifications-bell";
 import type { UserRole } from "@/lib/supabase/types";
 
 type BadgeCounts = {
@@ -66,6 +67,13 @@ export function NavbarBadgeLinks({
     };
   }, []);
 
+  const setUnreadNotifications = useCallback((count: number) => {
+    setCounts((current) => ({
+      unreadMessages: current?.unreadMessages ?? 0,
+      unreadNotifications: count,
+    }));
+  }, []);
+
   const unreadMessages = counts?.unreadMessages ?? 0;
   const unreadNotifications = counts?.unreadNotifications ?? 0;
 
@@ -75,21 +83,19 @@ export function NavbarBadgeLinks({
         <Link
           href={`/${locale}/${role === "canil" ? "canil" : "user"}/mensagens`}
           aria-label={messagesLabel}
-          className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
+          className="relative hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
         >
           <MessageCircle className="h-5 w-5" />
           <Badge count={unreadMessages} variant="accent" />
         </Link>
       )}
 
-      <Link
-        href={`/${locale}/notificacoes`}
-        aria-label={notificationsLabel}
-        className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
-      >
-        <Bell className="h-5 w-5" />
-        <Badge count={unreadNotifications} variant="primary" />
-      </Link>
+      <NotificationsBell
+        locale={locale}
+        label={notificationsLabel}
+        unreadCount={unreadNotifications}
+        onUnreadCountChange={setUnreadNotifications}
+      />
     </>
   );
 }
