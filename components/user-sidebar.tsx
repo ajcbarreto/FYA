@@ -12,8 +12,10 @@ import {
   Search,
   Settings,
   Heart,
+  LogOut,
 } from "lucide-react";
 import type { Locale } from "@/lib/i18n/config";
+import { logout } from "@/app/auth/register/actions";
 
 type UserSidebarProps = {
   locale: Locale;
@@ -30,16 +32,17 @@ export function UserSidebar({ locale }: UserSidebarProps) {
   const copy =
     locale === "pt"
       ? {
-          subtitle: "Area do Adotante",
+          subtitle: "Área do adotante",
           navLabel: "Navegação",
           accountLabel: "A tua conta",
           links: {
-            dashboard: "Dashboard",
-            catalog: "Catalogo de Pets",
+            dashboard: "Painel",
+            catalog: "Catálogo de animais",
             favorites: "Favoritos",
             requests: "Meus Pedidos",
             messages: "Mensagens",
-            settings: "Configuracoes",
+            settings: "Definições",
+            logout: "Terminar sessão",
           },
         }
       : {
@@ -48,11 +51,12 @@ export function UserSidebar({ locale }: UserSidebarProps) {
           accountLabel: "Your account",
           links: {
             dashboard: "Dashboard",
-            catalog: "Pet Catalog",
+            catalog: "Animal catalog",
             favorites: "Favorites",
             requests: "My Requests",
             messages: "Messages",
             settings: "Settings",
+            logout: "Sign out",
           },
         };
 
@@ -74,12 +78,41 @@ export function UserSidebar({ locale }: UserSidebarProps) {
       label: copy.links.messages,
       icon: MessageCircle,
     },
+  ];
+  const accountItems: NavItem[] = [
     {
       href: `/${locale}/user/configuracoes`,
       label: copy.links.settings,
       icon: Settings,
     },
   ];
+
+  const renderLink = (item: NavItem, extraClass = "") => {
+    const Icon = item.icon;
+    const active = isDashboardLinkActive(
+      pathname,
+      item.href,
+      `/${locale}/user`,
+    );
+
+    return (
+      <Link
+        key={item.href}
+        aria-current={active ? "page" : undefined}
+        title={item.label}
+        href={item.href}
+        className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors lg:gap-3 lg:px-4 lg:py-3 ${extraClass} ${
+          active
+            ? "bg-primary text-primary-foreground shadow-sm"
+            : "text-muted-foreground hover:bg-muted hover:text-primary"
+        }`}
+      >
+        <Icon aria-hidden className="h-4 w-4 shrink-0" />
+        <span className="font-semibold">{item.label}</span>
+        <DashboardLinkStatus />
+      </Link>
+    );
+  };
 
   return (
     <aside className="min-w-0 w-full shrink-0 rounded-2xl border border-border/25 bg-card p-3 lg:sticky lg:top-24 lg:h-fit lg:w-72 lg:p-4">
@@ -96,36 +129,28 @@ export function UserSidebar({ locale }: UserSidebarProps) {
         aria-label={copy.navLabel}
         className="flex gap-1.5 overflow-x-auto pb-1 lg:flex-col lg:gap-1 lg:overflow-visible lg:pb-0"
       >
-        {items.map((item) => {
-          const Icon = item.icon;
-          const active = isDashboardLinkActive(
-            pathname,
-            item.href,
-            `/${locale}/user`,
-          );
-
-          return (
-            <Link
-              key={item.href}
-              aria-current={active ? "page" : undefined}
-              title={item.label}
-              href={item.href}
-              className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors lg:gap-3 lg:px-4 lg:py-3 ${
-                active
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-muted hover:text-primary"
-              }`}
-            >
-              <Icon aria-hidden className="h-4 w-4 shrink-0" />
-              <span className="font-semibold">{item.label}</span>
-              <DashboardLinkStatus />
-            </Link>
-          );
-        })}
+        {items.map((item) => renderLink(item))}
+        {accountItems.map((item) => renderLink(item, "lg:hidden"))}
       </nav>
       <p className="mt-4 hidden border-t border-border/40 px-3 pt-4 text-[10px] font-bold uppercase tracking-[.16em] text-muted-foreground lg:block">
         {copy.accountLabel}
       </p>
+      <nav
+        aria-label={copy.accountLabel}
+        className="mt-2 hidden flex-col gap-1 lg:flex"
+      >
+        {accountItems.map((item) => renderLink(item))}
+        <form action={logout}>
+          <input type="hidden" name="locale" value={locale} />
+          <button
+            type="submit"
+            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+          >
+            <LogOut aria-hidden className="h-4 w-4 shrink-0" />
+            <span className="font-semibold">{copy.links.logout}</span>
+          </button>
+        </form>
+      </nav>
     </aside>
   );
 }
