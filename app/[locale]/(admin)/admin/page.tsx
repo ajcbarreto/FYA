@@ -34,9 +34,9 @@ export default async function AdminDashboardPage({
     locale === "pt"
       ? {
           title: "Visao geral da plataforma",
-          subtitle: "Indicadores principais da FYA num so lugar.",
+          subtitle: "Indicadores principais da FYA num só lugar.",
           cards: {
-            adoptions: "Adocoes concluidas",
+            adoptions: "Adoções concluídas",
             pending: "Pedidos pendentes",
             requests: "Total de pedidos",
             sheltersPending: "Canis por verificar",
@@ -44,23 +44,23 @@ export default async function AdminDashboardPage({
             users: "Utilizadores",
             newUsers: "Novos esta semana",
             animals: "Animais na plataforma",
-            available: "Animais disponiveis",
+            available: "Animais disponíveis",
           },
-          attentionTitle: "Precisa de atencao",
+          attentionTitle: "Precisa de atenção",
           attentionVerify: (count: number) =>
             count === 1
-              ? "1 canil aguarda verificacao."
-              : `${count} canis aguardam verificacao.`,
+              ? "1 canil aguarda verificação."
+              : `${count} canis aguardam verificação.`,
           attentionRequests: (count: number) =>
             count === 1
-              ? "1 pedido de adocao pendente na plataforma."
-              : `${count} pedidos de adocao pendentes na plataforma.`,
+              ? "1 pedido de adoção pendente na plataforma."
+              : `${count} pedidos de adoção pendentes na plataforma.`,
           allClear: "Tudo em dia. Sem itens pendentes.",
           quickTitle: "Acessos rapidos",
           quick: {
             shelters: "Gerir canis",
             users: "Ver utilizadores",
-            settings: "Configuracoes da plataforma",
+            settings: "Configurações da plataforma",
           },
         }
       : {

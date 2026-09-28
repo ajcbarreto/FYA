@@ -30,10 +30,10 @@ export default async function ForgotPasswordPage({
             "Indica o teu email e enviamos um link para definires uma nova password.",
           emailLabel: "Email",
           emailPlaceholder: "tu@email.com",
-          submit: "Enviar link de recuperacao",
+          submit: "Enviar link de recuperação",
           backToLogin: "Voltar ao login",
-          sent: "Se existir uma conta com esse email, enviamos um link de recuperacao.",
-          invalid_email: "Indica um email valido.",
+          sent: "Se existir uma conta com esse email, enviamos um link de recuperação.",
+          invalid_email: "Indica um email válido.",
         }
       : {
           title: "Reset password",

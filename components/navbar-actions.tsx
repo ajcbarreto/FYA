@@ -57,8 +57,8 @@ export async function NavbarActions({ locale }: NavbarActionsProps) {
       ? {
           openMenu: "Abrir menu da conta",
           panel: "Meu painel",
-          settings: "Configuracoes",
-          logout: "Terminar sessao",
+          settings: "Configurações",
+          logout: "Terminar sessão",
         }
       : {
           openMenu: "Open account menu",

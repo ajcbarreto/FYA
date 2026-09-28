@@ -20,7 +20,7 @@ export function helpGuides(locale: string): Guide[] {
           minutes: 3,
           destination: "canil/animais",
           steps: [
-            "Abre Meus Pets e escolhe adicionar um animal. Preenche nome, espécie, sexo, porte, idade e descrição pública.",
+            "Abre Os meus animais e escolhe adicionar um animal. Preenche nome, espécie, sexo, porte, idade e descrição pública.",
             "Guarda os dados e acrescenta fotografias do animal. Confirma que não contêm documentos ou dados de pessoas.",
             "Abre Registos para preencher referência interna, microchip, entrada, localização, saúde e comportamento. Estes campos são privados.",
             "A publicação depende da verificação do canil. Confirma o estado de publicação nos Registos e abre a ficha pública para rever o resultado.",

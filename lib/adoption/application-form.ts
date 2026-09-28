@@ -67,7 +67,7 @@ export function localizeAnswerKey(
     keyof AdoptionApplicationAnswers,
     { pt: string; en: string }
   > = {
-    housing_type: { pt: "Tipo de habitacao", en: "Housing type" },
+    housing_type: { pt: "Tipo de habitação", en: "Housing type" },
     has_garden: { pt: "Tem quintal/jardim", en: "Has garden" },
     household_size: { pt: "Pessoas em casa", en: "Household size" },
     has_children: { pt: "Tem criancas", en: "Has children" },
@@ -76,7 +76,7 @@ export function localizeAnswerKey(
       pt: "Detalhes outros animais",
       en: "Other pets details",
     },
-    experience: { pt: "Experiencia com animais", en: "Pet experience" },
+    experience: { pt: "Experiência com animais", en: "Pet experience" },
     hours_alone: { pt: "Horas sozinho/dia", en: "Hours alone per day" },
     reason: { pt: "Motivo para adotar", en: "Reason to adopt" },
     message: { pt: "Mensagem ao canil", en: "Message to shelter" },
@@ -90,11 +90,11 @@ export function localizeAnswerValue(
   locale: string,
 ) {
   if (typeof value === "boolean") {
-    if (locale === "pt") return value ? "Sim" : "Nao";
+    if (locale === "pt") return value ? "Sim" : "Não";
     return value ? "Yes" : "No";
   }
   if (typeof value !== "string" || value.length === 0) {
-    return locale === "pt" ? "Nao respondido" : "Not answered";
+    return locale === "pt" ? "Não respondido" : "Not answered";
   }
   const labels: Partial<
     Record<
@@ -109,9 +109,9 @@ export function localizeAnswerValue(
       other: { pt: "Outro", en: "Other" },
     },
     experience: {
-      none: { pt: "Sem experiencia", en: "None" },
-      some: { pt: "Alguma experiencia", en: "Some" },
-      experienced: { pt: "Muita experiencia", en: "Experienced" },
+      none: { pt: "Sem experiência", en: "None" },
+      some: { pt: "Alguma experiência", en: "Some" },
+      experienced: { pt: "Muita experiência", en: "Experienced" },
     },
   };
   const map = labels[key];

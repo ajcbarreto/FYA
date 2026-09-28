@@ -63,7 +63,7 @@ export default async function UserRequestsPage({
   const copy =
     locale === "pt"
       ? {
-          title: "Meus Pedidos de Adocao",
+          title: "Os meus pedidos de adoção",
           subtitle: "Acompanha o estado das tuas candidaturas.",
           columns: {
             pet: "Pet e Canil",
@@ -72,20 +72,20 @@ export default async function UserRequestsPage({
             notes: "Notas do Canil",
           },
           empty:
-            "Ainda nao tens pedidos. Visita o catalogo e candidata-te a um pet.",
+            "Ainda não tens pedidos. Visita o catálogo e candidata-te a um animal.",
           visitsLabel: "Visitas",
           success: {
             request_created: "Candidatura enviada com sucesso.",
-            visit_proposed: "Visita proposta. Aguarda confirmacao do canil.",
+            visit_proposed: "Visita proposta. Aguarda confirmação do canil.",
             visit_updated: "Visita atualizada.",
           } as Record<string, string>,
           errors: {
-            request_failed: "Nao foi possivel submeter candidatura.",
+            request_failed: "Não foi possível submeter candidatura.",
             invalid_visit: "Dados de visita invalidos.",
             visit_in_past: "Escolhe uma data no futuro.",
             visit_not_allowed:
-              "Nao e possivel agendar visita para este pedido.",
-            visit_failed: "Nao foi possivel agendar a visita.",
+              "Não e possível agendar visita para este pedido.",
+            visit_failed: "Não foi possível agendar a visita.",
           } as Record<string, string>,
         }
       : {

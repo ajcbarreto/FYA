@@ -32,11 +32,11 @@ export default async function CanilSettingsPage({
   const copy =
     locale === "pt"
       ? {
-          title: "Configuracoes do Canil",
-          subtitle: "Atualiza os dados publicos usados na pagina do canil.",
+          title: "Configurações do Canil",
+          subtitle: "Atualiza os dados públicos usados na página do canil.",
           labels: {
             nome: "Nome do canil",
-            localizacao: "Localizacao",
+            localizacao: "Localização",
             telefone: "Telefone",
             email: "Email de contacto",
             missao: "Missao",
@@ -48,12 +48,12 @@ export default async function CanilSettingsPage({
             email: "contato@canil.pt",
             missao: "Descreve brevemente a missao do canil.",
           },
-          save: "Guardar configuracoes",
-          success: "Configuracoes guardadas com sucesso.",
+          save: "Guardar configurações",
+          success: "Configurações guardadas com sucesso.",
           errors: {
-            invalid_data: "Preenche pelo menos nome e localizacao.",
-            save_failed: "Nao foi possivel guardar. Tenta novamente.",
-            no_shelter: "Nao foi encontrado um canil associado a esta conta.",
+            invalid_data: "Preenche pelo menos nome e localização.",
+            save_failed: "Não foi possível guardar. Tenta novamente.",
+            no_shelter: "Não foi encontrado um canil associado a esta conta.",
           },
         }
       : {

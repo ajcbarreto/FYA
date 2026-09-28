@@ -25,7 +25,7 @@ export default async function MatchPage({ params }: MatchPageProps) {
         q1: "Que tipo de companheiro procuras?",
         q1Options: [
           { value: "", label: "Indiferente" },
-          { value: "cao", label: "Um cao" },
+          { value: "cao", label: "Um cão" },
           { value: "gato", label: "Um gato" },
         ],
         q2: "Onde vives?",
@@ -44,7 +44,7 @@ export default async function MatchPage({ params }: MatchPageProps) {
           },
         ],
         submit: "Ver os meus matches",
-        hint: "Vamos abrir o catalogo ja filtrado com base nas tuas respostas.",
+        hint: "Vamos abrir o catálogo já filtrado com base nas tuas respostas.",
       }
     : {
         eyebrow: "Find your match",

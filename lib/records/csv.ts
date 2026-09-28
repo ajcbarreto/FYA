@@ -7,7 +7,7 @@ export type ImportAnimal = {
   description: string;
 };
 export const CSV_TEMPLATE =
-  "reference,name,species,breed,age,description\nFYA-001,Luna,cao,,2,Animal de exemplo";
+  "reference,name,species,breed,age,description\nFYA-001,Luna,cão,,2,Animal de exemplo";
 export function parseAnimalCsv(text: string): ImportAnimal[] {
   if (text.length > 500000)
     throw new Error("CSV demasiado grande / CSV too large");

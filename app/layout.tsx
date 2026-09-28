@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     default: "FYA (Found Your Animal)",
     template: "%s",
   },
-  description: "FYA - Found Your Animal, plataforma de adocao de animais",
+  description: "FYA - Found Your Animal, plataforma de adoção de animais",
   icons: {
     icon: "/favicon.ico",
   },

@@ -35,11 +35,11 @@ export function UserSidebar({ locale }: UserSidebarProps) {
           accountLabel: "A tua conta",
           links: {
             dashboard: "Dashboard",
-            catalog: "Catalogo de Pets",
+            catalog: "Catálogo de animais",
             favorites: "Favoritos",
             requests: "Meus Pedidos",
             messages: "Mensagens",
-            settings: "Configuracoes",
+            settings: "Configurações",
           },
         }
       : {

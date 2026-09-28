@@ -70,7 +70,7 @@ test("invalid login, persistent session, route isolation and logout", async ({
     await expect(page).toHaveURL(/\/pt\/user|\/pt\?error=unauthorized/);
   }
   await page.getByRole("button", { name: "Abrir menu da conta" }).click();
-  await page.getByRole("menuitem", { name: "Terminar sessao" }).click();
+  await page.getByRole("menuitem", { name: "Terminar sessão" }).click();
   await expect(page).toHaveURL(/\/pt$/);
   await page.goto("/pt/user");
   await expect(page).toHaveURL(/auth\/login/);

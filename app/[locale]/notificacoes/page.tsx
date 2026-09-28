@@ -36,10 +36,10 @@ export default async function NotificationsPage({
   const copy =
     locale === "pt"
       ? {
-          title: "Notificacoes",
+          title: "Notificações",
           subtitle: "Pedidos, favoritos e atividade da tua conta.",
           markAll: "Marcar todas como lidas",
-          empty: "Sem notificacoes por agora.",
+          empty: "Sem notificações por agora.",
           open: "Abrir",
         }
       : {

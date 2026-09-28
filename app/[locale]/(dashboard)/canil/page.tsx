@@ -45,8 +45,8 @@ export default async function CanilDashboardPage({
             "Visao geral operacional do teu canil na FYA (Found Your Animal).",
           welcomePrefix: "Bem-vindo de volta,",
           cards: {
-            totalPets: "Total de pets",
-            available: "Disponiveis",
+            totalPets: "Total de animais",
+            available: "Disponíveis",
             pending: "Pendentes",
             adopted: "Adotados",
           },
@@ -55,14 +55,14 @@ export default async function CanilDashboardPage({
             tasks: "Tarefas Prioritarias",
           },
           actions: {
-            viewAllPets: "Ver todos os pets",
-            openRequests: "Abrir pedidos de adocao",
+            viewAllPets: "Ver todos os animais",
+            openRequests: "Abrir pedidos de adoção",
             messages: "Ir para mensagens",
           },
-          emptyActivity: "Ainda nao ha atividade registada para este canil.",
+          emptyActivity: "Ainda não há atividade registada para este canil.",
           tasks: [
             "Responder aos novos pedidos pendentes",
-            "Atualizar fotos dos animais com mais visualizacoes",
+            "Atualizar fotos dos animais com mais visualizações",
             "Validar disponibilidade para visitas desta semana",
           ],
         }

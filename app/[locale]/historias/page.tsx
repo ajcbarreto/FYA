@@ -25,16 +25,16 @@ export default async function SuccessStoriesPage({
   const copy =
     locale === "pt"
       ? {
-          eyebrow: "Historias de sucesso",
-          title: "Cada adopcao e um final feliz",
-          subtitle: "Animais que ja encontraram a sua familia atraves da FYA.",
+          eyebrow: "Histórias de sucesso",
+          title: "Cada adoção e um final feliz",
+          subtitle: "Animais que já encontraram a sua família através da FYA.",
           stat: (count: number) =>
             `${count} ${count === 1 ? "amigo encontrou lar" : "amigos encontraram lar"}`,
           empty:
-            "Ainda nao ha adocoes concluidas registadas. Em breve, as primeiras historias aparecem aqui.",
-          browse: "Explorar animais para adocao",
+            "Ainda não há adoções concluídas registadas. Em breve, as primeiras histórias aparecem aqui.",
+          browse: "Explorar animais para adoção",
           foundHome: "encontrou um lar",
-          via: "atraves de",
+          via: "através de",
         }
       : {
           eyebrow: "Success stories",

@@ -138,7 +138,7 @@ export default async function CanilRequestsPage({
   const copy =
     locale === "pt"
       ? {
-          title: "Pedidos de Adocao",
+          title: "Pedidos de Adoção",
           subtitle: "Fila de candidaturas recebidas para os teus animais.",
           columns: {
             applicant: "Candidato e Pet",
@@ -154,22 +154,22 @@ export default async function CanilRequestsPage({
             entrevista: "Entrevista",
             aprovado: "Aprovado",
             rejeitado: "Rejeitado",
-            concluido: "Adocao concluida",
+            concluido: "Adoção concluída",
           },
           hint: "Atualiza o estado e adiciona notas para manter o adotante informado.",
-          notePlaceholder: "Observacoes para o adotante (opcional)",
+          notePlaceholder: "Observações para o adotante (opcional)",
           save: "Guardar",
           success: {
             updated: "Pedido atualizado com sucesso.",
             visit_updated: "Visita atualizada.",
           } as Record<string, string>,
           errors: {
-            invalid_request: "Pedido invalido.",
-            save_failed: "Nao foi possivel guardar alteracoes.",
-            unauthorized: "Nao autorizado.",
-            no_shelter: "Nao foi encontrado canil associado.",
+            invalid_request: "Pedido inválido.",
+            save_failed: "Não foi possível guardar alterações.",
+            unauthorized: "Não autorizado.",
+            no_shelter: "Não foi encontrado canil associado.",
             invalid_visit: "Dados de visita invalidos.",
-            visit_failed: "Nao foi possivel atualizar a visita.",
+            visit_failed: "Não foi possível atualizar a visita.",
           } as Record<string, string>,
         }
       : {

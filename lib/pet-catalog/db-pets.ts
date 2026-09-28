@@ -108,7 +108,7 @@ export function toCatalogItem(
     traits: [mapSizeTrait(animal.porte, locale), status],
     location:
       shelter?.localizacao ??
-      (locale === "pt" ? "Localizacao n/d" : "Location n/a"),
+      (locale === "pt" ? "Localização n/d" : "Location n/a"),
     shelterId: animal.canil_id,
     shelterName:
       shelter?.nome ?? (locale === "pt" ? "Abrigo n/d" : "Shelter n/a"),

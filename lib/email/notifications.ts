@@ -28,10 +28,10 @@ export async function notifyShelterNewRequest(
 
   const isPt = options.locale === "pt";
   const subject = isPt
-    ? `Novo pedido de adopcao — ${options.animalName}`
+    ? `Novo pedido de adoção — ${options.animalName}`
     : `New adoption request — ${options.animalName}`;
   const body = isPt
-    ? `Recebeste um novo pedido de adopcao para <strong>${escapeHtml(options.animalName)}</strong>. Entra na FYA para rever a candidatura e responder ao adotante.`
+    ? `Recebeste um novo pedido de adoção para <strong>${escapeHtml(options.animalName)}</strong>. Entra na FYA para rever a candidatura e responder ao adotante.`
     : `You received a new adoption request for <strong>${escapeHtml(options.animalName)}</strong>. Sign in to FYA to review the application and reply to the adopter.`;
 
   await sendEmail({
@@ -59,10 +59,10 @@ export async function notifyAdopterStatusChange(options: {
   const isPt = options.locale === "pt";
   const statusLabel = localizeRequestStatus(options.status, options.locale);
   const subject = isPt
-    ? `Atualizacao do teu pedido — ${options.animalName}`
+    ? `Atualização do teu pedido — ${options.animalName}`
     : `Update on your request — ${options.animalName}`;
   const body = isPt
-    ? `O estado do teu pedido de adopcao para <strong>${escapeHtml(options.animalName)}</strong> mudou para <strong>${statusLabel}</strong>.`
+    ? `O estado do teu pedido de adoção para <strong>${escapeHtml(options.animalName)}</strong> mudou para <strong>${statusLabel}</strong>.`
     : `Your adoption request for <strong>${escapeHtml(options.animalName)}</strong> changed status to <strong>${statusLabel}</strong>.`;
 
   await sendEmail({
