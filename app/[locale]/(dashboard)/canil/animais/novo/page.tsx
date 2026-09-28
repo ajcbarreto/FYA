@@ -43,8 +43,8 @@ export default async function NewAnimalPage({
           subtitle: "Adiciona um animal ao inventario do teu canil.",
           submit: "Criar animal",
           errors: {
-            invalid_data: "Preenche pelo menos nome, especie e estado.",
-            save_failed: "Nao foi possivel criar o animal.",
+            invalid_data: "Preenche pelo menos nome, espécie e estado.",
+            save_failed: "Não foi possível criar o animal.",
             needs_verification:
               "O teu canil precisa de ser verificado pelo admin antes de publicar animais.",
           },

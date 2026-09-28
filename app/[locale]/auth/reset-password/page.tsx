@@ -31,9 +31,9 @@ export default async function ResetPasswordPage({
           submit: "Guardar password",
           errors: {
             weak_password: "A password tem de ter pelo menos 6 caracteres.",
-            mismatch: "As passwords nao coincidem.",
-            expired: "O link expirou. Pede um novo link de recuperacao.",
-            update_failed: "Nao foi possivel atualizar a password.",
+            mismatch: "As passwords não coincidem.",
+            expired: "O link expirou. Pede um novo link de recuperação.",
+            update_failed: "Não foi possível atualizar a password.",
           },
         }
       : {

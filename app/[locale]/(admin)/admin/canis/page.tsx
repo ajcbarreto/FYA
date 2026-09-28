@@ -48,7 +48,7 @@ export default async function AdminSheltersPage({
           verified: "Verificado",
           pending: "Pendente",
           verify: "Verificar",
-          unverify: "Remover verificacao",
+          unverify: "Remover verificação",
           colName: "Canil",
           colJoined: "Registado",
           colStatus: "Estado",
@@ -56,10 +56,10 @@ export default async function AdminSheltersPage({
           empty: "Sem canis registados.",
           messages: {
             shelter_verified: "Canil verificado.",
-            shelter_unverified: "Verificacao removida.",
-            unauthorized: "Nao autorizado.",
-            invalid_shelter: "Canil invalido.",
-            verification_failed: "Nao foi possivel atualizar a verificacao.",
+            shelter_unverified: "Verificação removida.",
+            unauthorized: "Não autorizado.",
+            invalid_shelter: "Canil inválido.",
+            verification_failed: "Não foi possível atualizar a verificação.",
           },
         }
       : {

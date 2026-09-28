@@ -122,8 +122,8 @@ export default async function CanilMessagesPage({
           reminder: "Lembrete",
           success: "Mensagem enviada.",
           errors: {
-            invalid_message: "Mensagem invalida.",
-            send_failed: "Nao foi possivel enviar a mensagem.",
+            invalid_message: "Mensagem inválida.",
+            send_failed: "Não foi possível enviar a mensagem.",
           },
         }
       : {

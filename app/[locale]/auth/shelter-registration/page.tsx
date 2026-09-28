@@ -1,3 +1,4 @@
+import { Captcha } from "@/components/captcha";
 import { RegistrationPassword } from "@/components/registration-password";
 import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
@@ -41,19 +42,19 @@ export default async function ShelterRegistrationPage({
           title: "Registo de Canis",
           subtitlePrefix: "Torne o seu abrigo parte da rede",
           subtitleSuffix:
-            "Juntos, criamos ligacoes duradouras entre animais e familias amorosas.",
+            "Juntos, criamos ligações duradouras entre animais e famílias amorosas.",
           benefitsTitle: "Porque a FYA?",
           benefit1Title: "Visibilidade total",
           benefit1Text:
             "Alcance milhares de potenciais adotantes todos os dias.",
-          benefit2Title: "Gestao facilitada",
+          benefit2Title: "Gestão facilitada",
           benefit2Text:
             "Ferramentas intuitivas para gerir perfis de animais e candidaturas.",
           benefit3Title: "Rede de apoio",
           benefit3Text:
             "Acesso a recursos exclusivos e parcerias com veterinarios.",
           imageQuote: '"Mudar vidas, um patudo de cada vez."',
-          hasAccount: "Ja tens conta?",
+          hasAccount: "Já tens conta?",
           browseFile: "Procurar ficheiro",
         }
       : {
@@ -154,7 +155,7 @@ export default async function ShelterRegistrationPage({
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuoGWPNxgccv2PjP-EljrPZXeo21I3n6e1XE9YzPCzxMv50Zyf-2ceJmBnCbeumIC62eCf6b-57Jj_Spc6469NsNooVsVaJTuA0KJvhU3QvTq-ZgrRFVNQ2rCYucMZdjjXdt5TQTB4WPeWFpY7cMwfBO6hX84Ycx3qGsl1GiQEvZUGeEsCyX4YR-eRHXQ263xrXVvNV1qVa-QA-Y_Iqxx6kcBRsf8fCtCytfTwTCC2CRPD-WYXRXZyv_SsU5czIcNJFIUpY3hVSWU"
               alt={
                 locale === "pt"
-                  ? "Caes felizes num abrigo"
+                  ? "Cães felizes num abrigo"
                   : "Happy shelter dogs"
               }
               fill
@@ -365,6 +366,7 @@ export default async function ShelterRegistrationPage({
             >
               {dictionary.auth.saveDraft}
             </button>
+            <Captcha locale={locale} />
             <SubmitButton
               type="submit"
               className="w-full rounded-xl bg-primary px-12 py-4 font-bold text-primary-foreground shadow-xl transition-all hover:scale-[1.02] md:w-auto"

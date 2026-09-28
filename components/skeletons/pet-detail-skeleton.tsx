@@ -8,7 +8,7 @@ export function PetDetailBodySkeleton({ locale }: { locale: Locale }) {
   return (
     <div
       aria-busy="true"
-      aria-label={pt ? "A carregar detalhes do pet" : "Loading pet details"}
+      aria-label={pt ? "A carregar detalhes do animal" : "Loading pet details"}
     >
       <div className="grid items-start gap-8 lg:grid-cols-[1.3fr_1fr] lg:gap-12">
         <div className="space-y-7">
@@ -65,7 +65,7 @@ export function PetDetailSkeleton({ locale }: { locale: Locale }) {
       tabIndex={-1}
       className="page-shell"
       aria-busy="true"
-      aria-label={pt ? "A carregar detalhes do pet" : "Loading pet details"}
+      aria-label={pt ? "A carregar detalhes do animal" : "Loading pet details"}
     >
       <SketchSkeleton className="mb-7 h-4 w-36" />
       <PetDetailBodySkeleton locale={locale} />

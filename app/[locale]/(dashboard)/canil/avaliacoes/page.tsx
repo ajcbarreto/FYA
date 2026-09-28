@@ -45,14 +45,14 @@ export default async function CanilReviewsPage({
   const copy =
     locale === "pt"
       ? {
-          title: "Avaliacoes do canil",
+          title: "Avaliações do canil",
           subtitle:
-            "Aprova ou rejeita as avaliacoes que os adotantes deixaram. So as aprovadas ficam visiveis.",
-          noShelter: "Nao foi encontrado um canil associado a esta conta.",
-          pendingTitle: "A aguardar moderacao",
-          historyTitle: "Avaliacoes moderadas",
-          emptyPending: "Sem avaliacoes pendentes.",
-          emptyHistory: "Ainda nao moderaste nenhuma avaliacao.",
+            "Aprova ou rejeita as avaliações que os adotantes deixaram. Só as aprovadas ficam visíveis.",
+          noShelter: "Não foi encontrado um canil associado a esta conta.",
+          pendingTitle: "A aguardar moderação",
+          historyTitle: "Avaliações moderadas",
+          emptyPending: "Sem avaliações pendentes.",
+          emptyHistory: "Ainda não moderaste nenhuma avaliação.",
           approve: "Aprovar",
           reject: "Rejeitar",
           estados: {
@@ -61,10 +61,10 @@ export default async function CanilReviewsPage({
             rejeitada: "Rejeitada",
           } as Record<ReviewEstado, string>,
           messages: {
-            review_approved: "Avaliacao aprovada.",
-            review_rejected: "Avaliacao rejeitada.",
-            invalid_review: "Avaliacao invalida.",
-            moderation_failed: "Nao foi possivel moderar a avaliacao.",
+            review_approved: "Avaliação aprovada.",
+            review_rejected: "Avaliação rejeitada.",
+            invalid_review: "Avaliação inválida.",
+            moderation_failed: "Não foi possível moderar a avaliação.",
           } as Record<string, string>,
         }
       : {

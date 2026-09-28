@@ -1,3 +1,4 @@
+import { Captcha } from "@/components/captcha";
 import { RegistrationPassword } from "@/components/registration-password";
 import { SocialLoginButtons } from "@/components/social-login-buttons";
 import { SubmitButton } from "@/components/submit-button";
@@ -34,14 +35,14 @@ export default async function RegisterPage({
       ? {
           pageTitle: "Cada pata merece um lar feliz.",
           pageDescription:
-            "Junta-te a uma comunidade de adotantes e canis. O teu registo e o primeiro passo para criar novas historias.",
+            "Junta-te a uma comunidade de adotantes e canis. O teu registo e o primeiro passo para criar novas histórias.",
           joined: "Mais de 12.000 membros",
           joinedSubtitle: "Ativos em dezenas de canis parceiros",
-          alreadyHave: "Ja tens conta?",
+          alreadyHave: "Já tens conta?",
           createAccount: "Criar conta",
           continueWith: "OU CONTINUAR COM",
           terms:
-            "Concordo com os Termos de Servico e Politica de Privacidade e autorizo o tratamento dos meus dados para criacao de conta.",
+            "Concordo com os Termos de Serviço e Política de Privacidade e autorizo o tratamento dos meus dados para criação de conta.",
         }
       : {
           pageTitle: "Every paw deserves a joyful home.",
@@ -68,7 +69,7 @@ export default async function RegisterPage({
             <div className="h-72 w-72 overflow-hidden rounded-full bg-secondary/20">
               <Image
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWCZKJyZVDZ0dI5a0Biove2dBDNpabZ4NSMqwafAfeCf9CcyQ6ZxDzP6gJI7byxRwbFc67KU_Tts1FECIP4wPVI5tO0Dic1t1FiWeW60JafvL0nQJbENUVvPDgrWO4R034SZTDAFZ4naVmmdkHzHExw-HjvsUOP4FVyz52Ehzjb6289EJrWGhxXHLSHbCQ4_c_aiklLZrnAFSZOtWOrkSlzDvKMCceiMq9JouGzka6aERf8bHeGTBqVNYnqew7CTcARGYnTJchl7Y"
-                alt={locale === "pt" ? "Cao sorridente" : "Smiling dog"}
+                alt={locale === "pt" ? "Cão sorridente" : "Smiling dog"}
                 fill
                 sizes="288px"
                 className="object-cover"
@@ -220,6 +221,7 @@ export default async function RegisterPage({
               <span>{copy.terms} <Link className="underline" href={`/${locale}/termos`}>{locale === "pt" ? "Condições do piloto" : "Pilot terms"}</Link> · <Link className="underline" href={`/${locale}/privacidade`}>{locale === "pt" ? "Privacidade" : "Privacy"}</Link></span>
             </label>
 
+            <Captcha locale={locale} />
             <SubmitButton
               type="submit"
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90"

@@ -33,8 +33,8 @@ export default async function UserFavoritesPage({
           title: "Os meus favoritos",
           subtitle: "Animais que guardaste para reveres mais tarde.",
           empty:
-            "Ainda nao tens favoritos. Explora o catalogo e guarda os animais que mais gostares.",
-          browse: "Explorar catalogo",
+            "Ainda não tens favoritos. Explora o catálogo e guarda os animais que mais gostares.",
+          browse: "Explorar catálogo",
           remove: "Remover",
           view: "Ver detalhes",
         }

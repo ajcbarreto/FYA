@@ -23,12 +23,12 @@ export function AdminSidebar({ locale }: AdminSidebarProps) {
   const copy =
     locale === "pt"
       ? {
-          subtitle: "Administracao",
+          subtitle: "Administração",
           links: {
             dashboard: "Visao geral",
             shelters: "Canis",
             users: "Utilizadores",
-            settings: "Configuracoes",
+            settings: "Configurações",
           },
         }
       : {

@@ -28,7 +28,7 @@ export async function sendEmail({
 
   if (!apiKey) {
     console.warn(
-      `[email] RESEND_API_KEY nao definido — email para ${to} ("${subject}") ignorado.`,
+      `[email] RESEND_API_KEY não definido — email para ${to} ("${subject}") ignorado.`,
     );
     return;
   }

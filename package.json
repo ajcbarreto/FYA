@@ -23,6 +23,7 @@
     "media:export": "node scripts/export-media-kit.mjs"
   },
   "dependencies": {
+    "@sentry/nextjs": "^11.0.0",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.105.0",
     "class-variance-authority": "^0.7.1",

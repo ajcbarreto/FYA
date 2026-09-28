@@ -1,5 +1,9 @@
 import { timingSafeEqual } from "node:crypto";
-import { deliverEmailOutbox } from "@/lib/email/outbox";
+import * as Sentry from "@sentry/nextjs";
+import {
+  countExhaustedEmailJobs,
+  deliverEmailOutbox,
+} from "@/lib/email/outbox";
 export const runtime = "nodejs";
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
@@ -13,8 +17,20 @@ export async function GET(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const result = await deliverEmailOutbox();
-    return Response.json(result, { status: result.configured ? 200 : 503 });
-  } catch {
+    const exhausted = await countExhaustedEmailJobs();
+    if (exhausted > 0)
+      Sentry.captureMessage("Email jobs need manual intervention", {
+        level: "error",
+        extra: { exhausted },
+      });
+    if (!result.configured)
+      Sentry.captureMessage("Email delivery is not configured", "warning");
+    return Response.json(
+      { ...result, exhausted },
+      { status: result.configured ? 200 : 503 },
+    );
+  } catch (error) {
+    Sentry.captureException(error);
     return Response.json({ error: "Email queue unavailable" }, { status: 503 });
   }
 }

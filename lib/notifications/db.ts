@@ -69,7 +69,7 @@ export function localizeNotification(
         notification.referencia)
       : "";
     return {
-      title: isPt ? "Pedido de adopcao atualizado" : "Adoption request updated",
+      title: isPt ? "Pedido de adoção atualizado" : "Adoption request updated",
       body: isPt
         ? `O estado do teu pedido mudou para "${status}".`
         : `Your request status changed to "${status}".`,

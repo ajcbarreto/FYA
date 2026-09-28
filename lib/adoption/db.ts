@@ -84,7 +84,7 @@ export function localizeRequestStatus(
     entrevista: { pt: "Entrevista", en: "Interview" },
     aprovado: { pt: "Aprovado", en: "Approved" },
     rejeitado: { pt: "Rejeitado", en: "Rejected" },
-    concluido: { pt: "Adocao concluida", en: "Adoption completed" },
+    concluido: { pt: "Adoção concluída", en: "Adoption completed" },
   };
   return labels[status][locale === "pt" ? "pt" : "en"];
 }

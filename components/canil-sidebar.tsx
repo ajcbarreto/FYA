@@ -36,11 +36,11 @@ export function CanilSidebar({ locale }: CanilSidebarProps) {
           links: {
             dashboard: "Dashboard",
             shelterPage: "Pagina do Canil",
-            pets: "Meus Pets",
-            requests: "Pedidos de Adocao",
+            pets: "Os meus animais",
+            requests: "Pedidos de Adoção",
             messages: "Mensagens",
-            reviews: "Avaliacoes",
-            settings: "Configuracoes",
+            reviews: "Avaliações",
+            settings: "Configurações",
           },
         }
       : {

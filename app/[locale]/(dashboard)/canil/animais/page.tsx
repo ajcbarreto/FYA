@@ -38,17 +38,17 @@ export default async function CanilPetsPage({
   const copy =
     locale === "pt"
       ? {
-          title: "Gestao de Animais",
+          title: "Gestão de Animais",
           subtitle:
-            "Atualiza estados dos pets e acompanha o inventario do teu canil.",
+            "Atualiza o estado dos animais e acompanha o inventário do teu canil.",
           statusLabel: "Estado",
-          species: "Especie / Raca",
+          species: "Espécie / Raça",
           age: "Idade",
           actions: "Acoes",
-          noAnimals: "Ainda nao tens animais registados para este canil.",
+          noAnimals: "Ainda não tens animais registados para este canil.",
           save: "Guardar",
           statusOptions: {
-            disponivel: "Disponivel",
+            disponivel: "Disponível",
             reservado: "Reservado",
             em_tratamento: "Em tratamento",
             adotado: "Adotado",
@@ -58,12 +58,12 @@ export default async function CanilPetsPage({
             animal_deleted: "Animal arquivado.",
           },
           errors: {
-            invalid_status: "Estado invalido.",
-            save_failed: "Nao foi possivel guardar as alteracoes.",
-            no_shelter: "Nao foi encontrado um canil para a tua conta.",
+            invalid_status: "Estado inválido.",
+            save_failed: "Não foi possível guardar as alterações.",
+            no_shelter: "Não foi encontrado um canil para a tua conta.",
             invalid_data: "Dados invalidos.",
             not_authorized: "Sem permissao para este animal.",
-            delete_failed: "Nao foi possivel remover o animal.",
+            delete_failed: "Não foi possível remover o animal.",
           },
         }
       : {

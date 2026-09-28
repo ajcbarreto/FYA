@@ -6,6 +6,7 @@ import {
   type Locale,
 } from "./lib/i18n/config";
 import { resolveUserRole } from "./lib/auth/role";
+import { hasSecondFactor, mfaPath } from "./lib/auth/mfa";
 import { createProxySupabaseClient } from "./lib/supabase/proxy-client";
 import { hasSupabaseEnv } from "./lib/supabase/config";
 import type { UserRole } from "./lib/supabase/types";
@@ -51,7 +52,9 @@ export async function proxy(request: NextRequest) {
   if (!hasSupabaseEnv) {
     return required
       ? withLocaleCookie(
-          NextResponse.redirect(new URL(`/${activeLocale}/auth/login`, request.url)),
+          NextResponse.redirect(
+            new URL(`/${activeLocale}/auth/login`, request.url),
+          ),
           activeLocale,
         )
       : next;
@@ -82,6 +85,8 @@ export async function proxy(request: NextRequest) {
     }
     if (role !== required && role !== "admin" && !teamAccess)
       return redirectTo(`/${locale}?error=unauthorized`);
+    if (role === "admin" && !(await hasSecondFactor(client.supabase)))
+      return redirectTo(mfaPath(locale, pathname));
   } catch {
     return redirectTo(`/${locale}/auth/login?error=permissions_unavailable`);
   }

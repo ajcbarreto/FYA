@@ -1,5 +1,6 @@
 "use server";
 
+import { captchaToken } from "@/lib/captcha";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
@@ -37,7 +38,10 @@ export async function requestPasswordReset(formData: FormData) {
     ? `${origin}/auth/callback?next=${next}`
     : `/auth/callback?next=${next}`;
 
-  await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo,
+    captchaToken: captchaToken(formData),
+  });
 
   // Resposta sempre generica para nao revelar se o email existe.
   redirect(`/${locale}/auth/forgot-password?success=sent`);

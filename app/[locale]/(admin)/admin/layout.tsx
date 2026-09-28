@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import { resolveUserRole } from "@/lib/auth/role";
+import { hasSecondFactor, mfaPath } from "@/lib/auth/mfa";
 import { AdminSidebar } from "@/components/admin-sidebar";
 
 type AdminLayoutProps = {
@@ -28,6 +29,10 @@ export default async function AdminLayout({
   const role = await resolveUserRole(supabase, user);
   if (role !== "admin") {
     redirect(`/${locale}`);
+  }
+
+  if (!(await hasSecondFactor(supabase))) {
+    redirect(mfaPath(locale, `/${locale}/admin`));
   }
 
   return (

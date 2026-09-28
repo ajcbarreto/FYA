@@ -37,23 +37,23 @@ export default async function AdminSettingsPage({
   const copy =
     locale === "pt"
       ? {
-          title: "Configuracoes da plataforma",
+          title: "Configurações da plataforma",
           subtitle: "Define os dados globais e o comportamento da FYA.",
           platformTitle: "Identidade e contactos",
           platformName: "Nome da plataforma",
           contactEmail: "Email de contacto",
           supportEmail: "Email de apoio",
-          adoptionFee: "Taxa de adocao sugerida",
+          adoptionFee: "Taxa de adoção sugerida",
           adoptionFeeHint:
-            "Texto livre mostrado no detalhe do animal (ex: 150 EUR). Deixa vazio para nao mostrar.",
+            "Texto livre mostrado no detalhe do animal (ex: 150 EUR). Deixa vazio para não mostrar.",
           requireVerification: "Exigir canil verificado para publicar animais",
           requireVerificationHint:
             "A publicação exige sempre verificação. Os registos internos podem ser criados antes.",
-          save: "Guardar configuracoes",
+          save: "Guardar configurações",
           messages: {
-            platform_saved: "Configuracoes da plataforma guardadas.",
+            platform_saved: "Configurações da plataforma guardadas.",
             invalid_platform: "Indica pelo menos o nome da plataforma.",
-            platform_failed: "Nao foi possivel guardar as configuracoes.",
+            platform_failed: "Não foi possível guardar as configurações.",
           } as Record<string, string>,
         }
       : {

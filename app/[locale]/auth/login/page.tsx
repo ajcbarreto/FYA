@@ -1,3 +1,4 @@
+import { Captcha } from "@/components/captcha";
 import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
 import Image from "next/image";
@@ -33,15 +34,15 @@ export default async function LoginPage({
   const copy =
     locale === "pt"
       ? {
-          sideTitle: "Bem-vindo de volta a matilha.",
+          sideTitle: "Bem-vindo de volta à matilha.",
           sideText:
-            "Reconecta-te com canis e encontra o companheiro ideal para a tua familia.",
+            "Reconecta-te com canis e encontra o companheiro ideal para a tua família.",
           forgotPassword: "Esqueceste a password?",
           rememberDevice: "Lembrar este dispositivo",
           orContinue: "Ou continuar com",
-          registerPrompt: "Ainda nao tens conta?",
+          registerPrompt: "Ainda não tens conta?",
           passwordUpdated:
-            "Password atualizada. Inicia sessao com a nova password.",
+            "Password atualizada. Inicia sessão com a nova password.",
           socialIntro: "Ou entra com",
         }
       : {
@@ -66,7 +67,7 @@ export default async function LoginPage({
         <div className="relative hidden w-1/2 p-12 md:flex md:flex-col md:justify-between">
           <Image
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqoyq7uuDX8byZraMUtO0HvBbcv1cBciDJKIAGd_OJmJmh3oS-FWYWS-RoFfuXBQ7XfLtqOqqgcciPqEMzbp1-ygVwagCWtZYjJ1kn6UhP6ZwE4Zpst-gOQxVZAb8DGq2wZ8-Yekyn-l3Oi_TojuZYuX6JkthIO6bjOdbyCy-9Oyo8puEQ9AImEvZtgN4-xyWeVWHK1-sZ0edrBOSpaOkPG1QXpeTljsqV1-k2153B9MciUJH7VGl2I8SjE5ymIZUMA3E17dLbHWQ"
-            alt={locale === "pt" ? "Cao feliz" : "Happy golden retriever"}
+            alt={locale === "pt" ? "Cão feliz" : "Happy golden retriever"}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover"
@@ -175,6 +176,7 @@ export default async function LoginPage({
                 {copy.rememberDevice}
               </label>
 
+              <Captcha locale={locale} />
               <SubmitButton
                 type="submit"
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
