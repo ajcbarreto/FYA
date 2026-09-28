@@ -12,6 +12,7 @@ import {
 import { getShelterRatingSummaries } from "@/lib/canil/reviews";
 import { StarRating } from "@/components/star-rating";
 import { staticPageMetadata } from "@/lib/seo/metadata";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
 
 export function generateMetadata({
   params,
@@ -79,6 +80,11 @@ export default async function SheltersDirectoryPage({
       tabIndex={-1}
       className="mx-auto w-full max-w-7xl flex-1 px-6 pb-16 pt-10 lg:px-8"
     >
+      <Breadcrumbs
+        locale={locale}
+        items={[{ label: sectionCrumb(locale, "shelters").label }]}
+        currentPath="/canis"
+      />
       <header className="mb-10 space-y-3">
         <h1 className="text-4xl font-extrabold tracking-tight">{copy.title}</h1>
         <p className="max-w-2xl text-sm text-muted-foreground md:text-base">

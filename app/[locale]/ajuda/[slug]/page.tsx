@@ -4,6 +4,7 @@ import { helpGuides } from "@/lib/help/guides";
 import { isLocale } from "@/lib/i18n/config";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { describe } from "@/lib/seo/site";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
 export async function generateMetadata({
   params,
 }: {
@@ -42,9 +43,11 @@ export default async function GuidePage({
   if (!g) notFound();
   return (
     <main id="main-content" className="page-shell max-w-4xl space-y-7">
-      <Link href={`/${locale}/ajuda`} className="underline">
-        ← {pt ? "Centro de ajuda" : "Help centre"}
-      </Link>
+      <Breadcrumbs
+        locale={locale}
+        items={[sectionCrumb(locale, "help"), { label: g.title }]}
+        currentPath={`/ajuda/${g.slug}`}
+      />
       <header>
         <p className="text-sm text-muted-foreground">{g.minutes} min</p>
         <h1 className="display-title mt-2 text-4xl">{g.title}</h1>

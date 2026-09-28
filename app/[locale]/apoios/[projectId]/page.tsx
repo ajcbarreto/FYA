@@ -11,6 +11,7 @@ import { getPetById } from "@/lib/pet-catalog/db-pets";
 import { supportAmount } from "@/lib/support/format";
 import { pledgeSupport } from "@/app/support/actions";
 import { SubmitButton } from "@/components/submit-button";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { describe } from "@/lib/seo/site";
 export const dynamic = "force-dynamic";
@@ -90,12 +91,19 @@ export default async function PublicSupport({
     photo = pet?.imageUrl || s.image_url;
   return (
     <main id="main-content" className="page-shell max-w-4xl space-y-6">
-      <Link
-        className="underline"
-        href={`/${locale}/canis/${p.canil_id}/apoiar`}
-      >
-        ← {s.nome}
-      </Link>
+      <Breadcrumbs
+        locale={locale}
+        items={[
+          sectionCrumb(locale, "shelters"),
+          { label: s.nome, path: `/canis/${p.canil_id}` },
+          {
+            label: pt ? "Apoiar" : "Support",
+            path: `/canis/${p.canil_id}/apoiar`,
+          },
+          { label: p.title },
+        ]}
+        currentPath={`/apoios/${p.id}`}
+      />
       <h1 className="page-title">{p.title}</h1>
       {photo && (
         <div className="relative h-72 overflow-hidden rounded-3xl">

@@ -6,6 +6,7 @@ import { createPublicSupabaseClient } from "@/lib/supabase/public-client";
 import { supabaseUrl, supabasePublishableKey } from "@/lib/supabase/config";
 import { supportAmount } from "@/lib/support/format";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
 export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
@@ -57,9 +58,15 @@ export default async function ShelterSupport({
   if (error) throw new Error("Unable to load support");
   return (
     <main id="main-content" className="page-shell space-y-6">
-      <Link className="underline" href={`/${locale}/canis/${shelterId}`}>
-        ← {s.nome}
-      </Link>
+      <Breadcrumbs
+        locale={locale}
+        items={[
+          sectionCrumb(locale, "shelters"),
+          { label: s.nome, path: `/canis/${shelterId}` },
+          { label: pt ? "Apoiar" : "Support" },
+        ]}
+        currentPath={`/canis/${shelterId}/apoiar`}
+      />
       <header className="rounded-3xl bg-primary p-8 text-primary-foreground">
         <h1 className="page-title">
           {pt ? "Apoiar este canil" : "Support this shelter"}

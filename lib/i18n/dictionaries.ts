@@ -211,8 +211,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     nav: {
       home: "Início",
       pets: "Animais",
-      shelters: "Abrigos",
-      stories: "Histórias",
+      shelters: "Canis",
+      stories: "Adotados",
       notifications: "Notificações",
       login: "Entrar",
       register: "Registar",
@@ -439,9 +439,9 @@ const dictionaries: Record<Locale, Dictionary> = {
   en: {
     nav: {
       home: "Home",
-      pets: "Pet Catalog",
+      pets: "Animals",
       shelters: "Shelters",
-      stories: "Stories",
+      stories: "Adopted",
       notifications: "Notifications",
       login: "Login",
       register: "Register",

@@ -29,6 +29,7 @@ import { submitShelterReview } from "@/app/canil/reviews/actions";
 import { StarRating } from "@/components/star-rating";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { JsonLd, shelterJsonLd } from "@/lib/seo/json-ld";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
 
 type ShelterDetailBodyProps = {
   locale: Locale;
@@ -170,6 +171,11 @@ export async function ShelterDetailBody({
   return (
     <>
       <JsonLd data={shelterJsonLd(shelter, locale)} />
+      <Breadcrumbs
+        locale={locale}
+        items={[sectionCrumb(locale, "shelters"), { label: shelter.nome }]}
+        currentPath={`/canis/${shelter.id}`}
+      />
       <ToastFeedback
         message={feedback}
         variant={success ? "success" : "error"}

@@ -5,6 +5,7 @@ import { isLocale } from "@/lib/i18n/config";
 import { requestPilot } from "@/app/records/pilot-actions";
 import { SubmitButton } from "@/components/submit-button";
 import { staticPageMetadata } from "@/lib/seo/metadata";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
 
 export function generateMetadata({
   params,
@@ -56,6 +57,11 @@ export default async function ForShelters({
       ];
   return (
     <main id="main-content" className="page-shell space-y-12">
+      <Breadcrumbs
+        locale={locale}
+        items={[{ label: sectionCrumb(locale, "forShelters").label }]}
+        currentPath="/para-canis"
+      />
       <header className="rounded-3xl bg-primary p-8 text-primary-foreground md:p-12">
         <p className="text-sm font-bold uppercase tracking-widest">
           {pt

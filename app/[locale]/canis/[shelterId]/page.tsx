@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
 import { ShelterDetailBody } from "@/components/shelter-detail-body";
 import { ShelterDetailBodySkeleton } from "@/components/skeletons/shelter-detail-skeleton";
 import { isLocale } from "@/lib/i18n/config";
@@ -58,21 +56,12 @@ export default async function ShelterPublicPage({
     notFound();
   }
 
-  const backLabel = locale === "pt" ? "Voltar aos canis" : "Back to shelters";
-
   return (
     <main
       id="main-content"
       tabIndex={-1}
       className="mx-auto w-full max-w-7xl flex-1 px-5 pb-16 pt-8 sm:px-8"
     >
-      <Link
-        href={`/${locale}/canis`}
-        className="mb-6 inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
-      >
-        <ChevronLeft className="h-4 w-4" />
-        {backLabel}
-      </Link>
       <Suspense fallback={<ShelterDetailBodySkeleton locale={locale} />}>
         <ShelterDetailBody
           locale={locale}

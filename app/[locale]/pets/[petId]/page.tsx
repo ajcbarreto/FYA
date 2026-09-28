@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getCachedPetById } from "@/lib/pet-catalog/cached-pets";
@@ -50,7 +48,6 @@ export default async function PetDetails({ params, searchParams }: Props) {
   const { locale, petId } = await params;
   if (!isLocale(locale) || !/^[0-9a-f-]{36}$/i.test(petId)) notFound();
 
-  const pt = locale === "pt";
   const back = (await searchParams)?.back;
   const catalogPath =
     back && (back === `/${locale}/pets` || back.startsWith(`/${locale}/pets?`))
@@ -59,21 +56,12 @@ export default async function PetDetails({ params, searchParams }: Props) {
 
   return (
     <main id="main-content" tabIndex={-1} className="page-shell">
-      <Link
-        href={catalogPath}
-        className="mb-7 inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground"
-      >
-        <ArrowLeft className="size-4" />
-        {pt ? "Explorar animais" : "Explore animals"}
-      </Link>
-      <Link
-        className="mb-6 ml-5 inline-block text-sm underline"
-        href={`/${locale}/pets/${petId}/imprimir`}
-      >
-        {pt ? "Ficha imprimível e QR" : "Printable profile and QR"}
-      </Link>
       <Suspense fallback={<PetDetailBodySkeleton locale={locale} />}>
-        <PetDetailBody locale={locale} petId={petId} />
+        <PetDetailBody
+          locale={locale}
+          petId={petId}
+          catalogPath={catalogPath}
+        />
       </Suspense>
     </main>
   );

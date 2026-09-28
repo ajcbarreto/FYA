@@ -170,8 +170,8 @@ export function ApplicationForm({
       <div className="space-y-3">
         <p className="text-sm text-muted-foreground">
           {pt
-            ? "Entra na tua conta para te apresentares ao abrigo e conheceres melhor este amigo."
-            : "Sign in to introduce yourself to the shelter and get to know this friend."}
+            ? "Entra na tua conta para enviares a candidatura e falares com o abrigo."
+            : "Sign in to send your application and talk to the shelter."}
         </p>
         <Link
           href={`/${locale}/auth/login?next=/pets/${petId}`}

@@ -12,13 +12,20 @@ import { listAnimalPhotos } from "@/lib/canil/animal-photos";
 import { FavoriteButton } from "@/components/favorite-button";
 import { ApplicationForm } from "@/components/application-form";
 import { PetCard } from "@/components/pet-card";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
 
 type PetDetailBodyProps = {
   locale: Locale;
   petId: string;
+  /** Catalog URL with the filters the visitor came from. */
+  catalogPath: string;
 };
 
-export async function PetDetailBody({ locale, petId }: PetDetailBodyProps) {
+export async function PetDetailBody({
+  locale,
+  petId,
+  catalogPath,
+}: PetDetailBodyProps) {
   const pt = locale === "pt";
   const supabase = await createServerSupabaseClient();
   const [pet, related, photos, favorites, animal, { user }] = await Promise.all(
@@ -52,6 +59,22 @@ export async function PetDetailBody({ locale, petId }: PetDetailBodyProps) {
 
   return (
     <>
+      <Breadcrumbs
+        locale={locale}
+        items={[
+          { ...sectionCrumb(locale, "pets"), href: catalogPath },
+          { label: pet.name },
+        ]}
+        currentPath={`/pets/${pet.id}`}
+      />
+      <Link
+        className="mb-6 inline-block text-sm underline"
+        href={`/${locale}/pets/${pet.id}/imprimir`}
+      >
+        {pt
+          ? `Ficha imprimível de ${pet.name}, com código QR`
+          : `Printable profile of ${pet.name}, with QR code`}
+      </Link>
       <div className="grid items-start gap-8 lg:grid-cols-[1.3fr_1fr] lg:gap-12">
         <div className="space-y-7">
           <div className="relative aspect-[5/4] overflow-hidden rounded-[2rem] bg-muted">
@@ -106,7 +129,7 @@ export async function PetDetailBody({ locale, petId }: PetDetailBodyProps) {
               {pet.description ||
                 (pt
                   ? "O abrigo ainda não escreveu uma descrição. Podes perguntar à equipa por mensagem."
-                  : "The shelter has not added a description yet. Contact the team to learn more about this friend.")}
+                  : "The shelter has not written a description yet. You can ask the team by message.")}
             </p>
           </section>
           <section className="rounded-2xl bg-muted p-6">
@@ -125,9 +148,7 @@ export async function PetDetailBody({ locale, petId }: PetDetailBodyProps) {
         </div>
         <div className="space-y-6">
           <header>
-            <p className="eyebrow">
-              {pt ? "Um lugar na tua vida" : "A place in your life"}
-            </p>
+            <p className="eyebrow">{pt ? "Para adoção" : "For adoption"}</p>
             <h1 className="display-title mt-3 text-6xl">{pet.name}</h1>
             <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
               <MapPin className="size-4" />
@@ -152,7 +173,7 @@ export async function PetDetailBody({ locale, petId }: PetDetailBodyProps) {
             <div className="mb-5 flex items-center gap-2">
               <Heart className="size-5 text-accent" />
               <h2 className="text-xl font-semibold">
-                {pt ? "Vamos conhecer-nos?" : "Shall we meet?"}
+                {pt ? "Candidatar-me a adotar" : "Apply to adopt"}
               </h2>
             </div>
             <ApplicationForm
@@ -171,7 +192,7 @@ export async function PetDetailBody({ locale, petId }: PetDetailBodyProps) {
           >
             <div>
               <p className="text-xs text-white/65">
-                {pt ? "A cuidar deste amigo" : "Caring for this friend"}
+                {pt ? "Abrigo responsável" : "Shelter in charge"}
               </p>
               <h2 className="mt-1 font-semibold">{pet.shelterName}</h2>
               {shelter.data?.verificado && (

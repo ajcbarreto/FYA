@@ -11,6 +11,7 @@ import { getPublicCatalogFilters } from "@/lib/pet-catalog/public-data";
 import { normalizePetCatalogFiltersConfig } from "@/lib/pet-catalog/filter-config";
 import { configuredOptions } from "@/lib/pet-catalog/options";
 import { staticPageMetadata } from "@/lib/seo/metadata";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
 
 export function generateMetadata({
   params,
@@ -91,6 +92,11 @@ export default async function Catalog({
 
   return (
     <main id="main-content" tabIndex={-1} className="page-shell">
+      <Breadcrumbs
+        locale={locale}
+        items={[{ label: sectionCrumb(locale, "pets").label }]}
+        currentPath="/pets"
+      />
       <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="eyebrow hidden sm:block">

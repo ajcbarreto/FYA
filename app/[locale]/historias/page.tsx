@@ -6,6 +6,7 @@ import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAdoptedPets } from "@/lib/pet-catalog/db-pets";
 import { staticPageMetadata } from "@/lib/seo/metadata";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
 
 export function generateMetadata({
   params,
@@ -62,6 +63,13 @@ export default async function SuccessStoriesPage({
 
   return (
     <main id="main-content" tabIndex={-1} className="w-full flex-1 pb-16 pt-10">
+      <div className="mx-auto w-full max-w-7xl px-6 lg:px-8">
+        <Breadcrumbs
+          locale={locale}
+          items={[{ label: sectionCrumb(locale, "stories").label }]}
+          currentPath="/historias"
+        />
+      </div>
       <section className="mx-auto w-full max-w-7xl px-6 lg:px-8">
         <div className="rounded-3xl bg-secondary p-10 text-center text-white md:p-16">
           <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-bold uppercase tracking-widest">

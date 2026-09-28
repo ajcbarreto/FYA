@@ -8,16 +8,17 @@ export function SiteFooter({ locale }: { locale: Locale }) {
   const { footer } = getDictionary(locale);
 
   const footerLinks = [
-    ["conta/apoios", locale === "pt" ? "As minhas ajudas" : "My support"],
-    ["ajuda", locale === "pt" ? "Centro de ajuda" : "Help centre"],
-    ["para-canis", locale === "pt" ? "FYA para canis" : "FYA for shelters"],
     ["pets", footer.links.pets],
-    ["termos", locale === "pt" ? "Condições" : "Terms"],
-    ["privacidade", locale === "pt" ? "Privacidade" : "Privacy"],
-    ["convites", locale === "pt" ? "Convites de equipa" : "Team invitations"],
     ["canis", footer.links.shelters],
     ["historias", footer.links.stories],
+    ["match", locale === "pt" ? "Ajuda para escolher" : "Help choosing"],
+    ["para-canis", locale === "pt" ? "FYA para canis" : "FYA for shelters"],
+    ["ajuda", locale === "pt" ? "Centro de ajuda" : "Help centre"],
     ["#sobre-nos", footer.links.about],
+    ["termos", locale === "pt" ? "Condições de utilização" : "Terms of use"],
+    ["privacidade", locale === "pt" ? "Privacidade" : "Privacy"],
+    ["conta/apoios", locale === "pt" ? "As minhas ajudas" : "My support"],
+    ["convites", locale === "pt" ? "Convites de equipa" : "Team invitations"],
   ] as const;
 
   return (
