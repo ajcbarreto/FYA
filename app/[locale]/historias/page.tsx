@@ -5,6 +5,15 @@ import { Heart, PawPrint } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAdoptedPets } from "@/lib/pet-catalog/db-pets";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "stories", "/historias");
+}
 
 type SuccessStoriesPageProps = {
   params: Promise<{ locale: string }>;

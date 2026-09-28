@@ -15,10 +15,16 @@ test("public detail routes map to the resource the proxy checks", () => {
     table: "animais",
     id,
   });
+  assert.deepEqual(publicResourceFor(["canis", id]), {
+    kind: "record",
+    table: "canis",
+    id,
+  });
   assert.deepEqual(publicResourceFor(["canis", id, "apoiar"]), {
     kind: "record",
     table: "canis",
     id,
+    verifiedOnly: true,
   });
   assert.deepEqual(publicResourceFor(["apoios", id]), {
     kind: "record",

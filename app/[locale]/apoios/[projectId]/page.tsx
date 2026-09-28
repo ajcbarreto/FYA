@@ -11,7 +11,42 @@ import { getPetById } from "@/lib/pet-catalog/db-pets";
 import { supportAmount } from "@/lib/support/format";
 import { pledgeSupport } from "@/app/support/actions";
 import { SubmitButton } from "@/components/submit-button";
+import { pageMetadata } from "@/lib/seo/metadata";
+import { describe } from "@/lib/seo/site";
 export const dynamic = "force-dynamic";
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; projectId: string }>;
+}) {
+  const { locale, projectId } = await params;
+  if (!isLocale(locale) || !validId(projectId)) return {};
+  const { data: project } = await createPublicSupabaseClient(
+    supabaseUrl,
+    supabasePublishableKey,
+  )
+    .from("support_projects")
+    .select("id,title,description,canis(nome)")
+    .eq("id", projectId)
+    .maybeSingle();
+  if (!project) return {};
+  const shelter = Array.isArray(project.canis)
+    ? project.canis[0]?.nome
+    : project.canis?.nome;
+  const pt = locale === "pt";
+  return pageMetadata({
+    locale,
+    path: `/apoios/${project.id}`,
+    title: shelter ? `${project.title}, ${shelter}` : project.title,
+    description: describe(
+      project.description,
+      pt
+        ? "Campanha de apoio de um canil na FYA: objetivo, valor já recebido e como ajudar."
+        : "Support campaign from a shelter on FYA: the goal, what has been received and how to help.",
+    ),
+    type: "article",
+  });
+}
 export default async function PublicSupport({
   params,
   searchParams,

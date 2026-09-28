@@ -2,6 +2,15 @@ import { notFound, redirect } from "next/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import { CanilSidebar } from "@/components/canil-sidebar";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "shelterArea", "/canil");
+}
 
 type CanilLayoutProps = {
   children: React.ReactNode;

@@ -2,7 +2,13 @@ type RecordTable = "animais" | "canis" | "support_projects";
 
 export type PublicResource =
   | { kind: "guide"; slug: string }
-  | { kind: "record"; table: RecordTable; id: string };
+  | {
+      kind: "record";
+      table: RecordTable;
+      id: string;
+      /** The support page only exists for verified shelters. */
+      verifiedOnly?: boolean;
+    };
 
 /**
  * Public detail routes whose existence depends on a slug or a database row.
@@ -14,8 +20,10 @@ export function publicResourceFor(segments: string[]): PublicResource | null {
   if (section === "ajuda" && !sub) return { kind: "guide", slug: key };
   if (section === "pets" && (!sub || sub === "imprimir"))
     return { kind: "record", table: "animais", id: key };
-  if (section === "canis" && (!sub || sub === "apoiar"))
+  if (section === "canis" && !sub)
     return { kind: "record", table: "canis", id: key };
+  if (section === "canis" && sub === "apoiar")
+    return { kind: "record", table: "canis", id: key, verifiedOnly: true };
   if (section === "apoios" && !sub)
     return { kind: "record", table: "support_projects", id: key };
   return null;

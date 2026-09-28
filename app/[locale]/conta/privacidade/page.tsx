@@ -1,6 +1,15 @@
 import { recordsContext } from "@/lib/records/context";
 import { requestPrivacy } from "@/app/records/privacy-actions";
 import { SubmitButton } from "@/components/submit-button";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "accountPrivacy", "/conta/privacidade");
+}
 export default async function PrivacyAccount({
   params,
   searchParams,
@@ -20,9 +29,7 @@ export default async function PrivacyAccount({
   if (error) throw new Error("Unable to load requests");
   return (
     <main id="main-content" className="mx-auto w-full max-w-3xl p-8 space-y-6">
-      <h1 className="page-title">
-        {pt ? "Os teus dados" : "Your data"}
-      </h1>
+      <h1 className="page-title">{pt ? "Os teus dados" : "Your data"}</h1>
       <a download className="underline" href="/api/account/export">
         {pt
           ? "Descarregar os dados da tua conta (JSON)"

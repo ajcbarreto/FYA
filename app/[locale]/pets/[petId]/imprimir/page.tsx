@@ -3,16 +3,31 @@ import Link from "next/link";
 import QRCode from "qrcode";
 import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
+import { pageMetadata } from "@/lib/seo/metadata";
 import { getPetById } from "@/lib/pet-catalog/db-pets";
 import { createPublicSupabaseClient } from "@/lib/supabase/public-client";
 import { supabaseUrl, supabasePublishableKey } from "@/lib/supabase/config";
 import { publicAnimalUrl } from "@/lib/help/public-url";
 import { PrintButton } from "@/components/print-button";
 export const dynamic = "force-dynamic";
-export const metadata = {
-  title: "Ficha para divulgação | FYA",
-  robots: { index: false, follow: true },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; petId: string }>;
+}) {
+  const { locale, petId } = await params;
+  if (!isLocale(locale)) return {};
+  const pt = locale === "pt";
+  return pageMetadata({
+    locale,
+    path: `/pets/${petId}/imprimir`,
+    title: pt ? "Ficha para divulgação" : "Printable profile",
+    description: pt
+      ? "Ficha imprimível com código QR para divulgar um animal para adoção."
+      : "Printable profile with a QR code to share an animal for adoption.",
+    noindex: true,
+  });
+}
 export default async function PrintAnimal({
   params,
 }: {

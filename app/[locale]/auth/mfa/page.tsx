@@ -9,6 +9,15 @@ import { safeLocalPath } from "@/lib/auth/redirect";
 import { resolveUserRole } from "@/lib/auth/role";
 import { isLocale } from "@/lib/i18n/config";
 import { getAuthUser } from "@/lib/supabase/get-user";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "mfa", "/auth/mfa");
+}
 
 type MfaPageProps = {
   params: Promise<{ locale: string }>;

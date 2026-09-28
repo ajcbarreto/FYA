@@ -6,6 +6,15 @@ import { ArrowLeft, Mail } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { requestPasswordReset } from "@/app/auth/password/actions";
 import { ToastFeedback } from "@/components/toast-feedback";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "forgotPassword", "/auth/forgot-password");
+}
 
 type ForgotPasswordPageProps = {
   params: Promise<{ locale: string }>;

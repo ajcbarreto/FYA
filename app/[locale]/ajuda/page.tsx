@@ -2,11 +2,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { searchGuides } from "@/lib/help/guides";
-export const metadata = {
-  title: "Ajuda · Help | FYA",
-  description:
-    "Guias para registos, documentos, candidaturas e trabalho em equipa na FYA.",
-};
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "help", "/ajuda");
+}
 export default async function Help({
   params,
   searchParams,

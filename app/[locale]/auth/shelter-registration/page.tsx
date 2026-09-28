@@ -7,6 +7,19 @@ import { CheckCircle2, FileUp } from "lucide-react";
 import { register } from "@/app/auth/register/actions";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(
+    params,
+    "shelterRegistration",
+    "/auth/shelter-registration",
+  );
+}
 
 type ShelterRegistrationPageProps = {
   params: Promise<{ locale: string }>;

@@ -8,6 +8,8 @@ import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getCachedPetById } from "@/lib/pet-catalog/cached-pets";
 import { PetDetailBody } from "@/components/pet-detail-body";
 import { PetDetailBodySkeleton } from "@/components/skeletons/pet-detail-skeleton";
+import { pageMetadata } from "@/lib/seo/metadata";
+import { describe } from "@/lib/seo/site";
 
 type Props = {
   searchParams?: Promise<{ back?: string }>;
@@ -23,11 +25,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     locale,
   );
   if (!pet) return {};
-  return {
-    title: `${pet.name} | FYA`,
-    description: pet.description.slice(0, 160),
-    openGraph: { title: `${pet.name} | FYA`, images: [pet.imageUrl] },
-  };
+  const pt = locale === "pt";
+  return pageMetadata({
+    locale,
+    path: `/pets/${pet.id}`,
+    title: pt
+      ? `${pet.name}, ${pet.species} para adoção em ${pet.location}`
+      : `${pet.name}, ${pet.species} for adoption in ${pet.location}`,
+    description: describe(
+      pet.description,
+      pt
+        ? `${pet.name} está para adoção em ${pet.shelterName}. Vê a ficha, as fotografias e envia a candidatura na FYA.`
+        : `${pet.name} is available for adoption at ${pet.shelterName}. See the profile and photos and apply on FYA.`,
+    ),
+    image: pet.imageUrl.startsWith("/animal-placeholder")
+      ? null
+      : { url: pet.imageUrl, alt: pet.name },
+    type: "article",
+  });
 }
 
 export default async function PetDetails({ params, searchParams }: Props) {

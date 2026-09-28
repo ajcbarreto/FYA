@@ -8,6 +8,15 @@ import { ArrowRight, Lock, Mail, User, Phone } from "lucide-react";
 import { register } from "@/app/auth/register/actions";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "register", "/auth/register");
+}
 
 type RegisterPageProps = {
   params: Promise<{ locale: string }>;

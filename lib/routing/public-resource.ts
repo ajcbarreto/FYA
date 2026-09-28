@@ -18,12 +18,17 @@ export async function publicResourceExists(
     return helpGuides(locale).some((guide) => guide.slug === resource.slug);
   if (!validId(resource.id)) return false;
   if (!supabase) return true;
-  const selection = resource.table === "animais" ? "id,canis!inner(id)" : "id";
+  const selection =
+    resource.table === "animais"
+      ? "id,canis!inner(id)"
+      : resource.verifiedOnly
+        ? "id,verificado"
+        : "id";
   const { data, error } = await supabase
     .from(resource.table)
     .select(selection)
     .eq("id", resource.id)
-    .maybeSingle();
+    .maybeSingle<{ id: string; verificado?: boolean }>();
   if (error) return true;
-  return data !== null;
+  return data !== null && (!resource.verifiedOnly || data.verificado === true);
 }

@@ -5,7 +5,34 @@ import { validId } from "@/lib/records/validation";
 import { createPublicSupabaseClient } from "@/lib/supabase/public-client";
 import { supabaseUrl, supabasePublishableKey } from "@/lib/supabase/config";
 import { supportAmount } from "@/lib/support/format";
+import { pageMetadata } from "@/lib/seo/metadata";
 export const dynamic = "force-dynamic";
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; shelterId: string }>;
+}) {
+  const { locale, shelterId } = await params;
+  if (!isLocale(locale) || !validId(shelterId)) return {};
+  const { data: shelter } = await createPublicSupabaseClient(
+    supabaseUrl,
+    supabasePublishableKey,
+  )
+    .from("canis")
+    .select("id,nome,localizacao")
+    .eq("id", shelterId)
+    .maybeSingle();
+  if (!shelter) return {};
+  const pt = locale === "pt";
+  return pageMetadata({
+    locale,
+    path: `/canis/${shelter.id}/apoiar`,
+    title: pt ? `Apoiar ${shelter.nome}` : `Support ${shelter.nome}`,
+    description: pt
+      ? `Campanhas e necessidades de ${shelter.nome} (${shelter.localizacao}): alimentação, cuidados veterinários e outros apoios que podes dar a este canil.`
+      : `Campaigns and needs of ${shelter.nome} (${shelter.localizacao}): food, veterinary care and other support you can give this shelter.`,
+  });
+}
 export default async function ShelterSupport({
   params,
 }: {

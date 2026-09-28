@@ -11,6 +11,15 @@ import {
   markAllNotificationsRead,
   openNotification,
 } from "@/app/notifications/actions";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "notifications", "/notificacoes");
+}
 
 type NotificationsPageProps = {
   params: Promise<{ locale: string }>;

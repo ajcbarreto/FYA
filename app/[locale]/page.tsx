@@ -11,6 +11,15 @@ import { Suspense } from "react";
 import { PetCardSkeleton } from "@/components/skeletons/pet-card-skeleton";
 import type { Locale } from "@/lib/i18n/config";
 import { PetCard } from "@/components/pet-card";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "home", "");
+}
 
 const speciesLinks = [
   ["cao", "dog"] as const,

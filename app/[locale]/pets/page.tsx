@@ -10,6 +10,15 @@ import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { getPublicCatalogFilters } from "@/lib/pet-catalog/public-data";
 import { normalizePetCatalogFiltersConfig } from "@/lib/pet-catalog/filter-config";
 import { configuredOptions } from "@/lib/pet-catalog/options";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "pets", "/pets");
+}
 
 export default async function Catalog({
   params,

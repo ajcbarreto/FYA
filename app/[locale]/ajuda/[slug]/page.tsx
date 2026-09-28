@@ -2,6 +2,34 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { helpGuides } from "@/lib/help/guides";
 import { isLocale } from "@/lib/i18n/config";
+import { pageMetadata } from "@/lib/seo/metadata";
+import { describe } from "@/lib/seo/site";
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}) {
+  const { locale, slug } = await params;
+  if (!isLocale(locale)) return {};
+  const guide = helpGuides(locale).find((g) => g.slug === slug);
+  if (!guide) return {};
+  return pageMetadata({
+    locale,
+    path: `/ajuda/${guide.slug}`,
+    title:
+      locale === "pt"
+        ? `${guide.title}: guia para canis`
+        : `${guide.title}: guide for shelters`,
+    description: describe(
+      guide.summary,
+      locale === "pt"
+        ? "Passos detalhados e perguntas frequentes no centro de ajuda da FYA para canis e associações."
+        : "Detailed steps and frequently asked questions in the FYA help centre for shelters and rescue groups.",
+    ),
+    type: "article",
+  });
+}
+
 export default async function GuidePage({
   params,
 }: {

@@ -11,6 +11,15 @@ import {
 } from "@/lib/canil/public-directory";
 import { getShelterRatingSummaries } from "@/lib/canil/reviews";
 import { StarRating } from "@/components/star-rating";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "shelters", "/canis");
+}
 
 type SheltersDirectoryPageProps = {
   params: Promise<{ locale: string }>;

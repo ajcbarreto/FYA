@@ -8,6 +8,15 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
 import { ToastFeedback } from "@/components/toast-feedback";
 import { SocialLoginButtons } from "@/components/social-login-buttons";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "login", "/auth/login");
+}
 
 type LoginPageProps = {
   params: Promise<{ locale: string }>;

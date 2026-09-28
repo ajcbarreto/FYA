@@ -2,7 +2,10 @@ import { notFound, redirect } from "next/navigation";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import { isLocale } from "@/lib/i18n/config";
 import { validId } from "@/lib/records/validation";
-export const metadata = { robots: { index: false, follow: false } };
+export const metadata = {
+  title: { absolute: "Dossier | FYA" },
+  robots: { index: false, follow: false },
+};
 export default async function DossierPage({
   params,
 }: {

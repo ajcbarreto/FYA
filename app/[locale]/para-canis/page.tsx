@@ -4,11 +4,15 @@ import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { requestPilot } from "@/app/records/pilot-actions";
 import { SubmitButton } from "@/components/submit-button";
-export const metadata = {
-  title: "FYA para canis e associações",
-  description:
-    "Registos, candidaturas, documentos e acompanhamento num único lugar. Conhece o piloto FYA.",
-};
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "forShelters", "/para-canis");
+}
 export default async function ForShelters({
   params,
   searchParams,

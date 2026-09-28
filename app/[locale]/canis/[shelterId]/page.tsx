@@ -8,6 +8,8 @@ import { ShelterDetailBodySkeleton } from "@/components/skeletons/shelter-detail
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getCachedPublicShelterById } from "@/lib/canil/cached-shelter";
+import { pageMetadata } from "@/lib/seo/metadata";
+import { describe } from "@/lib/seo/site";
 
 type ShelterPublicPageProps = {
   params: Promise<{ locale: string; shelterId: string }>;
@@ -20,34 +22,29 @@ export async function generateMetadata({
   params: Promise<{ locale: string; shelterId: string }>;
 }): Promise<Metadata> {
   const { locale, shelterId } = await params;
-  if (!isLocale(locale)) {
-    return {};
-  }
+  if (!isLocale(locale)) return {};
 
   const supabase = await createServerSupabaseClient();
   const shelter = await getCachedPublicShelterById(supabase, shelterId);
+  if (!shelter) return {};
 
-  if (!shelter) {
-    return {
-      title:
-        locale === "pt"
-          ? "Canil não encontrado | FYA"
-          : "Shelter not found | FYA",
-    };
-  }
-
-  const title = `${shelter.nome} | FYA`;
-  const description =
-    shelter.missao?.trim().slice(0, 160) ||
-    (locale === "pt"
-      ? `Conhece o canil ${shelter.nome} em ${shelter.localizacao} e os animais para adoção.`
-      : `Discover ${shelter.nome} shelter in ${shelter.localizacao} and its pets available for adoption.`);
-
-  return {
-    title,
-    description,
-    openGraph: { title, description, type: "website" },
-  };
+  const pt = locale === "pt";
+  return pageMetadata({
+    locale,
+    path: `/canis/${shelter.id}`,
+    title: pt
+      ? `${shelter.nome}, animais para adoção em ${shelter.localizacao}`
+      : `${shelter.nome}, animals for adoption in ${shelter.localizacao}`,
+    description: describe(
+      shelter.missao,
+      pt
+        ? `Conhece ${shelter.nome} (${shelter.localizacao}), os animais que tem para adoção e como contactar a equipa na FYA.`
+        : `Meet ${shelter.nome} (${shelter.localizacao}), the animals it has for adoption and how to contact the team on FYA.`,
+    ),
+    image: shelter.image_url
+      ? { url: shelter.image_url, alt: shelter.nome }
+      : null,
+  });
 }
 
 export default async function ShelterPublicPage({
