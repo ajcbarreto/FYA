@@ -42,6 +42,16 @@ A candidatura e a mudança de estado criam jobs na `email_outbox` na mesma trans
 
 O worker reclama até 20 jobs, bloqueia entregas concorrentes, usa uma chave de idempotência por email e limita a cinco tentativas. Inspecionar jobs com `sent_at is null and attempts >= 5` para intervenção manual. O sistema de notificações dentro da aplicação funciona independentemente do email.
 
+## Segurança e alertas
+
+**MFA dos administradores.** A migração `202609280001_admin_mfa.sql` exige o segundo fator (TOTP) a qualquer conta `admin`. Sem ele, a sessão de um administrador não lê nem altera dados, mesmo por chamadas diretas à API. Depois do login, o administrador é levado para `/pt/auth/mfa`, onde associa uma aplicação de autenticação na primeira vez. No Supabase alojado, confirmar em Authentication → Multi-Factor que o TOTP está ativo. Se um administrador perder o telemóvel, remover o fator no painel do Supabase (Authentication → Users) para que volte a associar.
+
+**Captcha.** Com `NEXT_PUBLIC_TURNSTILE_SITE_KEY` e `TURNSTILE_SECRET_KEY` (Cloudflare Turnstile, gratuito), o widget aparece no registo, login, recuperação de palavra-passe e pedido de piloto. O pedido de piloto é verificado pela aplicação. Para o registo, login e recuperação, ativar também em Supabase → Authentication → Attack Protection o captcha Turnstile com o mesmo segredo; é o Supabase que o verifica. Ativar os dois ao mesmo tempo: com o captcha ativo no Supabase e sem chave no site, o login falha.
+
+**Alertas de erros.** Com `SENTRY_DSN` (servidor) e `NEXT_PUBLIC_SENTRY_DSN` (browser), os erros são enviados para o Sentry sem dados pessoais, cookies, cabeçalhos ou corpos de pedidos. O endpoint de emails reporta também jobs esgotados e envio não configurado. Configurar no Sentry quem recebe os alertas.
+
+**Envio periódico de emails.** O workflow `.github/workflows/email-jobs.yml` chama `/api/jobs/email` a cada 10 minutos quando os segredos `APP_URL` e `CRON_SECRET` estão definidos no repositório. Pode ser substituído pelo cron do alojamento.
+
 ## Verificação
 
 ```sh

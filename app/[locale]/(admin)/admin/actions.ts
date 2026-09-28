@@ -6,6 +6,7 @@ import { validFilterConfig } from "@/lib/pet-catalog/options";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { hasSecondFactor, mfaPath } from "@/lib/auth/mfa";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
@@ -39,6 +40,10 @@ async function requireAdmin(locale: Locale) {
 
   if ((profile?.role as UserRole | undefined) !== "admin") {
     redirect(`/${locale}/admin?error=unauthorized`);
+  }
+
+  if (!(await hasSecondFactor(supabase))) {
+    redirect(mfaPath(locale, `/${locale}/admin`));
   }
 
   return supabase;

@@ -1,3 +1,4 @@
+import { Captcha } from "@/components/captcha";
 import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -95,6 +96,7 @@ export default async function ForgotPasswordPage({
               />
             </div>
           </div>
+          <Captcha locale={locale} />
           <SubmitButton
             type="submit"
             className="w-full rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"

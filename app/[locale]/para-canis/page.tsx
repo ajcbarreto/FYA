@@ -1,3 +1,4 @@
+import { Captcha } from "@/components/captcha";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
@@ -215,6 +216,7 @@ export default async function ForShelters({
               </Link>
             </span>
           </label>
+          <Captcha locale={locale} />
           <SubmitButton className="rounded-full bg-primary px-6 py-3 font-bold text-primary-foreground">
             {pt ? "Pedir contacto sobre o piloto" : "Request pilot contact"}
           </SubmitButton>

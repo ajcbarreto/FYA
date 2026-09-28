@@ -1,4 +1,5 @@
 "use server";
+import { verifyCaptcha } from "@/lib/captcha";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { isLocale } from "@/lib/i18n/config";
@@ -29,6 +30,8 @@ export async function requestPilot(form: FormData) {
   if (invalid) redirect(`/${locale}/para-canis?error=invalid#piloto`);
   if (String(form.get("website") ?? ""))
     redirect(`/${locale}/para-canis?success=received#piloto`);
+  if (!(await verifyCaptcha(form)))
+    redirect(`/${locale}/para-canis?error=captcha#piloto`);
   const admin = createAdminSupabaseClient();
   if (!admin) redirect(`/${locale}/para-canis?error=unavailable#piloto`);
   const { error } = await admin.rpc("submit_pilot_request", {

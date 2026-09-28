@@ -1624,99 +1624,22 @@ export type Database = {
     Views: Record<string, never>;
     Functions: {
       accept_shelter_invitation: { Args: { p_id: string }; Returns: undefined };
-      trello_enqueue: {
-        Args: { p_event: string; p_card: string };
-        Returns: boolean;
-      };
-      submit_adoption: {
-        Args: { p_animal: string; p_answers: Json; p_message: string };
-        Returns: string;
-      };
-      trello_claim: {
-        Args: { p_run: string; p_owner: string };
-        Returns: Database["public"]["Tables"]["trello_jobs"]["Row"][];
-      };
-      trello_save: {
-        Args: {
-          p_card: string;
-          p_run: string;
-          p_state: string;
-          p_branch: string;
-          p_checkpoint: Json;
-          p_delivery: boolean;
-          p_delay: number;
-        };
-        Returns: boolean;
-      };
-      transition_adoption: {
-        Args: { p_request: string; p_status: string; p_notes: string };
-        Returns: undefined;
-      };
+      cancel_support_pledge: { Args: { p_id: string }; Returns: undefined };
       claim_email_jobs: {
         Args: Record<string, never>;
         Returns: Database["public"]["Tables"]["email_outbox"]["Row"][];
       };
-      retry_document_email: { Args: { p_id: string }; Returns: undefined };
-      share_animal_documents: {
-        Args: {
-          p_id: string;
-          p_request: string;
-          p_documents: string[];
-          p_days: number;
-        };
-        Returns: string;
-      };
-      revoke_document_share: { Args: { p_id: string }; Returns: undefined };
-      my_shelters: {
-        Args: Record<string, never>;
-        Returns: Database["public"]["Tables"]["canis"]["Row"][];
-      };
-      submit_pilot_request: {
-        Args: {
-          p_organization: string;
-          p_contact: string;
-          p_email: string;
-          p_location: string;
-          p_message: string;
-          p_consent: boolean;
-        };
-        Returns: undefined;
+      import_animals: {
+        Args: { p_shelter: string; p_rows: Json };
+        Returns: number;
       };
       manage_animal: {
         Args: { p_animal: string; p_operation: string };
         Returns: undefined;
       };
-      withdraw_adoption: { Args: { p_request: string }; Returns: undefined };
-      save_animal_details: {
-        Args: { p_animal: string; p_data: Json };
-        Returns: undefined;
-      };
-      shelter_delivery_status: { Args: { p_shelter: string }; Returns: Json };
-      import_animals: {
-        Args: { p_shelter: string; p_rows: Json };
-        Returns: number;
-      };
-      reschedule_visit: {
-        Args: { p_visit: string; p_date: string };
-        Returns: string;
-      };
-      shelter_metrics: { Args: { p_shelter: string }; Returns: Json };
-      search_shelter_requests: {
-        Args: {
-          p_shelter: string;
-          p_query?: string;
-          p_status?: string;
-          p_assignee?: string;
-          p_min_days?: number;
-          p_unanswered?: boolean;
-          p_order?: string;
-          p_page?: number;
-        };
-        Returns: Json;
-      };
-      reply_to_application: {
-        Args: { p_request: string; p_message_id: string; p_body: string };
-        Returns: undefined;
+      my_shelters: {
+        Args: Record<string, never>;
+        Returns: Database["public"]["Tables"]["canis"]["Row"][];
       };
       pledge_support: {
         Args: {
@@ -1737,11 +1660,88 @@ export type Database = {
         };
         Returns: undefined;
       };
-      cancel_support_pledge: { Args: { p_id: string }; Returns: undefined };
+      reply_to_application: {
+        Args: { p_request: string; p_message_id: string; p_body: string };
+        Returns: undefined;
+      };
+      reschedule_visit: {
+        Args: { p_visit: string; p_date: string };
+        Returns: string;
+      };
+      retry_document_email: { Args: { p_id: string }; Returns: undefined };
+      revoke_document_share: { Args: { p_id: string }; Returns: undefined };
+      save_animal_details: {
+        Args: { p_animal: string; p_data: Json };
+        Returns: undefined;
+      };
+      search_shelter_requests: {
+        Args: {
+          p_shelter: string;
+          p_query?: string;
+          p_status?: string;
+          p_assignee?: string;
+          p_min_days?: number;
+          p_unanswered?: boolean;
+          p_order?: string;
+          p_page?: number;
+        };
+        Returns: Json;
+      };
+      share_animal_documents: {
+        Args: {
+          p_id: string;
+          p_request: string;
+          p_documents: string[];
+          p_days: number;
+        };
+        Returns: string;
+      };
+      shelter_delivery_status: { Args: { p_shelter: string }; Returns: Json };
+      shelter_metrics: { Args: { p_shelter: string }; Returns: Json };
+      submit_adoption: {
+        Args: { p_animal: string; p_answers: Json; p_message: string };
+        Returns: string;
+      };
+      submit_pilot_request: {
+        Args: {
+          p_organization: string;
+          p_contact: string;
+          p_email: string;
+          p_location: string;
+          p_message: string;
+          p_consent: boolean;
+        };
+        Returns: undefined;
+      };
+      transition_adoption: {
+        Args: { p_request: string; p_status: string; p_notes: string };
+        Returns: undefined;
+      };
+      trello_claim: {
+        Args: { p_run: string; p_owner: string };
+        Returns: Database["public"]["Tables"]["trello_jobs"]["Row"][];
+      };
+      trello_enqueue: {
+        Args: { p_event: string; p_card: string };
+        Returns: boolean;
+      };
+      trello_save: {
+        Args: {
+          p_card: string;
+          p_run: string;
+          p_state: string;
+          p_branch: string;
+          p_checkpoint: Json;
+          p_delivery: boolean;
+          p_delay: number;
+        };
+        Returns: boolean;
+      };
       void_support_receipt: {
         Args: { p_id: string; p_reason: string };
         Returns: undefined;
       };
+      withdraw_adoption: { Args: { p_request: string }; Returns: undefined };
     };
     Enums: { app_role: "admin" | "user" | "canil" };
     CompositeTypes: Record<string, never>;

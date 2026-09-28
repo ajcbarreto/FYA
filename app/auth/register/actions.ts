@@ -1,5 +1,6 @@
 "use server";
 
+import { captchaToken } from "@/lib/captcha";
 import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -60,6 +61,7 @@ export async function register(formData: FormData) {
     email,
     password,
     options: {
+      captchaToken: captchaToken(formData),
       emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/auth/callback?next=/${locale}/${role === "canil" ? "canil" : "user"}`,
       data: userMetadata,
     },

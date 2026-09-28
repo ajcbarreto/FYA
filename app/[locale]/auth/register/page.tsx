@@ -1,3 +1,4 @@
+import { Captcha } from "@/components/captcha";
 import { RegistrationPassword } from "@/components/registration-password";
 import { SocialLoginButtons } from "@/components/social-login-buttons";
 import { SubmitButton } from "@/components/submit-button";
@@ -220,6 +221,7 @@ export default async function RegisterPage({
               <span>{copy.terms} <Link className="underline" href={`/${locale}/termos`}>{locale === "pt" ? "Condições do piloto" : "Pilot terms"}</Link> · <Link className="underline" href={`/${locale}/privacidade`}>{locale === "pt" ? "Privacidade" : "Privacy"}</Link></span>
             </label>
 
+            <Captcha locale={locale} />
             <SubmitButton
               type="submit"
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90"

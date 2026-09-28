@@ -1,3 +1,4 @@
+import { Captcha } from "@/components/captcha";
 import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
 import Image from "next/image";
@@ -33,7 +34,7 @@ export default async function LoginPage({
   const copy =
     locale === "pt"
       ? {
-          sideTitle: "Bem-vindo de volta a matilha.",
+          sideTitle: "Bem-vindo de volta à matilha.",
           sideText:
             "Reconecta-te com canis e encontra o companheiro ideal para a tua família.",
           forgotPassword: "Esqueceste a password?",
@@ -175,6 +176,7 @@ export default async function LoginPage({
                 {copy.rememberDevice}
               </label>
 
+              <Captcha locale={locale} />
               <SubmitButton
                 type="submit"
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90"

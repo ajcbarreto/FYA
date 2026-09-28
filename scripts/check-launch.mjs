@@ -13,6 +13,9 @@ const required = [
   "SUPPORT_EMAIL",
   "PRIVACY_EMAIL",
   "LEGAL_APPROVED_AT",
+  "SENTRY_DSN",
+  "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
+  "TURNSTILE_SECRET_KEY",
 ];
 const missing = required.filter((key) => !process.env[key]?.trim());
 for (const key of missing) console.error(`Pending: ${key}`);

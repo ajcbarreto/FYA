@@ -143,3 +143,17 @@ export async function deliverEmailOutbox() {
     failed: results.filter((x) => x === "failed").length,
   };
 }
+
+/** Jobs that will never be retried (five failed attempts) and need a person. */
+export async function countExhaustedEmailJobs() {
+  const admin = createAdminSupabaseClient();
+  if (!admin) return 0;
+  const { count, error } = await admin
+    .from("email_outbox")
+    .select("id", { count: "exact", head: true })
+    .is("sent_at", null)
+    .is("cancelled_at", null)
+    .gte("attempts", 5);
+  if (error) throw new Error("Unable to inspect email jobs", { cause: error });
+  return count ?? 0;
+}

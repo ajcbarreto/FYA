@@ -1,3 +1,4 @@
+import { Captcha } from "@/components/captcha";
 import { RegistrationPassword } from "@/components/registration-password";
 import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
@@ -365,6 +366,7 @@ export default async function ShelterRegistrationPage({
             >
               {dictionary.auth.saveDraft}
             </button>
+            <Captcha locale={locale} />
             <SubmitButton
               type="submit"
               className="w-full rounded-xl bg-primary px-12 py-4 font-bold text-primary-foreground shadow-xl transition-all hover:scale-[1.02] md:w-auto"

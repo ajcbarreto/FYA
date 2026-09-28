@@ -1,6 +1,8 @@
 "use server";
 
+import { captchaToken } from "@/lib/captcha";
 import { safeLocalPath } from "@/lib/auth/redirect";
+import { mfaPath } from "@/lib/auth/mfa";
 import { loginErrorMessage } from "@/lib/auth/login-error";
 import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
@@ -29,6 +31,7 @@ export async function login(formData: FormData) {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
+    options: { captchaToken: captchaToken(formData) },
   });
 
   if (error || !data.user) {
@@ -49,14 +52,18 @@ export async function login(formData: FormData) {
 
   const role = profile?.role as UserRole | undefined;
 
-  if (nextPath) {
-    redirect(
-      /^\/(pt|en)(\/|$)/.test(nextPath) ? nextPath : `/${locale}${nextPath}`,
-    );
-  }
+  const target = nextPath
+    ? /^\/(pt|en)(\/|$)/.test(nextPath)
+      ? nextPath
+      : `/${locale}${nextPath}`
+    : null;
 
   if (role === "admin") {
-    redirect(`/${locale}/admin`);
+    redirect(mfaPath(locale, target ?? `/${locale}/admin`));
+  }
+
+  if (target) {
+    redirect(target);
   }
 
   if (role === "canil") {
