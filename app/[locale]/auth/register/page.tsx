@@ -77,9 +77,9 @@ export default async function RegisterPage({
     >
       <section className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 items-center gap-12 px-6 py-12 lg:grid-cols-2 lg:px-8 lg:py-16">
         <div className="hidden lg:block">
-          <h2 className="display-title text-4xl leading-tight">
+          <p className="display-title text-4xl leading-tight">
             {copy.sideTitle}
-          </h2>
+          </p>
           <ol className="mt-8 space-y-5">
             {copy.sideItems.map((item, i) => (
               <li key={item} className="flex gap-4">

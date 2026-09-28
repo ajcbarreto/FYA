@@ -28,6 +28,7 @@ import {
 import { submitShelterReview } from "@/app/canil/reviews/actions";
 import { StarRating } from "@/components/star-rating";
 import { ToastFeedback } from "@/components/toast-feedback";
+import { JsonLd, shelterJsonLd } from "@/lib/seo/json-ld";
 
 type ShelterDetailBodyProps = {
   locale: Locale;
@@ -168,6 +169,7 @@ export async function ShelterDetailBody({
 
   return (
     <>
+      <JsonLd data={shelterJsonLd(shelter, locale)} />
       <ToastFeedback
         message={feedback}
         variant={success ? "success" : "error"}

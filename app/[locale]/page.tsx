@@ -11,6 +11,7 @@ import { Suspense } from "react";
 import { PetCardSkeleton } from "@/components/skeletons/pet-card-skeleton";
 import type { Locale } from "@/lib/i18n/config";
 import { PetCard } from "@/components/pet-card";
+import { JsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/seo/json-ld";
 import { staticPageMetadata } from "@/lib/seo/metadata";
 
 export function generateMetadata({
@@ -40,6 +41,7 @@ export default async function Home({
 
   return (
     <main id="main-content" tabIndex={-1}>
+      <JsonLd data={[organizationJsonLd(locale), websiteJsonLd(locale)]} />
       <section className="page-shell grid items-center gap-10 pb-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pb-20">
         <div className="py-4 lg:py-10">
           <span className="eyebrow inline-flex items-center gap-2">

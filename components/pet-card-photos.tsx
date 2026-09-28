@@ -37,7 +37,7 @@ export function PetCardPhotos({
                 ? "Fotografia indisponível"
                 : "Photo unavailable"
               : multiple
-                ? `${name} — ${position}`
+                ? `${name}, ${position}`
                 : name
           }
           fill

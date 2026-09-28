@@ -90,9 +90,9 @@ export default async function LoginPage({
             </span>
           </div>
           <div className="max-w-sm">
-            <h2 className="display-title text-3xl leading-tight">
+            <p className="display-title text-3xl leading-tight">
               {copy.sideTitle}
-            </h2>
+            </p>
             <ul className="mt-5 list-disc space-y-2 pl-5 text-base leading-relaxed text-white/85">
               {copy.sideItems.map((item) => (
                 <li key={item}>{item}</li>
