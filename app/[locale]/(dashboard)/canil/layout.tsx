@@ -9,7 +9,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "shelterArea", "/canil");
+  return staticPageMetadata(params, "shelterArea");
 }
 
 type CanilLayoutProps = {

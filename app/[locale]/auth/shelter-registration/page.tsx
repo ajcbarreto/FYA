@@ -14,11 +14,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(
-    params,
-    "shelterRegistration",
-    "/auth/shelter-registration",
-  );
+  return staticPageMetadata(params, "shelterRegistration");
 }
 
 type ShelterRegistrationPageProps = {

@@ -12,7 +12,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "stories", "/historias");
+  return staticPageMetadata(params, "stories");
 }
 
 type SuccessStoriesPageProps = {

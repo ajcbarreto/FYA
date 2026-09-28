@@ -11,7 +11,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "forShelters", "/para-canis");
+  return staticPageMetadata(params, "forShelters");
 }
 export default async function ForShelters({
   params,

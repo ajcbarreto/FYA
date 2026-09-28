@@ -8,7 +8,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "privacy", "/privacidade");
+  return staticPageMetadata(params, "privacy");
 }
 export default async function Privacy({
   params,

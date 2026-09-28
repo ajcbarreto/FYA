@@ -10,7 +10,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "match", "/match");
+  return staticPageMetadata(params, "match");
 }
 
 type MatchPageProps = {

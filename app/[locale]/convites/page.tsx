@@ -8,7 +8,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "invitations", "/convites");
+  return staticPageMetadata(params, "invitations");
 }
 export default async function Invitations({
   params,

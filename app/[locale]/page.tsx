@@ -19,7 +19,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "home", "");
+  return staticPageMetadata(params, "home");
 }
 
 const speciesLinks = [

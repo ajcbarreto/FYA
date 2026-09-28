@@ -17,7 +17,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "pets", "/pets");
+  return staticPageMetadata(params, "pets");
 }
 
 export default async function Catalog({

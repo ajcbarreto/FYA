@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
-import { pageCopy, type PageKey } from "@/lib/seo/pages";
+import { pageCopy, type PageEntry, type PageKey } from "@/lib/seo/pages";
 import { pageTitle, siteName, siteOrigin } from "@/lib/seo/site";
 
 const ogLocale: Record<Locale, string> = { pt: "pt_PT", en: "en_GB" };
@@ -87,14 +87,14 @@ export const metadataBase = new URL(siteOrigin());
 export async function staticPageMetadata(
   params: Promise<{ locale: string }>,
   key: PageKey,
-  path: string,
 ): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const page: {
-    pt: { title: string; description: string };
-    en: { title: string; description: string };
-    noindex?: boolean;
-  } = pageCopy[key];
-  return pageMetadata({ locale, path, ...page[locale], noindex: page.noindex });
+  const page: PageEntry = pageCopy[key];
+  return pageMetadata({
+    locale,
+    path: page.path,
+    ...page[locale],
+    noindex: page.noindex,
+  });
 }

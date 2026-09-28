@@ -9,7 +9,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "help", "/ajuda");
+  return staticPageMetadata(params, "help");
 }
 export default async function Help({
   params,

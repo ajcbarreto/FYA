@@ -1,12 +1,24 @@
-// Titles (topic only; " | FYA" is appended) and descriptions for fixed pages.
+// Fixed pages: path, title (topic only; " | FYA" is appended) and description.
+// The sitemap lists every entry without noindex, so a new public page added
+// here is picked up automatically.
 // Indexable pages are checked in tests: title 50–60 characters with the
 // brand, description 140–160 characters.
 
 type Copy = { title: string; description: string };
-type PageCopy = { pt: Copy; en: Copy; noindex?: boolean };
+type PageCopy = {
+  /** Path after the locale ("" for the home page). */
+  path: string;
+  pt: Copy;
+  en: Copy;
+  noindex?: boolean;
+  /** Date the page content last changed (sitemap lastmod); indexable pages only. */
+  updated?: string;
+};
 
 export const pageCopy = {
   home: {
+    path: "",
+    updated: "2026-09-28",
     pt: {
       title: "Adoção de cães e gatos de canis e associações",
       description:
@@ -19,6 +31,8 @@ export const pageCopy = {
     },
   },
   pets: {
+    path: "/pets",
+    updated: "2026-09-28",
     pt: {
       title: "Cães e gatos para adoção em canis e associações",
       description:
@@ -31,6 +45,8 @@ export const pageCopy = {
     },
   },
   shelters: {
+    path: "/canis",
+    updated: "2026-09-28",
     pt: {
       title: "Lista de canis e associações com animais para adoção",
       description:
@@ -43,6 +59,8 @@ export const pageCopy = {
     },
   },
   stories: {
+    path: "/historias",
+    updated: "2026-09-28",
     pt: {
       title: "Animais já adotados através de canis e associações",
       description:
@@ -55,6 +73,8 @@ export const pageCopy = {
     },
   },
   match: {
+    path: "/match",
+    updated: "2026-09-28",
     pt: {
       title: "Que animal adotar? Três perguntas para escolher",
       description:
@@ -67,6 +87,8 @@ export const pageCopy = {
     },
   },
   help: {
+    path: "/ajuda",
+    updated: "2026-09-28",
     pt: {
       title: "Centro de ajuda: guias para canis e associações",
       description:
@@ -79,6 +101,8 @@ export const pageCopy = {
     },
   },
   forShelters: {
+    path: "/para-canis",
+    updated: "2026-09-28",
     pt: {
       title: "Plataforma de gestão para canis e associações",
       description:
@@ -91,6 +115,8 @@ export const pageCopy = {
     },
   },
   privacy: {
+    path: "/privacidade",
+    updated: "2026-09-28",
     pt: {
       title: "Privacidade e proteção de dados de adotantes e canis",
       description:
@@ -103,6 +129,8 @@ export const pageCopy = {
     },
   },
   terms: {
+    path: "/termos",
+    updated: "2026-09-28",
     pt: {
       title: "Condições de utilização e regras do período piloto",
       description:
@@ -115,6 +143,7 @@ export const pageCopy = {
     },
   },
   login: {
+    path: "/auth/login",
     noindex: true,
     pt: {
       title: "Entrar",
@@ -128,6 +157,7 @@ export const pageCopy = {
     },
   },
   register: {
+    path: "/auth/register",
     noindex: true,
     pt: {
       title: "Criar conta de adotante",
@@ -141,6 +171,7 @@ export const pageCopy = {
     },
   },
   shelterRegistration: {
+    path: "/auth/shelter-registration",
     noindex: true,
     pt: {
       title: "Registo de canis e associações",
@@ -154,6 +185,7 @@ export const pageCopy = {
     },
   },
   forgotPassword: {
+    path: "/auth/forgot-password",
     noindex: true,
     pt: {
       title: "Recuperar palavra-passe",
@@ -167,6 +199,7 @@ export const pageCopy = {
     },
   },
   resetPassword: {
+    path: "/auth/reset-password",
     noindex: true,
     pt: {
       title: "Definir nova palavra-passe",
@@ -178,6 +211,7 @@ export const pageCopy = {
     },
   },
   checkEmail: {
+    path: "/auth/check-email",
     noindex: true,
     pt: {
       title: "Confirma o teu email",
@@ -189,6 +223,7 @@ export const pageCopy = {
     },
   },
   mfa: {
+    path: "/auth/mfa",
     noindex: true,
     pt: {
       title: "Verificação em dois passos",
@@ -201,11 +236,13 @@ export const pageCopy = {
     },
   },
   notifications: {
+    path: "/notificacoes",
     noindex: true,
     pt: { title: "Notificações", description: "As tuas notificações na FYA." },
     en: { title: "Notifications", description: "Your notifications on FYA." },
   },
   invitations: {
+    path: "/convites",
     noindex: true,
     pt: {
       title: "Convites de equipa",
@@ -218,6 +255,7 @@ export const pageCopy = {
     },
   },
   accountSupport: {
+    path: "/conta/apoios",
     noindex: true,
     pt: {
       title: "As minhas ajudas",
@@ -230,6 +268,7 @@ export const pageCopy = {
     },
   },
   accountPrivacy: {
+    path: "/conta/privacidade",
     noindex: true,
     pt: {
       title: "Os meus dados",
@@ -241,6 +280,7 @@ export const pageCopy = {
     },
   },
   userArea: {
+    path: "/user",
     noindex: true,
     pt: {
       title: "Área do adotante",
@@ -254,6 +294,7 @@ export const pageCopy = {
     },
   },
   shelterArea: {
+    path: "/canil",
     noindex: true,
     pt: {
       title: "Área do canil",
@@ -267,6 +308,7 @@ export const pageCopy = {
     },
   },
   adminArea: {
+    path: "/admin",
     noindex: true,
     pt: {
       title: "Administração",
@@ -280,3 +322,4 @@ export const pageCopy = {
 } satisfies Record<string, PageCopy>;
 
 export type PageKey = keyof typeof pageCopy;
+export type PageEntry = PageCopy;

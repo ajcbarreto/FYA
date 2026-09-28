@@ -14,7 +14,9 @@ test("public help search, pilot contact capture and private administrator follow
     p.getByRole("heading", { name: "Registar e publicar um animal" }),
   ).toBeVisible();
   await expect(
-    p.getByText("Vídeo em preparação — segue os passos abaixo."),
+    p.getByText(
+      "O vídeo ainda está a ser preparado. Os passos estão descritos abaixo.",
+    ),
   ).toBeVisible();
   await p.setViewportSize({ width: 390, height: 844 });
   expect(
@@ -153,7 +155,10 @@ test("getting started, private timeline and printable public QR preserve data bo
   await admin.from("animais").update({ published: false }).eq("id", animal.id);
   await p.goto(`/pt/pets/${animal.id}/imprimir`);
   await expect(
-    p.getByRole("heading", { name: "404", exact: true }),
+    p.getByRole("heading", {
+      name: "Não encontrámos esta página",
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(
     p.getByRole("heading", { name: animal.nome, exact: true }),
@@ -163,7 +168,10 @@ test("getting started, private timeline and printable public QR preserve data bo
   await login(op, "other-shelter");
   await op.goto(`/pt/canil/animais/${animal.id}/historico`);
   await expect(
-    op.getByRole("heading", { name: "404", exact: true }),
+    op.getByRole("heading", {
+      name: "Não encontrámos esta página",
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(
     op.getByText("Registo privado atualizado", { exact: true }),

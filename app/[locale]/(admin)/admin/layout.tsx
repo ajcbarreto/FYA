@@ -11,7 +11,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "adminArea", "/admin");
+  return staticPageMetadata(params, "adminArea");
 }
 
 type AdminLayoutProps = {

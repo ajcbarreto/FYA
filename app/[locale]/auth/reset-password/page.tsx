@@ -11,7 +11,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "resetPassword", "/auth/reset-password");
+  return staticPageMetadata(params, "resetPassword");
 }
 
 type ResetPasswordPageProps = {

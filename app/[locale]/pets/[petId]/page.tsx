@@ -26,12 +26,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   );
   if (!pet) return {};
   const pt = locale === "pt";
+  const species = pet.species.toLocaleLowerCase(locale);
   return pageMetadata({
     locale,
     path: `/pets/${pet.id}`,
     title: pt
-      ? `${pet.name}, ${pet.species} para adoção em ${pet.location}`
-      : `${pet.name}, ${pet.species} for adoption in ${pet.location}`,
+      ? `${pet.name}, ${species} para adoção em ${pet.location}`
+      : `${pet.name}, ${species} for adoption in ${pet.location}`,
     description: describe(
       pet.description,
       pt

@@ -9,7 +9,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "checkEmail", "/auth/check-email");
+  return staticPageMetadata(params, "checkEmail");
 }
 
 export default async function CheckEmailPage({

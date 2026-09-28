@@ -18,7 +18,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "shelters", "/canis");
+  return staticPageMetadata(params, "shelters");
 }
 
 type SheltersDirectoryPageProps = {

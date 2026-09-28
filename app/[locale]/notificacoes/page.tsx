@@ -18,7 +18,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "notifications", "/notificacoes");
+  return staticPageMetadata(params, "notifications");
 }
 
 type NotificationsPageProps = {

@@ -13,7 +13,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "forgotPassword", "/auth/forgot-password");
+  return staticPageMetadata(params, "forgotPassword");
 }
 
 type ForgotPasswordPageProps = {

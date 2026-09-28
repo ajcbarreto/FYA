@@ -9,7 +9,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "userArea", "/user");
+  return staticPageMetadata(params, "userArea");
 }
 
 type UserLayoutProps = {

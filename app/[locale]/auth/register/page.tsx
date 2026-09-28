@@ -15,7 +15,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "register", "/auth/register");
+  return staticPageMetadata(params, "register");
 }
 
 type RegisterPageProps = {

@@ -8,7 +8,7 @@ export function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return staticPageMetadata(params, "accountPrivacy", "/conta/privacidade");
+  return staticPageMetadata(params, "accountPrivacy");
 }
 export default async function PrivacyAccount({
   params,
