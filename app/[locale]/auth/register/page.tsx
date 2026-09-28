@@ -3,12 +3,20 @@ import { RegistrationPassword } from "@/components/registration-password";
 import { SocialLoginButtons } from "@/components/social-login-buttons";
 import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ArrowRight, Lock, Mail, PawPrint, User, Phone } from "lucide-react";
+import { ArrowRight, Lock, Mail, User, Phone } from "lucide-react";
 import { register } from "@/app/auth/register/actions";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "register");
+}
 
 type RegisterPageProps = {
   params: Promise<{ locale: string }>;
@@ -33,11 +41,13 @@ export default async function RegisterPage({
   const copy =
     locale === "pt"
       ? {
-          pageTitle: "Cada pata merece um lar feliz.",
-          pageDescription:
-            "Junta-te a uma comunidade de adotantes e canis. O teu registo e o primeiro passo para criar novas histórias.",
-          joined: "Mais de 12.000 membros",
-          joinedSubtitle: "Ativos em dezenas de canis parceiros",
+          sideTitle: "Para que serve a conta",
+          sideItems: [
+            "Enviar candidaturas de adoção e ver em que ponto estão.",
+            "Falar com a equipa do canil e combinar visitas.",
+            "Guardar os animais que te interessam para veres mais tarde.",
+          ],
+          shelterPrompt: "Representas um canil ou associação?",
           alreadyHave: "Já tens conta?",
           createAccount: "Criar conta",
           continueWith: "OU CONTINUAR COM",
@@ -45,11 +55,13 @@ export default async function RegisterPage({
             "Concordo com os Termos de Serviço e Política de Privacidade e autorizo o tratamento dos meus dados para criação de conta.",
         }
       : {
-          pageTitle: "Every paw deserves a joyful home.",
-          pageDescription:
-            "Join our community of adopters and shelters. Registration is your first step toward more success stories.",
-          joined: "Joined by 12,000+ members",
-          joinedSubtitle: "Active across partner shelters",
+          sideTitle: "What the account is for",
+          sideItems: [
+            "Send adoption applications and see where they stand.",
+            "Talk to the shelter team and arrange visits.",
+            "Save the animals you like so you can come back to them.",
+          ],
+          shelterPrompt: "Represent a shelter or rescue group?",
           alreadyHave: "Already have an account?",
           createAccount: "Create account",
           continueWith: "OR CONTINUE WITH",
@@ -64,56 +76,41 @@ export default async function RegisterPage({
       className="flex min-h-[calc(100vh-4rem)] flex-col bg-background"
     >
       <section className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 items-center gap-12 px-6 py-12 lg:grid-cols-2 lg:px-8 lg:py-16">
-        <div className="hidden lg:flex lg:flex-col lg:gap-10">
-          <div className="relative w-fit">
-            <div className="h-72 w-72 overflow-hidden rounded-full bg-secondary/20">
-              <Image
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWCZKJyZVDZ0dI5a0Biove2dBDNpabZ4NSMqwafAfeCf9CcyQ6ZxDzP6gJI7byxRwbFc67KU_Tts1FECIP4wPVI5tO0Dic1t1FiWeW60JafvL0nQJbENUVvPDgrWO4R034SZTDAFZ4naVmmdkHzHExw-HjvsUOP4FVyz52Ehzjb6289EJrWGhxXHLSHbCQ4_c_aiklLZrnAFSZOtWOrkSlzDvKMCceiMq9JouGzka6aERf8bHeGTBqVNYnqew7CTcARGYnTJchl7Y"
-                alt={locale === "pt" ? "Cão sorridente" : "Smiling dog"}
-                fill
-                sizes="288px"
-                className="object-cover"
-              />
-            </div>
-            <div className="absolute -bottom-6 -right-8 h-48 w-48 overflow-hidden rounded-full border-8 border-background bg-accent/20">
-              <Image
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFutvC_LkhP2mmaQjWonEh_ong68fgPK1qYZHCdhxexb3hi7Ymm6BFV-354zz-BHNPO6omH0gEY9HCPlFducmGdQDSjaC7AaaVV2Io2Gq5e_BTz393TiLXwYzhw2W57Sj_bIbTjHkOTcARH9SEppiFgFyak9TEiv5p6wymyrszd0dQryHvfl2Fvq44uIl35uYEReZRjN9xdGvjB4LESi0GbGx5fJGkAALGaldpttCHCcMAycy9rr8drj1SHv6LtoOTvo7W_7Pus4M"
-                alt={locale === "pt" ? "Gatinho" : "Kitten"}
-                fill
-                sizes="192px"
-                className="object-cover"
-              />
-            </div>
-          </div>
-          <div className="max-w-md">
-            <h1 className="text-5xl font-extrabold leading-tight tracking-tight">
-              {copy.pageTitle.split(" ").slice(0, -2).join(" ")}{" "}
-              <span className="text-secondary">
-                {copy.pageTitle.split(" ").slice(-2).join(" ")}
-              </span>
-            </h1>
-            <p className="mt-6 text-base leading-relaxed text-muted-foreground">
-              {copy.pageDescription}
-            </p>
-            <div className="mt-8 flex items-center gap-4 rounded-2xl bg-muted/55 p-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
-                <PawPrint className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="font-bold">{copy.joined}</p>
-                <p className="text-sm text-muted-foreground">
-                  {copy.joinedSubtitle}
+        <div className="hidden lg:block">
+          <p className="display-title text-4xl leading-tight">
+            {copy.sideTitle}
+          </p>
+          <ol className="mt-8 space-y-5">
+            {copy.sideItems.map((item, i) => (
+              <li key={item} className="flex gap-4">
+                <span
+                  aria-hidden="true"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-sm font-bold text-secondary"
+                >
+                  {i + 1}
+                </span>
+                <p className="pt-1.5 leading-relaxed text-muted-foreground">
+                  {item}
                 </p>
-              </div>
-            </div>
-          </div>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-10 border-t border-border pt-6 text-sm text-muted-foreground">
+            {copy.shelterPrompt}{" "}
+            <Link
+              href={`/${locale}/auth/shelter-registration`}
+              className="font-semibold text-secondary hover:underline"
+            >
+              {dictionary.auth.shelterRegistrationLink}
+            </Link>
+          </p>
         </div>
 
         <div className="rounded-2xl border border-border/30 bg-muted/35 p-8 shadow-[0_20px_40px_rgba(56,56,51,0.06)] md:p-12">
           <div className="mb-10 text-center lg:text-left">
-            <h2 className="text-3xl font-bold tracking-tight text-primary">
+            <h1 className="text-3xl font-bold tracking-tight text-primary">
               {copy.createAccount}
-            </h2>
+            </h1>
             <p className="mt-2 text-muted-foreground">
               {dictionary.auth.registerSubtitle}
             </p>
@@ -132,22 +129,36 @@ export default async function RegisterPage({
 
           <div className="mb-6 space-y-3">
             <p className="text-sm text-muted-foreground">
-              {locale === "pt" ? "Cria a tua conta de adotante com:" : "Create your adopter account with:"}
+              {locale === "pt"
+                ? "Cria a tua conta de adotante com:"
+                : "Create your adopter account with:"}
             </p>
             <SocialLoginButtons locale={locale} />
             <p className="text-center text-xs text-muted-foreground">
-              {locale === "pt" ? "ou regista-te com email" : "or register with email"}
+              {locale === "pt"
+                ? "ou regista-te com email"
+                : "or register with email"}
             </p>
           </div>
           <form action={register} className="space-y-6">
             <input type="hidden" name="locale" value={locale} />
             <div className="space-y-2">
-              <label htmlFor="phone" className="ml-1 block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+              <label
+                htmlFor="phone"
+                className="ml-1 block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground"
+              >
                 {locale === "pt" ? "Telemóvel" : "Mobile phone"}
               </label>
               <div className="relative">
                 <Phone className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input id="phone" name="phone" type="tel" required placeholder="+351 900 000 000" className="h-13 w-full rounded-xl bg-background px-12 pr-4 text-sm outline-none transition-colors focus:ring-2 focus:ring-primary/30" />
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  required
+                  placeholder="+351 900 000 000"
+                  className="h-13 w-full rounded-xl bg-background px-12 pr-4 text-sm outline-none transition-colors focus:ring-2 focus:ring-primary/30"
+                />
               </div>
             </div>
 
@@ -205,8 +216,11 @@ export default async function RegisterPage({
             </div>
 
             <input type="hidden" name="role" value="user" />
-            <p className="text-sm text-muted-foreground">
-              <Link href={`/${locale}/auth/shelter-registration`} className="font-medium text-secondary hover:underline">
+            <p className="text-sm text-muted-foreground lg:hidden">
+              <Link
+                href={`/${locale}/auth/shelter-registration`}
+                className="font-medium text-secondary hover:underline"
+              >
                 {dictionary.auth.shelterRegistrationLink}
               </Link>
             </p>
@@ -218,7 +232,16 @@ export default async function RegisterPage({
                 required
                 className="mt-1 h-4 w-4 rounded border-border text-secondary focus:ring-secondary"
               />
-              <span>{copy.terms} <Link className="underline" href={`/${locale}/termos`}>{locale === "pt" ? "Condições do piloto" : "Pilot terms"}</Link> · <Link className="underline" href={`/${locale}/privacidade`}>{locale === "pt" ? "Privacidade" : "Privacy"}</Link></span>
+              <span>
+                {copy.terms}{" "}
+                <Link className="underline" href={`/${locale}/termos`}>
+                  {locale === "pt" ? "Condições do piloto" : "Pilot terms"}
+                </Link>{" "}
+                ·{" "}
+                <Link className="underline" href={`/${locale}/privacidade`}>
+                  {locale === "pt" ? "Privacidade" : "Privacy"}
+                </Link>
+              </span>
             </label>
 
             <Captcha locale={locale} />
@@ -232,13 +255,6 @@ export default async function RegisterPage({
           </form>
         </div>
       </section>
-
-      <footer className="mt-8 bg-muted/45 px-6 py-10 text-center text-xs text-muted-foreground lg:px-8">
-        © 2026 FYA (Found Your Animal).{" "}
-        {locale === "pt"
-          ? "Construido com carinho para cada pata."
-          : "Built with care for every paw."}
-      </footer>
     </main>
   );
 }

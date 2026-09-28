@@ -4,6 +4,15 @@ import { getAuthUser } from "@/lib/supabase/get-user";
 import { resolveUserRole } from "@/lib/auth/role";
 import { hasSecondFactor, mfaPath } from "@/lib/auth/mfa";
 import { AdminSidebar } from "@/components/admin-sidebar";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "adminArea");
+}
 
 type AdminLayoutProps = {
   children: React.ReactNode;

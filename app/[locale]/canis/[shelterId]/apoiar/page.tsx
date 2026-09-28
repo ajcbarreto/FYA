@@ -5,7 +5,35 @@ import { validId } from "@/lib/records/validation";
 import { createPublicSupabaseClient } from "@/lib/supabase/public-client";
 import { supabaseUrl, supabasePublishableKey } from "@/lib/supabase/config";
 import { supportAmount } from "@/lib/support/format";
+import { pageMetadata } from "@/lib/seo/metadata";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
 export const dynamic = "force-dynamic";
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; shelterId: string }>;
+}) {
+  const { locale, shelterId } = await params;
+  if (!isLocale(locale) || !validId(shelterId)) return {};
+  const { data: shelter } = await createPublicSupabaseClient(
+    supabaseUrl,
+    supabasePublishableKey,
+  )
+    .from("canis")
+    .select("id,nome,localizacao")
+    .eq("id", shelterId)
+    .maybeSingle();
+  if (!shelter) return {};
+  const pt = locale === "pt";
+  return pageMetadata({
+    locale,
+    path: `/canis/${shelter.id}/apoiar`,
+    title: pt ? `Apoiar ${shelter.nome}` : `Support ${shelter.nome}`,
+    description: pt
+      ? `Campanhas e necessidades de ${shelter.nome} (${shelter.localizacao}): alimentação, cuidados veterinários e outros apoios que podes dar a este canil.`
+      : `Campaigns and needs of ${shelter.nome} (${shelter.localizacao}): food, veterinary care and other support you can give this shelter.`,
+  });
+}
 export default async function ShelterSupport({
   params,
 }: {
@@ -30,9 +58,15 @@ export default async function ShelterSupport({
   if (error) throw new Error("Unable to load support");
   return (
     <main id="main-content" className="page-shell space-y-6">
-      <Link className="underline" href={`/${locale}/canis/${shelterId}`}>
-        ← {s.nome}
-      </Link>
+      <Breadcrumbs
+        locale={locale}
+        items={[
+          sectionCrumb(locale, "shelters"),
+          { label: s.nome, path: `/canis/${shelterId}` },
+          { label: pt ? "Apoiar" : "Support" },
+        ]}
+        currentPath={`/canis/${shelterId}/apoiar`}
+      />
       <header className="rounded-3xl bg-primary p-8 text-primary-foreground">
         <h1 className="page-title">
           {pt ? "Apoiar este canil" : "Support this shelter"}

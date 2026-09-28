@@ -42,6 +42,30 @@ save(
     text(890, 780, 26, "Found Your Animal", "#d9e5da"),
   "FYA — capa YouTube, texto na área central",
 );
+// Default Open Graph / Twitter images (lib/seo/metadata.ts), one per locale.
+for (const [name, lines, subtitle, title] of [
+  [
+    "og-pt.svg",
+    ["Animais para adoção,", "direto dos canis."],
+    "Candidatura, mensagens e visitas com canis e associações.",
+    "FYA: animais para adoção de canis e associações",
+  ],
+  [
+    "og-en.svg",
+    ["Animals for adoption,", "straight from shelters."],
+    "Applications, messages and visits with shelters and rescue groups.",
+    "FYA: animals for adoption from shelters and rescue groups",
+  ],
+])
+  save(
+    name,
+    1200,
+    630,
+    wordmark(80, 150, 80) +
+      lines.map((line, i) => text(80, 320 + i * 86, 68, line)).join("") +
+      text(80, 530, 28, subtitle, "#d9e5da"),
+    title,
+  );
 const posts = [
   [
     "01-apresentacao.svg",
@@ -75,4 +99,4 @@ for (const [name, lines, subtitle] of posts)
       text(80, 970, 24, "FYA · Piloto em preparação", "#d9e5da"),
     `FYA — ${lines.join(" ")}`,
   );
-console.log("Created 7 editable SVG assets in public/media-kit.");
+console.log("Created 9 editable SVG assets in public/media-kit.");

@@ -5,12 +5,23 @@ import { notFound } from "next/navigation";
 import { BadgeCheck, Building2, MapPin, PawPrint, Search } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { hasSupabaseEnv } from "@/lib/supabase/config";
 import {
   countAnimalsByShelter,
   listPublicShelters,
 } from "@/lib/canil/public-directory";
 import { getShelterRatingSummaries } from "@/lib/canil/reviews";
 import { StarRating } from "@/components/star-rating";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "shelters");
+}
 
 type SheltersDirectoryPageProps = {
   params: Promise<{ locale: string }>;
@@ -29,32 +40,38 @@ export default async function SheltersDirectoryPage({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const shelters = await listPublicShelters(supabase, {
-    search: query || undefined,
-  });
+  // Without Supabase configured (local previews) the directory is empty
+  // instead of failing, like the pets catalog.
+  const supabase = hasSupabaseEnv ? await createServerSupabaseClient() : null;
+  const shelters = supabase
+    ? await listPublicShelters(supabase, { search: query || undefined })
+    : [];
   const shelterIds = shelters.map((shelter) => shelter.id);
-  const [animalsCount, ratingSummaries] = await Promise.all([
-    countAnimalsByShelter(supabase, shelterIds),
-    getShelterRatingSummaries(supabase, shelterIds),
-  ]);
+  const [animalsCount, ratingSummaries] = supabase
+    ? await Promise.all([
+        countAnimalsByShelter(supabase, shelterIds),
+        getShelterRatingSummaries(supabase, shelterIds),
+      ])
+    : [new Map<string, number>(), new Map()];
 
   const copy =
     locale === "pt"
       ? {
-          title: "Canis e abrigos parceiros",
-          subtitle: "Conhece as organizacoes que dao casa aos animais na FYA.",
-          searchPlaceholder: "Procurar por nome, cidade ou missao...",
-          empty: "Sem canis encontrados para essa pesquisa.",
+          title: "Canis e associações",
+          subtitle:
+            "Organizações registadas na FYA, com os animais que têm para adoção e a forma de as contactar.",
+          searchPlaceholder: "Nome ou localidade",
+          empty: "Nenhum canil corresponde a esta pesquisa.",
           totalPets: (count: number) =>
             `${count} ${count === 1 ? "animal" : "animais"}`,
           openCanil: "Ver canil",
           submit: "Procurar",
         }
       : {
-          title: "Partner shelters",
-          subtitle: "Meet the organizations that give pets a home through FYA.",
-          searchPlaceholder: "Search by name, city or mission...",
+          title: "Shelters and rescue groups",
+          subtitle:
+            "Organisations registered on FYA, with the animals they have for adoption and how to contact them.",
+          searchPlaceholder: "Name or town",
           empty: "No shelters match this search.",
           totalPets: (count: number) =>
             `${count} ${count === 1 ? "pet" : "pets"}`,
@@ -68,6 +85,11 @@ export default async function SheltersDirectoryPage({
       tabIndex={-1}
       className="mx-auto w-full max-w-7xl flex-1 px-6 pb-16 pt-10 lg:px-8"
     >
+      <Breadcrumbs
+        locale={locale}
+        items={[{ label: sectionCrumb(locale, "shelters").label }]}
+        currentPath="/canis"
+      />
       <header className="mb-10 space-y-3">
         <h1 className="text-4xl font-extrabold tracking-tight">{copy.title}</h1>
         <p className="max-w-2xl text-sm text-muted-foreground md:text-base">

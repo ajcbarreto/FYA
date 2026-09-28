@@ -10,6 +10,16 @@ import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { getPublicCatalogFilters } from "@/lib/pet-catalog/public-data";
 import { normalizePetCatalogFiltersConfig } from "@/lib/pet-catalog/filter-config";
 import { configuredOptions } from "@/lib/pet-catalog/options";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "pets");
+}
 
 export default async function Catalog({
   params,
@@ -82,20 +92,23 @@ export default async function Catalog({
 
   return (
     <main id="main-content" tabIndex={-1} className="page-shell">
+      <Breadcrumbs
+        locale={locale}
+        items={[{ label: sectionCrumb(locale, "pets").label }]}
+        currentPath="/pets"
+      />
       <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="eyebrow hidden sm:block">
-            {pt
-              ? "O próximo capítulo começa aqui"
-              : "The next chapter starts here"}
+            {pt ? "Catálogo" : "Catalog"}
           </p>
           <h1 className="display-title text-2xl sm:mt-1 sm:text-3xl lg:text-4xl">
-            {pt ? "Encontra o teu companheiro." : "Find your companion."}
+            {pt ? "Animais para adoção" : "Animals for adoption"}
           </h1>
           <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
             {pt
-              ? "Cada um com a sua personalidade. Todos com uma história para partilhar."
-              : "Each with a personality. All with a story to share."}
+              ? "Fichas publicadas pelos canis e associações. Filtra por espécie, idade, porte ou localidade."
+              : "Profiles published by shelters and rescue groups. Filter by species, age, size or location."}
           </p>
         </div>
         <Link href={`/${locale}/match`} className="button-secondary">
@@ -123,11 +136,7 @@ export default async function Catalog({
             <input
               name="q"
               defaultValue={q}
-              placeholder={
-                pt
-                  ? "Nome, raça ou uma palavra especial…"
-                  : "Name, breed or a special word…"
-              }
+              placeholder={pt ? "Nome ou raça" : "Name or breed"}
               className="field pl-11"
             />
           </label>

@@ -1,6 +1,15 @@
 import { recordsContext } from "@/lib/records/context";
 import { acceptInvitation } from "@/app/records/operations-actions";
 import { SubmitButton } from "@/components/submit-button";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "invitations");
+}
 export default async function Invitations({
   params,
 }: {

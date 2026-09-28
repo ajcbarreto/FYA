@@ -34,12 +34,7 @@ type Dictionary = {
         cat: string;
         other: string;
       };
-      heroImageAlt: string;
-      illustrativeBadge: string;
-      cardTitle: string;
-      cardSubtitle: string;
     };
-    trustBar: [string, string, string];
     featured: {
       eyebrow: string;
       title: string;
@@ -48,7 +43,6 @@ type Dictionary = {
       exploreCatalog: string;
     };
     journey: {
-      eyebrow: string;
       title: string;
       helpChoose: string;
       steps: [
@@ -60,7 +54,7 @@ type Dictionary = {
   };
   footer: {
     tagline: string;
-    findConnection: string;
+    exploreTitle: string;
     links: {
       pets: string;
       shelters: string;
@@ -70,16 +64,14 @@ type Dictionary = {
     joinTitle: string;
     joinDescription: string;
     registerShelter: string;
-    closingLine: string;
   };
   aboutFamily: {
     imageAlt: string;
-    quote: string;
+    caption: string;
     eyebrow: string;
     title: string;
     paragraph1: string;
     paragraph2: string;
-    closingQuote: string;
     cta: string;
   };
   auth: {
@@ -219,8 +211,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     nav: {
       home: "Início",
       pets: "Animais",
-      shelters: "Abrigos",
-      stories: "Histórias",
+      shelters: "Canis",
+      stories: "Adotados",
       notifications: "Notificações",
       login: "Entrar",
       register: "Registar",
@@ -236,93 +228,82 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
     home: {
       hero: {
-        eyebrow: "Pequenos encontros. Grandes histórias.",
-        titleLine1: "O teu melhor amigo",
-        titleLine2: "está por aqui.",
+        eyebrow: "Adoção de animais de canis e associações",
+        titleLine1: "Animais para adoção,",
+        titleLine2: "direto dos canis.",
         subtitle:
-          "Há uma nova história à tua espera. Conhece animais para adoção e os abrigos que cuidam deles, até encontrarem um lugar a que chamar casa.",
+          "As fichas são publicadas pelas equipas que cuidam de cada animal. Fazes a candidatura aqui, trocas mensagens com o canil e combinam a visita antes de decidir.",
         searchLabel: "Procurar um animal",
-        searchPlaceholder: "Quem gostavas de conhecer?",
+        searchPlaceholder: "Nome ou raça",
         searchAriaLabel: "Pesquisar",
-        quickMeetLabel: "Quero conhecer",
+        quickMeetLabel: "Ver só",
         species: {
           dog: "Cães",
           cat: "Gatos",
-          other: "Outros amigos",
+          other: "Outros animais",
         },
-        heroImageAlt: "Retrato ilustrativo de um cão ao ar livre",
-        illustrativeBadge: "Imagem ilustrativa",
-        cardTitle: "Uma casa muda tudo.",
-        cardSubtitle: "A próxima história pode ser a tua.",
       },
-      trustBar: [
-        "Adoção com responsabilidade",
-        "Contacto direto com os abrigos",
-        "Acompanhamento em cada passo",
-      ],
       featured: {
-        eyebrow: "À procura de uma família",
-        title: "Um encontro que fica.",
-        viewAll: "Conhecer todos",
+        eyebrow: "Publicados recentemente",
+        title: "Alguns dos animais disponíveis",
+        viewAll: "Ver todos os animais",
         emptyDescription:
-          "Cada adoção começa por conhecer melhor um animal. Explora o catálogo e encontra os próximos companheiros.",
-        exploreCatalog: "Explorar catálogo",
+          "Ainda não há animais publicados. Quando os canis publicarem as primeiras fichas, aparecem aqui.",
+        exploreCatalog: "Abrir o catálogo",
       },
       journey: {
-        eyebrow: "Mais perto de casa",
-        title: "O início de uma boa história.",
-        helpChoose: "Ajuda-me a escolher",
+        title: "Como funciona a adoção",
+        helpChoose: "Não sabes por onde começar? Responde a três perguntas",
         steps: [
           {
-            title: "Encontra uma ligação",
-            text: "Descobre os animais, as suas histórias e as necessidades de cada um.",
+            title: "Escolhe um animal",
+            text: "Filtra por espécie, idade, porte e compatibilidade, e lê a ficha escrita pelo canil.",
           },
           {
-            title: "Vamos conversar",
-            text: "Apresenta-te ao abrigo, coloca as tuas dúvidas e combina uma visita.",
+            title: "Envia a candidatura",
+            text: "Contas como é a tua casa e a tua rotina. O canil responde e podes tirar dúvidas por mensagem.",
           },
           {
-            title: "Abre a porta de casa",
-            text: "Prepara a chegada com o abrigo e acompanha cada etapa da adoção.",
+            title: "Conhece-o antes de decidir",
+            text: "Marcam uma visita. Se correr bem, preparam juntos a entrega e o acompanhamento.",
           },
         ],
       },
     },
     footer: {
       tagline:
-        "Ajudamos animais e pessoas a escrever a sua próxima história. Juntos.",
-      findConnection: "Encontra uma ligação",
+        "Catálogo de animais para adoção publicado por canis e associações, com candidatura, mensagens e visitas no mesmo sítio.",
+      exploreTitle: "Explorar",
       links: {
         pets: "Animais para adoção",
-        shelters: "Conhecer os abrigos",
-        stories: "Novos começos",
-        about: "Sobre nós",
+        shelters: "Canis e associações",
+        stories: "Animais adotados",
+        about: "Quem somos",
       },
-      joinTitle: "Faz parte",
+      joinTitle: "Tens um canil ou associação?",
       joinDescription:
-        "Representas um abrigo? Dá a conhecer os animais que esperam por uma família.",
-      registerShelter: "Registar o meu abrigo",
-      closingLine: "Mais encontros. Mais finais felizes.",
+        "Publica os animais, recebe candidaturas e acompanha cada adoção com a tua equipa.",
+      registerShelter: "Registar o canil",
     },
     aboutFamily: {
       imageAlt:
         "Retrato ilustrado da família FYA: o casal e o filho junto ao rio",
-      quote: "Uma família. Uma paixão em comum.",
-      eyebrow: "Sobre nós",
-      title: "O amor pelos animais começa em casa.",
+      caption: "Ilustração da família que criou a FYA.",
+      eyebrow: "Quem somos",
+      title: "Uma família que gosta de animais",
       paragraph1:
-        "Somos uma família — um casal e o nosso filho — unida pela paixão pelos animais. A FYA nasce dessa ligação e da vontade de a transformar em ajuda para quem mais precisa.",
+        "A FYA foi criada por uma família, um casal e o nosso filho, que partilha o gosto pelos animais. Quisemos transformar esse gosto em ajuda concreta.",
       paragraph2:
-        "Queremos dar mais visibilidade aos animais dos canis e abrigos e ajudar os animais abandonados a encontrar uma família. Aproximamos quem cuida deles de quem está pronto para lhes abrir a porta de casa, com tempo, carinho e responsabilidade.",
-      closingQuote: "Porque todos merecem um lugar onde pertencer.",
-      cta: "Conhece quem espera por uma família",
+        "Queremos que os animais dos canis e associações sejam mais vistos e que encontrem família mais depressa. Para isso, juntamos num só sítio quem cuida deles e quem está a pensar adotar, com a informação que cada um precisa para decidir com calma.",
+      cta: "Ver os animais para adoção",
     },
     auth: {
       loginTitle: "Entrar",
       loginSubtitle: "Acede com o teu email e password.",
       loginSubmit: "Entrar",
       registerTitle: "Criar conta",
-      registerSubtitle: "Escolhe o teu perfil: Adotante ou Canil.",
+      registerSubtitle:
+        "Conta de adotante. Os canis e associações têm um registo próprio.",
       fullName: "Nome completo",
       email: "Email",
       password: "Password",
@@ -330,46 +311,44 @@ const dictionaries: Record<Locale, Dictionary> = {
       adopter: "Adotante",
       canil: "Canil",
       submit: "Criar conta",
-      invalidData: "Dados invalidos",
-      invalidCredentials: "Credenciais invalidas",
-      accountCreated: "Conta criada. Verifique o email",
+      invalidData: "Dados inválidos",
+      invalidCredentials: "Credenciais inválidas",
+      accountCreated: "Conta criada. Confirma o teu email para entrar.",
       noAccount: "Ainda não tens conta?",
       hasAccount: "Já tens conta?",
       goToRegister: "Criar conta",
       goToLogin: "Entrar",
-      shelterRegistrationTitle: "Registo de Canis - Joyful Sanctuary",
+      shelterRegistrationTitle: "Registo de canis e associações",
       shelterRegistrationSubtitle:
-        "Torne-se um parceiro da FYA completando o registo do abrigo e os dados de verificação.",
-      shelterIdentitySection: "Identidade do Abrigo",
-      shelterName: "Nome do Abrigo / Canil",
-      shelterLocation: "Localização (Cidade/Distrito)",
-      shelterMission: "Declaração de Missao",
-      contactPersonSection: "Pessoa de Contacto",
-      contactRole: "Cargo / Função",
+        "Preenche os dados da organização e da pessoa de contacto para criar a conta do canil.",
+      shelterIdentitySection: "Dados do canil ou associação",
+      shelterName: "Nome do canil ou associação",
+      shelterLocation: "Localidade e distrito",
+      shelterMission: "Apresentação curta",
+      contactPersonSection: "Pessoa de contacto",
+      contactRole: "Função na organização",
       contactPhone: "Telefone",
       verificationSection: "Verificação",
-      registrationCertificateLabel:
-        "Carregue o Certificado de Registro da Entidade",
-      registrationCertificateHint: "PDF, JPG ou PNG (Max 5MB)",
+      registrationCertificateLabel: "Documento de registo da entidade",
+      registrationCertificateHint: "PDF, JPG ou PNG, até 5 MB",
       shelterDeclaration:
         "Confirmo que as informações fornecidas são verdadeiras e que tenho autoridade para representar este abrigo na plataforma FYA (Found Your Animal).",
-      saveDraft: "Guardar Rascunho",
-      finalizeRegistration: "Finalizar Registo",
-      shelterRegistrationLink: "Registar canil com formulario completo",
+      saveDraft: "Guardar rascunho",
+      finalizeRegistration: "Criar conta do canil",
+      shelterRegistrationLink: "Registar um canil ou associação",
     },
     petCatalog: {
       title: "Animais disponíveis para adoção",
-      subtitle:
-        "Explora animais de vários canis e encontra o teu próximo melhor amigo.",
-      resultCount: "A mostrar 1.240 animais em procura de uma família.",
+      subtitle: "Animais publicados por vários canis e associações.",
+      resultCount: "Animais à procura de família.",
       gridView: "Grelha",
       listView: "Lista",
       filtersTitle: "Filtrar resultados",
-      filtersSubtitle: "Encontra o match ideal",
+      filtersSubtitle: "Afina a pesquisa",
       clearFilters: "Limpar filtros",
       sections: {
         species: "Espécie",
-        ageRange: "Faixa etaria",
+        ageRange: "Idade",
         size: "Porte",
         gender: "Género",
         compatibility: "Compatibilidade",
@@ -381,7 +360,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       },
       searchPlaceholder: "Pesquisa por raça ou nome...",
       pagination: {
-        previous: "Pagina anterior",
+        previous: "Página anterior",
         next: "Próxima página",
       },
       tags: {
@@ -397,13 +376,13 @@ const dictionaries: Record<Locale, Dictionary> = {
       medicalSummaryTitle: "Resumo médico",
       contactCardTitle: "Contacto do canil",
       contactCardSubtitle:
-        "Responderemos em até 24 horas com os próximos passos da adoção.",
+        "O canil responde pela plataforma com os próximos passos.",
       applyCta: "Candidatar para adotar",
-      saveCta: "Guardar pet",
+      saveCta: "Guardar nos favoritos",
       adoptionHintTitle: "Dica para adoção",
       adoptionHintDescription:
-        "Partilha a tua rotina e experiência com animais para acelerar a avaliação.",
-      similarPetsTitle: "Conhece mais amigos",
+        "Descreve a tua rotina e a experiência que tens com animais. Ajuda o canil a avaliar a candidatura.",
+      similarPetsTitle: "Outros animais para adoção",
     },
     admin: {
       title: "Painel de administração",
@@ -412,11 +391,11 @@ const dictionaries: Record<Locale, Dictionary> = {
       filterConfigDescription:
         "Define que opções aparecem no filtro do catálogo.",
       species: "Espécies",
-      ageRanges: "Faixas etarias",
+      ageRanges: "Faixas etárias",
       sizes: "Portes",
-      genders: "Generos",
+      genders: "Géneros",
       compatibilities: "Compatibilidades",
-      hint: "Separar opções com virgulas (ex: Cão, Gato, Outro).",
+      hint: "Separa as opções com vírgulas (ex.: Cão, Gato, Outro).",
       save: "Guardar configuração",
       success: "Configuração atualizada com sucesso.",
       unauthorized: "Não autorizado para esta operação.",
@@ -424,8 +403,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
     canilProfile: {
       title: "Perfil do Abrigo",
-      subtitle:
-        "Gere a identidade publica do teu abrigo na FYA (Found Your Animal).",
+      subtitle: "Gere a informação pública do teu abrigo na FYA.",
       shelterRole: "Abrigo",
       verifiedLabel: "Verificação",
       verifiedValue: "Verificado",
@@ -436,7 +414,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       joinedLabel: "Membro desde",
       notProvided: "Não definido",
       stats: {
-        activePets: "Pets ativos",
+        activePets: "Animais publicados",
         completedAdoptions: "Adoções concluídas",
         pendingRequests: "Pedidos pendentes",
         responseTime: "Tempo de resposta",
@@ -444,26 +422,26 @@ const dictionaries: Record<Locale, Dictionary> = {
       },
       aboutTitle: "Sobre o abrigo",
       aboutDescription:
-        "Mantem este perfil atualizado para aumentar a confianca dos adotantes e melhorar a taxa de resposta.",
+        "Mantém este perfil atualizado para os adotantes saberem com quem estão a falar.",
       tagsTitle: "Especialidades e comodidades",
       editProfile: "Editar perfil",
       managePets: "Gerir animais",
-      quickActionsTitle: "Acoes rapidas",
-      postNewPet: "Publicar novo pet",
+      quickActionsTitle: "Ações rápidas",
+      postNewPet: "Publicar animal",
       viewMessages: "Ver mensagens",
-      exportReport: "Exportar relatorio",
+      exportReport: "Exportar relatório",
       profileProgressTitle: "Progresso do perfil",
       profileProgressDescription:
-        "Perfil base concluído. Completa telefone e localização para maior destaque.",
+        "Perfil base concluído. Falta o telefone e a localização.",
       openProfileCta: "Abrir perfil do abrigo",
     },
   },
   en: {
     nav: {
       home: "Home",
-      pets: "Pet Catalog",
+      pets: "Animals",
       shelters: "Shelters",
-      stories: "Stories",
+      stories: "Adopted",
       notifications: "Notifications",
       login: "Login",
       register: "Register",
@@ -479,93 +457,82 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
     home: {
       hero: {
-        eyebrow: "Small encounters. Big stories.",
-        titleLine1: "Your best friend",
-        titleLine2: "is waiting here.",
+        eyebrow: "Adopt from shelters and rescue groups",
+        titleLine1: "Animals for adoption,",
+        titleLine2: "straight from shelters.",
         subtitle:
-          "A new story is waiting for you. Meet animals looking for a home and the shelters caring for them along the way.",
+          "Profiles are published by the teams caring for each animal. You apply here, message the shelter and arrange a visit before you decide.",
         searchLabel: "Find an animal",
-        searchPlaceholder: "Who would you like to meet?",
+        searchPlaceholder: "Name or breed",
         searchAriaLabel: "Search",
-        quickMeetLabel: "I'd love to meet",
+        quickMeetLabel: "Show only",
         species: {
           dog: "Dogs",
           cat: "Cats",
-          other: "Other friends",
+          other: "Other animals",
         },
-        heroImageAlt: "Illustrative portrait of a dog outdoors",
-        illustrativeBadge: "Illustrative image",
-        cardTitle: "A home changes everything.",
-        cardSubtitle: "The next story could be yours.",
       },
-      trustBar: [
-        "Responsible adoption",
-        "Direct contact with shelters",
-        "Support at every step",
-      ],
       featured: {
-        eyebrow: "Looking for a family",
-        title: "A connection that lasts.",
-        viewAll: "Meet them all",
+        eyebrow: "Recently published",
+        title: "Some of the animals available",
+        viewAll: "See all animals",
         emptyDescription:
-          "Every adoption starts by getting to know an animal. Explore the catalog to find your next companion.",
-        exploreCatalog: "Explore catalog",
+          "No animals have been published yet. They will appear here as soon as shelters add their first profiles.",
+        exploreCatalog: "Open the catalog",
       },
       journey: {
-        eyebrow: "Closer to home",
-        title: "The start of a good story.",
-        helpChoose: "Help me choose",
+        title: "How adoption works",
+        helpChoose: "Not sure where to start? Answer three questions",
         steps: [
           {
-            title: "Find a connection",
-            text: "Discover animals, their stories and their individual needs.",
+            title: "Choose an animal",
+            text: "Filter by species, age, size and compatibility, and read the profile written by the shelter.",
           },
           {
-            title: "Start a conversation",
-            text: "Introduce yourself to the shelter, ask questions and arrange a visit.",
+            title: "Send an application",
+            text: "Tell the shelter about your home and routine. They reply, and you can ask questions by message.",
           },
           {
-            title: "Open your door",
-            text: "Prepare for their arrival with the shelter and follow every step.",
+            title: "Meet before you decide",
+            text: "Arrange a visit. If it goes well, you plan the handover and follow-up together.",
           },
         ],
       },
     },
     footer: {
       tagline:
-        "Helping animals and people write their next story. Together.",
-      findConnection: "Find a connection",
+        "A catalog of animals for adoption published by shelters and rescue groups, with applications, messages and visits in one place.",
+      exploreTitle: "Explore",
       links: {
         pets: "Animals for adoption",
-        shelters: "Meet the shelters",
-        stories: "New beginnings",
+        shelters: "Shelters and rescue groups",
+        stories: "Adopted animals",
         about: "About us",
       },
-      joinTitle: "Be part of it",
+      joinTitle: "Run a shelter or rescue group?",
       joinDescription:
-        "Represent a shelter? Introduce the animals waiting for a family.",
-      registerShelter: "Register my shelter",
-      closingLine: "More connections. More happy endings.",
+        "Publish your animals, receive applications and follow each adoption with your team.",
+      registerShelter: "Register your shelter",
     },
     aboutFamily: {
       imageAlt:
         "Illustrated portrait of the FYA family: the couple and their son by the river",
-      quote: "One family. One shared passion.",
+      caption: "Illustration of the family behind FYA.",
       eyebrow: "About us",
-      title: "Our love for animals starts at home.",
+      title: "A family that loves animals",
       paragraph1:
-        "We are a family — a couple and our son — brought together by a love of animals. FYA grows out of that bond and our wish to turn it into help for those who need it most.",
+        "FYA was started by a family, a couple and our son, who share a love of animals. We wanted to turn that into practical help.",
       paragraph2:
-        "We want to give animals in shelters more visibility and help abandoned animals find a family. We connect the people caring for them with those ready to welcome them home with time, kindness and responsibility.",
-      closingQuote: "Because everyone deserves a place to belong.",
-      cta: "Meet those waiting for a family",
+        "We want animals in shelters and rescue groups to be seen by more people and find a family sooner. So we bring together the people caring for them and the people thinking about adopting, with the information each side needs to decide calmly.",
+      cta: "See animals for adoption",
     },
     auth: {
       loginTitle: "Login",
       loginSubtitle: "Sign in with your email and password.",
       loginSubmit: "Sign in",
       registerTitle: "Create account",
-      registerSubtitle: "Choose your profile: Adopter or Shelter.",
+      registerSubtitle:
+        "Adopter account. Shelters and rescue groups have their own registration.",
       fullName: "Full name",
       email: "Email",
       password: "Password",
@@ -580,35 +547,33 @@ const dictionaries: Record<Locale, Dictionary> = {
       hasAccount: "Already have an account?",
       goToRegister: "Create account",
       goToLogin: "Sign in",
-      shelterRegistrationTitle: "Shelter Registration - Become a Partner",
+      shelterRegistrationTitle: "Shelter and rescue group registration",
       shelterRegistrationSubtitle:
-        "Become an FYA partner by completing your shelter profile and verification information.",
-      shelterIdentitySection: "Shelter Identity",
-      shelterName: "Shelter Name",
-      shelterLocation: "Location (City/Region)",
-      shelterMission: "Mission Statement",
-      contactPersonSection: "Contact Person",
-      contactRole: "Role / Position",
+        "Fill in your organisation and contact details to create the shelter account.",
+      shelterIdentitySection: "Shelter or rescue group details",
+      shelterName: "Shelter or rescue group name",
+      shelterLocation: "Town and district",
+      shelterMission: "Short introduction",
+      contactPersonSection: "Contact person",
+      contactRole: "Role in the organisation",
       contactPhone: "Phone",
       verificationSection: "Verification",
-      registrationCertificateLabel:
-        "Upload Organization Registration Certificate",
-      registrationCertificateHint: "PDF, JPG, or PNG (Max 5MB)",
+      registrationCertificateLabel: "Organisation registration document",
+      registrationCertificateHint: "PDF, JPG or PNG, up to 5 MB",
       shelterDeclaration:
         "I confirm that the provided information is accurate and that I am authorized to represent this shelter on FYA (Found Your Animal).",
-      saveDraft: "Save Draft",
-      finalizeRegistration: "Complete Registration",
-      shelterRegistrationLink: "Register shelter with full form",
+      saveDraft: "Save draft",
+      finalizeRegistration: "Create shelter account",
+      shelterRegistrationLink: "Register a shelter or rescue group",
     },
     petCatalog: {
       title: "Available pets for adoption",
-      subtitle:
-        "Explore animals from trusted shelters and find your next best friend.",
-      resultCount: "Showing 1,240 pets currently looking for a family.",
+      subtitle: "Animals published by shelters and rescue groups.",
+      resultCount: "Animals looking for a family.",
       gridView: "Grid",
       listView: "List",
       filtersTitle: "Filter results",
-      filtersSubtitle: "Find your perfect match",
+      filtersSubtitle: "Narrow your search",
       clearFilters: "Clear filters",
       sections: {
         species: "Species",
@@ -640,9 +605,9 @@ const dictionaries: Record<Locale, Dictionary> = {
       medicalSummaryTitle: "Medical summary",
       contactCardTitle: "Shelter contact",
       contactCardSubtitle:
-        "We usually reply within 24 hours with the next adoption steps.",
+        "The shelter replies on the platform with the next steps.",
       applyCta: "Apply to adopt",
-      saveCta: "Save pet",
+      saveCta: "Save to favourites",
       adoptionHintTitle: "Adoption tip",
       adoptionHintDescription:
         "Share your routine and pet experience to speed up the review.",

@@ -8,11 +8,14 @@ export function PetCard({
   locale,
   isFavorite,
   returnTo,
+  eager,
 }: {
   pet: PetCatalogItem;
   locale: string;
   isFavorite?: boolean;
   returnTo?: string;
+  /** Load the photo immediately: set for cards visible without scrolling. */
+  eager?: boolean;
 }) {
   const href = `/${locale}/pets/${pet.id}${returnTo ? `?back=${encodeURIComponent(returnTo)}` : ""}`;
   return (
@@ -24,6 +27,7 @@ export function PetCard({
         status={pet.status}
         locale={locale}
         href={href}
+        eager={eager}
       />
       <Link href={href} className="group block">
         <div className="p-5">

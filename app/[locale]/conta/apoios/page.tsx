@@ -2,6 +2,15 @@ import Link from "next/link";
 import { recordsContext } from "@/lib/records/context";
 import { cancelPledge } from "@/app/support/actions";
 import { SubmitButton } from "@/components/submit-button";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "accountSupport");
+}
 export default async function MySupport({
   params,
   searchParams,

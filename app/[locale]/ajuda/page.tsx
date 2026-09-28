@@ -2,11 +2,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { searchGuides } from "@/lib/help/guides";
-export const metadata = {
-  title: "Ajuda · Help | FYA",
-  description:
-    "Guias para registos, documentos, candidaturas e trabalho em equipa na FYA.",
-};
+import { staticPageMetadata } from "@/lib/seo/metadata";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "help");
+}
 export default async function Help({
   params,
   searchParams,
@@ -21,6 +26,11 @@ export default async function Help({
     guides = searchGuides(locale, q);
   return (
     <main id="main-content" className="page-shell space-y-8">
+      <Breadcrumbs
+        locale={locale}
+        items={[{ label: sectionCrumb(locale, "help").label }]}
+        currentPath="/ajuda"
+      />
       <header className="rounded-3xl bg-primary p-8 text-primary-foreground">
         <p className="text-sm font-semibold">
           FYA · {pt ? "Aprender fazendo" : "Learn by doing"}

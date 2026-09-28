@@ -2,6 +2,15 @@ import { notFound, redirect } from "next/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import { UserSidebar } from "@/components/user-sidebar";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "userArea");
+}
 
 type UserLayoutProps = {
   children: React.ReactNode;

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
 export function LegalInformation({
   locale,
   kind,
@@ -15,6 +16,13 @@ export function LegalInformation({
   );
   return (
     <main id="main-content" className="mx-auto w-full max-w-3xl space-y-6 p-8">
+      <Breadcrumbs
+        locale={locale === "en" ? "en" : "pt"}
+        items={[
+          { label: sectionCrumb(locale === "en" ? "en" : "pt", kind).label },
+        ]}
+        currentPath={kind === "terms" ? "/termos" : "/privacidade"}
+      />
       <h1 className="page-title">
         {kind === "terms"
           ? pt

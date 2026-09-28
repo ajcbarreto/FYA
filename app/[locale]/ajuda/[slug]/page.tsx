@@ -2,6 +2,35 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { helpGuides } from "@/lib/help/guides";
 import { isLocale } from "@/lib/i18n/config";
+import { pageMetadata } from "@/lib/seo/metadata";
+import { describe } from "@/lib/seo/site";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}) {
+  const { locale, slug } = await params;
+  if (!isLocale(locale)) return {};
+  const guide = helpGuides(locale).find((g) => g.slug === slug);
+  if (!guide) return {};
+  return pageMetadata({
+    locale,
+    path: `/ajuda/${guide.slug}`,
+    title:
+      locale === "pt"
+        ? `${guide.title}: guia para canis`
+        : `${guide.title}: guide for shelters`,
+    description: describe(
+      guide.summary,
+      locale === "pt"
+        ? "Passos detalhados e perguntas frequentes no centro de ajuda da FYA para canis e associações."
+        : "Detailed steps and frequently asked questions in the FYA help centre for shelters and rescue groups.",
+    ),
+    type: "article",
+  });
+}
+
 export default async function GuidePage({
   params,
 }: {
@@ -14,9 +43,11 @@ export default async function GuidePage({
   if (!g) notFound();
   return (
     <main id="main-content" className="page-shell max-w-4xl space-y-7">
-      <Link href={`/${locale}/ajuda`} className="underline">
-        ← {pt ? "Centro de ajuda" : "Help centre"}
-      </Link>
+      <Breadcrumbs
+        locale={locale}
+        items={[sectionCrumb(locale, "help"), { label: g.title }]}
+        currentPath={`/ajuda/${g.slug}`}
+      />
       <header>
         <p className="text-sm text-muted-foreground">{g.minutes} min</p>
         <h1 className="display-title mt-2 text-4xl">{g.title}</h1>
@@ -36,8 +67,8 @@ export default async function GuidePage({
       ) : (
         <p className="rounded-xl bg-muted p-4 text-sm">
           {pt
-            ? "Vídeo em preparação — segue os passos abaixo."
-            : "Video in preparation — follow the steps below."}
+            ? "O vídeo ainda está a ser preparado. Os passos estão descritos abaixo."
+            : "The video is still being prepared. The steps are described below."}
         </p>
       )}
       <ol className="list-decimal space-y-5 pl-6">

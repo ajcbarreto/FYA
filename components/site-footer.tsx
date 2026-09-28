@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, Heart } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import type { Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { Brand } from "@/components/brand";
@@ -8,16 +8,17 @@ export function SiteFooter({ locale }: { locale: Locale }) {
   const { footer } = getDictionary(locale);
 
   const footerLinks = [
-    ["conta/apoios", locale === "pt" ? "As minhas ajudas" : "My support"],
-    ["ajuda", locale === "pt" ? "Centro de ajuda" : "Help centre"],
-    ["para-canis", locale === "pt" ? "FYA para canis" : "FYA for shelters"],
     ["pets", footer.links.pets],
-    ["termos", locale === "pt" ? "Condições" : "Terms"],
-    ["privacidade", locale === "pt" ? "Privacidade" : "Privacy"],
-    ["convites", locale === "pt" ? "Convites de equipa" : "Team invitations"],
     ["canis", footer.links.shelters],
     ["historias", footer.links.stories],
+    ["match", locale === "pt" ? "Ajuda para escolher" : "Help choosing"],
+    ["para-canis", locale === "pt" ? "FYA para canis" : "FYA for shelters"],
+    ["ajuda", locale === "pt" ? "Centro de ajuda" : "Help centre"],
     ["#sobre-nos", footer.links.about],
+    ["termos", locale === "pt" ? "Condições de utilização" : "Terms of use"],
+    ["privacidade", locale === "pt" ? "Privacidade" : "Privacy"],
+    ["conta/apoios", locale === "pt" ? "As minhas ajudas" : "My support"],
+    ["convites", locale === "pt" ? "Convites de equipa" : "Team invitations"],
   ] as const;
 
   return (
@@ -30,7 +31,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
           </p>
         </div>
         <div>
-          <p className="eyebrow mb-4">{footer.findConnection}</p>
+          <p className="eyebrow mb-4">{footer.exploreTitle}</p>
           <ul className="space-y-3 text-sm">
             {footerLinks.map(([path, label]) => (
               <li key={path}>
@@ -61,10 +62,6 @@ export function SiteFooter({ locale }: { locale: Locale }) {
       </div>
       <div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-3 border-t border-border/50 px-8 py-5 text-xs text-muted-foreground">
         <p>© {new Date().getFullYear()} FYA · Found Your Animal</p>
-        <p className="flex items-center gap-2">
-          <Heart className="size-3 text-accent" />
-          {footer.closingLine}
-        </p>
       </div>
     </footer>
   );

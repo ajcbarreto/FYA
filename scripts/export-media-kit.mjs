@@ -39,4 +39,4 @@ try {
 } finally {
   await browser.close();
 }
-console.log("Exported 7 PNG assets; all text fits within its canvas.");
+console.log("Exported 9 PNG assets; all text fits within its canvas.");

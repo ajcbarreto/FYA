@@ -3,6 +3,16 @@ import { notFound } from "next/navigation";
 import { Cat, Dog, Home, PawPrint, Sparkles } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { findMatches } from "@/app/match/actions";
+import { staticPageMetadata } from "@/lib/seo/metadata";
+import { Breadcrumbs, sectionCrumb } from "@/components/breadcrumbs";
+
+export function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  return staticPageMetadata(params, "match");
+}
 
 type MatchPageProps = {
   params: Promise<{ locale: string }>;
@@ -18,10 +28,10 @@ export default async function MatchPage({ params }: MatchPageProps) {
   const isPt = locale === "pt";
   const copy = isPt
     ? {
-        eyebrow: "Encontra o teu match",
-        title: "Qual e o animal certo para ti?",
+        eyebrow: "Ajuda para escolher",
+        title: "Que animal se adapta à tua casa?",
         subtitle:
-          "Responde a 3 perguntas rapidas e mostramos-te os animais que melhor encaixam no teu estilo de vida.",
+          "Três perguntas sobre o que procuras, onde vives e o tempo que tens. Não substituem a conversa com o canil, mas ajudam a começar pelos animais certos.",
         q1: "Que tipo de companheiro procuras?",
         q1Options: [
           { value: "", label: "Indiferente" },
@@ -43,14 +53,14 @@ export default async function MatchPage({ params }: MatchPageProps) {
             label: "Bastante tempo para passeios e brincadeira",
           },
         ],
-        submit: "Ver os meus matches",
+        submit: "Ver animais compatíveis",
         hint: "Vamos abrir o catálogo já filtrado com base nas tuas respostas.",
       }
     : {
-        eyebrow: "Find your match",
-        title: "Which pet is right for you?",
+        eyebrow: "Help choosing",
+        title: "Which animal suits your home?",
         subtitle:
-          "Answer 3 quick questions and we'll show the pets that best fit your lifestyle.",
+          "Three questions about what you are looking for, where you live and how much time you have. They do not replace talking to the shelter, but they help you start with the right animals.",
         q1: "What kind of companion are you looking for?",
         q1Options: [
           { value: "", label: "No preference" },
@@ -69,7 +79,7 @@ export default async function MatchPage({ params }: MatchPageProps) {
           { value: "medio", label: "Some time every day" },
           { value: "muito", label: "Plenty of time for walks and play" },
         ],
-        submit: "See my matches",
+        submit: "See compatible animals",
         hint: "We'll open the catalog already filtered based on your answers.",
       };
 
@@ -90,6 +100,11 @@ export default async function MatchPage({ params }: MatchPageProps) {
       tabIndex={-1}
       className="mx-auto w-full max-w-2xl flex-1 px-6 pb-16 pt-10 lg:px-8"
     >
+      <Breadcrumbs
+        locale={locale}
+        items={[{ label: sectionCrumb(locale, "match").label }]}
+        currentPath="/match"
+      />
       <div className="rounded-3xl bg-primary p-8 text-center text-primary-foreground md:p-12">
         <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-bold uppercase tracking-widest">
           <Sparkles className="h-3.5 w-3.5" />
