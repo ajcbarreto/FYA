@@ -42,19 +42,21 @@ export default async function SheltersDirectoryPage({
   const copy =
     locale === "pt"
       ? {
-          title: "Canis e abrigos parceiros",
-          subtitle: "Conhece as organizacoes que dao casa aos animais na FYA.",
-          searchPlaceholder: "Procurar por nome, cidade ou missao...",
-          empty: "Sem canis encontrados para essa pesquisa.",
+          title: "Canis e associações",
+          subtitle:
+            "Organizações registadas na FYA, com os animais que têm para adoção e a forma de as contactar.",
+          searchPlaceholder: "Nome ou localidade",
+          empty: "Nenhum canil corresponde a esta pesquisa.",
           totalPets: (count: number) =>
             `${count} ${count === 1 ? "animal" : "animais"}`,
           openCanil: "Ver canil",
           submit: "Procurar",
         }
       : {
-          title: "Partner shelters",
-          subtitle: "Meet the organizations that give pets a home through FYA.",
-          searchPlaceholder: "Search by name, city or mission...",
+          title: "Shelters and rescue groups",
+          subtitle:
+            "Organisations registered on FYA, with the animals they have for adoption and how to contact them.",
+          searchPlaceholder: "Name or town",
           empty: "No shelters match this search.",
           totalPets: (count: number) =>
             `${count} ${count === 1 ? "pet" : "pets"}`,

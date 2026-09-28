@@ -175,9 +175,7 @@ export async function ShelterDetailBody({
 
       <header className="relative overflow-hidden rounded-3xl bg-primary p-5 text-primary-foreground sm:p-8 lg:p-10">
         <p className="mb-6 text-xs font-bold uppercase tracking-[0.2em] opacity-70">
-          {locale === "pt"
-            ? "Pessoas que cuidam. Animais que importam."
-            : "People who care. Animals who matter."}
+          {locale === "pt" ? "Canil ou associação" : "Shelter or rescue group"}
         </p>
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
           {shelter.image_url ? (
@@ -532,20 +530,18 @@ export async function ShelterDetailBody({
           >
             <Heart className="mb-5 h-7 w-7 text-primary" />
             <p className="text-xs font-bold uppercase tracking-widest text-primary">
-              {locale === "pt"
-                ? "Faz parte desta missão"
-                : "Be part of this mission"}
+              {locale === "pt" ? "Apoiar" : "Support"}
             </p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight">
               {locale === "pt"
-                ? "O teu apoio faz a diferença."
-                : "Your support makes a difference."}
+                ? "Como ajudar este canil"
+                : "How to help this shelter"}
             </h2>
             <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
               {shelter.donation_message ||
                 (locale === "pt"
-                  ? "Ajuda quem cuida deles todos os dias. Contacta o canil para conhecer as necessidades atuais: alimentação, mantas, voluntariado ou apoio veterinário."
-                  : "Help the people caring for them every day. Contact the shelter about food, blankets, volunteering or veterinary support.")}
+                  ? "Contacta o canil para saberes do que precisa neste momento, por exemplo alimentação, mantas, voluntariado ou apoio veterinário."
+                  : "Contact the shelter to find out what it needs right now, such as food, blankets, volunteering or veterinary support.")}
             </p>
             {shelter.verificado && (
               <Link

@@ -36,8 +36,8 @@ export default async function GuidePage({
       ) : (
         <p className="rounded-xl bg-muted p-4 text-sm">
           {pt
-            ? "Vídeo em preparação — segue os passos abaixo."
-            : "Video in preparation — follow the steps below."}
+            ? "O vídeo ainda está a ser preparado. Os passos estão descritos abaixo."
+            : "The video is still being prepared. The steps are described below."}
         </p>
       )}
       <ol className="list-decimal space-y-5 pl-6">

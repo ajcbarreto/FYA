@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Heart, PawPrint, Sparkles } from "lucide-react";
+import { Heart, PawPrint } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getAdoptedPets } from "@/lib/pet-catalog/db-pets";
@@ -25,25 +25,27 @@ export default async function SuccessStoriesPage({
   const copy =
     locale === "pt"
       ? {
-          eyebrow: "Histórias de sucesso",
-          title: "Cada adoção e um final feliz",
-          subtitle: "Animais que já encontraram a sua família através da FYA.",
+          eyebrow: "Adoções concluídas",
+          title: "Animais que já foram adotados",
+          subtitle:
+            "Adoções concluídas através dos canis e associações da FYA.",
           stat: (count: number) =>
             `${count} ${count === 1 ? "amigo encontrou lar" : "amigos encontraram lar"}`,
           empty:
-            "Ainda não há adoções concluídas registadas. Em breve, as primeiras histórias aparecem aqui.",
+            "Ainda não há adoções concluídas registadas. Quando houver, aparecem aqui.",
           browse: "Explorar animais para adoção",
           foundHome: "encontrou um lar",
           via: "através de",
         }
       : {
-          eyebrow: "Success stories",
-          title: "Every adoption is a happy ending",
-          subtitle: "Pets that have already found their family through FYA.",
+          eyebrow: "Completed adoptions",
+          title: "Animals that have been adopted",
+          subtitle:
+            "Adoptions completed through shelters and rescue groups on FYA.",
           stat: (count: number) =>
             `${count} ${count === 1 ? "friend found a home" : "friends found a home"}`,
           empty:
-            "No completed adoptions yet. Soon the first stories will show up here.",
+            "No completed adoptions have been recorded yet. They will appear here when there are.",
           browse: "Browse pets for adoption",
           foundHome: "found a home",
           via: "via",
@@ -54,7 +56,6 @@ export default async function SuccessStoriesPage({
       <section className="mx-auto w-full max-w-7xl px-6 lg:px-8">
         <div className="rounded-3xl bg-secondary p-10 text-center text-white md:p-16">
           <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-bold uppercase tracking-widest">
-            <Sparkles className="h-3.5 w-3.5" />
             {copy.eyebrow}
           </p>
           <h1 className="mx-auto mt-5 max-w-2xl text-4xl font-extrabold tracking-tight md:text-5xl">

@@ -1,7 +1,6 @@
 import { Captcha } from "@/components/captcha";
 import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowRight, Lock, Mail, PawPrint } from "lucide-react";
 import { login } from "@/app/auth/login/actions";
@@ -34,9 +33,14 @@ export default async function LoginPage({
   const copy =
     locale === "pt"
       ? {
-          sideTitle: "Bem-vindo de volta à matilha.",
-          sideText:
-            "Reconecta-te com canis e encontra o companheiro ideal para a tua família.",
+          sideTitle: "Com a tua conta podes",
+          sideItems: [
+            "acompanhar o estado das candidaturas que enviaste;",
+            "trocar mensagens com os canis e combinar visitas;",
+            "voltar aos animais que guardaste nos favoritos.",
+          ],
+          shelterNote:
+            "Trabalhas num canil? Entras aqui com a mesma conta da equipa.",
           forgotPassword: "Esqueceste a password?",
           rememberDevice: "Lembrar este dispositivo",
           orContinue: "Ou continuar com",
@@ -46,9 +50,14 @@ export default async function LoginPage({
           socialIntro: "Ou entra com",
         }
       : {
-          sideTitle: "Welcome back to the pack.",
-          sideText:
-            "Reconnect with local shelters and find the companion that completes your family.",
+          sideTitle: "With your account you can",
+          sideItems: [
+            "check the status of the applications you sent;",
+            "message shelters and arrange visits;",
+            "come back to the animals you saved as favourites.",
+          ],
+          shelterNote:
+            "Work at a shelter? Sign in here with your team account.",
           forgotPassword: "Forgot password?",
           rememberDevice: "Remember this device",
           orContinue: "Or continue with",
@@ -64,28 +73,24 @@ export default async function LoginPage({
       className="mx-auto flex w-full max-w-6xl flex-1 items-center justify-center px-4 py-10 md:px-8 md:py-12"
     >
       <section className="flex min-h-[700px] w-full flex-col overflow-hidden rounded-2xl bg-muted/35 shadow-[0_20px_40px_rgba(56,56,51,0.06)] md:flex-row">
-        <div className="relative hidden w-1/2 p-12 md:flex md:flex-col md:justify-between">
-          <Image
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqoyq7uuDX8byZraMUtO0HvBbcv1cBciDJKIAGd_OJmJmh3oS-FWYWS-RoFfuXBQ7XfLtqOqqgcciPqEMzbp1-ygVwagCWtZYjJ1kn6UhP6ZwE4Zpst-gOQxVZAb8DGq2wZ8-Yekyn-l3Oi_TojuZYuX6JkthIO6bjOdbyCy-9Oyo8puEQ9AImEvZtgN4-xyWeVWHK1-sZ0edrBOSpaOkPG1QXpeTljsqV1-k2153B9MciUJH7VGl2I8SjE5ymIZUMA3E17dLbHWQ"
-            alt={locale === "pt" ? "Cão feliz" : "Happy golden retriever"}
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-primary/15 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-t from-primary/45 to-transparent" />
-          <div className="relative z-10 inline-flex w-fit items-center gap-2 rounded-xl bg-background/80 px-4 py-2 backdrop-blur-md">
-            <PawPrint className="h-4 w-4 text-primary" />
+        <div className="hidden w-1/2 flex-col justify-between bg-primary p-12 text-primary-foreground md:flex">
+          <div className="inline-flex w-fit items-center gap-2">
+            <PawPrint aria-hidden="true" className="h-4 w-4" />
             <span className="text-xs font-bold uppercase tracking-wider">
               FYA
             </span>
           </div>
-          <div className="relative z-10 max-w-sm text-white">
-            <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
+          <div className="max-w-sm">
+            <h2 className="display-title text-3xl leading-tight">
               {copy.sideTitle}
             </h2>
-            <p className="mt-4 text-base leading-relaxed text-white/90">
-              {copy.sideText}
+            <ul className="mt-5 list-disc space-y-2 pl-5 text-base leading-relaxed text-white/85">
+              {copy.sideItems.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <p className="mt-8 border-t border-white/20 pt-5 text-sm text-white/70">
+              {copy.shelterNote}
             </p>
           </div>
         </div>

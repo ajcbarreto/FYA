@@ -2,15 +2,8 @@ import { Captcha } from "@/components/captcha";
 import { RegistrationPassword } from "@/components/registration-password";
 import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
-import {
-  CheckCircle2,
-  Eye,
-  FileUp,
-  HeartHandshake,
-  LayoutDashboard,
-} from "lucide-react";
+import { CheckCircle2, FileUp } from "lucide-react";
 import { register } from "@/app/auth/register/actions";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
@@ -38,40 +31,34 @@ export default async function ShelterRegistrationPage({
   const content =
     locale === "pt"
       ? {
-          eyebrow: "Junte-se a nossa missao",
-          title: "Registo de Canis",
-          subtitlePrefix: "Torne o seu abrigo parte da rede",
-          subtitleSuffix:
-            "Juntos, criamos ligações duradouras entre animais e famílias amorosas.",
-          benefitsTitle: "Porque a FYA?",
-          benefit1Title: "Visibilidade total",
-          benefit1Text:
-            "Alcance milhares de potenciais adotantes todos os dias.",
-          benefit2Title: "Gestão facilitada",
-          benefit2Text:
-            "Ferramentas intuitivas para gerir perfis de animais e candidaturas.",
-          benefit3Title: "Rede de apoio",
-          benefit3Text:
-            "Acesso a recursos exclusivos e parcerias com veterinarios.",
-          imageQuote: '"Mudar vidas, um patudo de cada vez."',
+          eyebrow: "Para canis e associações",
+          title: "Registo de canis e associações",
+          subtitle:
+            "Cria a conta da tua organização para publicar animais, receber candidaturas e organizar o trabalho da equipa na FYA.",
+          benefitsTitle: "O que a conta inclui",
+          benefits: [
+            "Ficha pública de cada animal, com registo privado, documentos e histórico.",
+            "Candidaturas, mensagens e visitas num só sítio, com respostas modelo.",
+            "Contas individuais para a equipa, tarefas com prazo e acompanhamento depois da adoção.",
+          ],
+          pilotPrompt: "Ainda estás a avaliar?",
+          pilotLink: "Conhece o piloto para canis",
           hasAccount: "Já tens conta?",
           browseFile: "Procurar ficheiro",
         }
       : {
-          eyebrow: "Join our mission",
-          title: "Shelter Registration",
-          subtitlePrefix: "Bring your shelter into the",
-          subtitleSuffix:
-            "network and create lasting matches between pets and loving families.",
-          benefitsTitle: "Why FYA?",
-          benefit1Title: "Total visibility",
-          benefit1Text: "Reach thousands of potential adopters every day.",
-          benefit2Title: "Easy management",
-          benefit2Text: "Intuitive tools to manage pets and adoption requests.",
-          benefit3Title: "Support network",
-          benefit3Text:
-            "Access exclusive resources and partner vet initiatives.",
-          imageQuote: '"Changing lives, one paw at a time."',
+          eyebrow: "For shelters and rescue groups",
+          title: "Shelter and rescue group registration",
+          subtitle:
+            "Create your organisation's account to publish animals, receive applications and organise your team's work on FYA.",
+          benefitsTitle: "What the account includes",
+          benefits: [
+            "A public profile for each animal, with private records, documents and history.",
+            "Applications, messages and visits in one place, with reply templates.",
+            "Individual team accounts, tasks with deadlines and follow-up after adoption.",
+          ],
+          pilotPrompt: "Still deciding?",
+          pilotLink: "Learn about the shelter pilot",
           hasAccount: "Already have an account?",
           browseFile: "Browse file",
         };
@@ -90,9 +77,7 @@ export default async function ShelterRegistrationPage({
           {content.title}
         </h1>
         <p className="mt-6 text-base leading-relaxed text-muted-foreground md:text-lg">
-          {content.subtitlePrefix}{" "}
-          <span className="font-bold text-primary">FYA</span>.{" "}
-          {content.subtitleSuffix}
+          {content.subtitle}
         </p>
       </header>
 
@@ -108,66 +93,30 @@ export default async function ShelterRegistrationPage({
       )}
 
       <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12">
-        <aside className="space-y-8 lg:col-span-4">
-          <div className="rounded-3xl bg-secondary/10 p-8">
-            <h3 className="mb-6 text-xl font-bold text-secondary">
-              {content.benefitsTitle}
-            </h3>
-            <div className="space-y-6">
-              <div className="flex gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
-                  <Eye className="h-5 w-5" />
-                </div>
-                <div>
-                  <h4 className="font-bold">{content.benefit1Title}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {content.benefit1Text}
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
-                  <LayoutDashboard className="h-5 w-5" />
-                </div>
-                <div>
-                  <h4 className="font-bold">{content.benefit2Title}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {content.benefit2Text}
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
-                  <HeartHandshake className="h-5 w-5" />
-                </div>
-                <div>
-                  <h4 className="font-bold">{content.benefit3Title}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {content.benefit3Text}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative h-64 overflow-hidden rounded-3xl shadow-xl">
-            <Image
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuoGWPNxgccv2PjP-EljrPZXeo21I3n6e1XE9YzPCzxMv50Zyf-2ceJmBnCbeumIC62eCf6b-57Jj_Spc6469NsNooVsVaJTuA0KJvhU3QvTq-ZgrRFVNQ2rCYucMZdjjXdt5TQTB4WPeWFpY7cMwfBO6hX84Ycx3qGsl1GiQEvZUGeEsCyX4YR-eRHXQ263xrXVvNV1qVa-QA-Y_Iqxx6kcBRsf8fCtCytfTwTCC2CRPD-WYXRXZyv_SsU5czIcNJFIUpY3hVSWU"
-              alt={
-                locale === "pt"
-                  ? "Cães felizes num abrigo"
-                  : "Happy shelter dogs"
-              }
-              fill
-              sizes="(max-width: 1024px) 100vw, 33vw"
-              className="object-cover"
-            />
-            <div className="absolute inset-0 flex items-end bg-gradient-to-t from-primary/60 to-transparent p-6">
-              <p className="font-medium italic text-white">
-                {content.imageQuote}
-              </p>
-            </div>
-          </div>
+        <aside className="border-l-4 border-secondary pl-6 lg:col-span-4">
+          <h2 className="text-xl font-bold text-secondary">
+            {content.benefitsTitle}
+          </h2>
+          <ul className="mt-5 space-y-4">
+            {content.benefits.map((benefit) => (
+              <li key={benefit} className="flex gap-3 text-sm leading-6">
+                <CheckCircle2
+                  aria-hidden="true"
+                  className="mt-0.5 h-5 w-5 shrink-0 text-secondary"
+                />
+                {benefit}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-8 text-sm text-muted-foreground">
+            {content.pilotPrompt}{" "}
+            <Link
+              href={`/${locale}/para-canis`}
+              className="font-semibold text-primary underline"
+            >
+              {content.pilotLink}
+            </Link>
+          </p>
         </aside>
 
         <form action={register} className="space-y-10 lg:col-span-8">
@@ -358,7 +307,21 @@ export default async function ShelterRegistrationPage({
             </label>
           </section>
 
-          <label className="flex items-start gap-3"><input type="checkbox" name="terms" required/><span>{locale === "pt" ? "Li e aceito as condições do piloto." : "I have read and accept the pilot terms."} <Link className="underline" href={`/${locale}/termos`}>{locale === "pt" ? "Condições" : "Terms"}</Link> · <Link className="underline" href={`/${locale}/privacidade`}>{locale === "pt" ? "Privacidade" : "Privacy"}</Link></span></label>
+          <label className="flex items-start gap-3">
+            <input type="checkbox" name="terms" required />
+            <span>
+              {locale === "pt"
+                ? "Li e aceito as condições do piloto."
+                : "I have read and accept the pilot terms."}{" "}
+              <Link className="underline" href={`/${locale}/termos`}>
+                {locale === "pt" ? "Condições" : "Terms"}
+              </Link>{" "}
+              ·{" "}
+              <Link className="underline" href={`/${locale}/privacidade`}>
+                {locale === "pt" ? "Privacidade" : "Privacy"}
+              </Link>
+            </span>
+          </label>
           <div className="flex flex-col items-center justify-end gap-4 md:flex-row">
             <button
               type="button"

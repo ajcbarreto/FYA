@@ -97,7 +97,7 @@ export async function PetDetailBody({ locale, petId }: PetDetailBodyProps) {
           )}
           <section className="surface">
             <p className="eyebrow">
-              {pt ? "Uma história para conhecer" : "A story to discover"}
+              {pt ? "Sobre este animal" : "About this animal"}
             </p>
             <h2 className="display-title mt-3 text-3xl">
               {pt ? `Um pouco sobre ${pet.name}` : `A little about ${pet.name}`}
@@ -105,7 +105,7 @@ export async function PetDetailBody({ locale, petId }: PetDetailBodyProps) {
             <p className="mt-5 whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
               {pet.description ||
                 (pt
-                  ? "O abrigo ainda não adicionou uma descrição. Conversa com a equipa para saber mais sobre este amigo."
+                  ? "O abrigo ainda não escreveu uma descrição. Podes perguntar à equipa por mensagem."
                   : "The shelter has not added a description yet. Contact the team to learn more about this friend.")}
             </p>
           </section>
@@ -189,7 +189,7 @@ export async function PetDetailBody({ locale, petId }: PetDetailBodyProps) {
         <section className="mt-16">
           <div className="mb-7 flex items-end justify-between gap-4">
             <h2 className="display-title text-4xl">
-              {pt ? "Mais amigos para conhecer." : "More friends to meet."}
+              {pt ? "Outros animais para adoção" : "Other animals for adoption"}
             </h2>
             <Link href={`/${locale}/pets`} className="text-sm font-semibold">
               {pt ? "Ver todos" : "View all"}
