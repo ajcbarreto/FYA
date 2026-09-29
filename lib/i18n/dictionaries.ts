@@ -29,6 +29,8 @@ type Dictionary = {
       searchPlaceholder: string;
       searchAriaLabel: string;
       quickMeetLabel: string;
+      heroImageAlt: string;
+      illustrativeBadge: string;
       species: {
         dog: string;
         cat: string;
@@ -237,6 +239,8 @@ const dictionaries: Record<Locale, Dictionary> = {
         searchPlaceholder: "Nome ou raça",
         searchAriaLabel: "Pesquisar",
         quickMeetLabel: "Ver só",
+        heroImageAlt: "Retrato ilustrativo de um cão ao ar livre",
+        illustrativeBadge: "Imagem ilustrativa",
         species: {
           dog: "Cães",
           cat: "Gatos",
@@ -466,6 +470,8 @@ const dictionaries: Record<Locale, Dictionary> = {
         searchPlaceholder: "Name or breed",
         searchAriaLabel: "Search",
         quickMeetLabel: "Show only",
+        heroImageAlt: "Illustrative portrait of a dog outdoors",
+        illustrativeBadge: "Illustrative image",
         species: {
           dog: "Dogs",
           cat: "Cats",

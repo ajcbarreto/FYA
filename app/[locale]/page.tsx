@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowRight, ArrowUpRight, Search, PawPrint } from "lucide-react";
 import { isLocale } from "@/lib/i18n/config";
@@ -95,7 +96,31 @@ export default async function Home({
             ))}
           </div>
         </div>
-        {/* TODO(FYA): quando houver fotografias reais de animais de um canil parceiro (com autorização), podem entrar aqui ao lado dos passos. */}
+        <div className="relative isolate mx-auto w-full max-w-xl pb-5">
+          <div className="absolute -right-2 top-8 -z-10 h-[85%] w-[94%] rotate-3 rounded-[45%_45%_15%_15%] bg-[#dce5ce]" />
+          <div className="relative aspect-[.95] overflow-hidden rounded-[45%_45%_12%_12%] bg-[#e5d6bd]">
+            {/* TODO(FYA): trocar por uma fotografia real de um animal de um canil parceiro (com autorização) quando houver. */}
+            <Image
+              src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&q=85"
+              alt={hero.heroImageAlt}
+              fill
+              preload
+              sizes="(max-width: 1024px) 90vw, 45vw"
+              className="object-cover"
+            />
+            <span className="absolute bottom-5 right-5 rounded-full bg-black/25 px-3 py-1 text-[10px] text-white">
+              {hero.illustrativeBadge}
+            </span>
+          </div>
+          <span
+            aria-hidden="true"
+            className="absolute right-0 top-5 flex size-20 rotate-12 items-center justify-center rounded-full bg-[#e9edb9] text-primary shadow-sm"
+          >
+            <PawPrint className="size-9" />
+          </span>
+        </div>
+      </section>
+      <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
         <section
           aria-labelledby="how-it-works-title"
           className="rounded-[1.75rem] bg-primary px-6 py-8 text-primary-foreground sm:px-10 sm:py-10"
@@ -106,7 +131,7 @@ export default async function Home({
           >
             {journey.title}
           </h2>
-          <ol className="mt-8 space-y-7">
+          <ol className="mt-8 grid gap-7 lg:grid-cols-3 lg:gap-10">
             {journey.steps.map(({ title, text }, i) => (
               <li key={title} className="grid grid-cols-[2.25rem_1fr] gap-4">
                 <span
@@ -130,7 +155,7 @@ export default async function Home({
             <ArrowUpRight aria-hidden="true" className="size-4 shrink-0" />
           </Link>
         </section>
-      </section>
+      </div>
       <section className="page-shell">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
           <div>
