@@ -31,12 +31,15 @@ type Dictionary = {
       quickMeetLabel: string;
       heroImageAlt: string;
       illustrativeBadge: string;
+      cardTitle: string;
+      cardSubtitle: string;
       species: {
         dog: string;
         cat: string;
         other: string;
       };
     };
+    trustBar: [string, string, string];
     featured: {
       eyebrow: string;
       title: string;
@@ -45,6 +48,7 @@ type Dictionary = {
       exploreCatalog: string;
     };
     journey: {
+      eyebrow: string;
       title: string;
       helpChoose: string;
       steps: [
@@ -66,14 +70,17 @@ type Dictionary = {
     joinTitle: string;
     joinDescription: string;
     registerShelter: string;
+    closingLine: string;
   };
   aboutFamily: {
     imageAlt: string;
     caption: string;
+    quote: string;
     eyebrow: string;
     title: string;
     paragraph1: string;
     paragraph2: string;
+    closingQuote: string;
     cta: string;
   };
   auth: {
@@ -231,8 +238,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     home: {
       hero: {
         eyebrow: "Adoção de animais de canis e associações",
-        titleLine1: "Animais para adoção,",
-        titleLine2: "direto dos canis.",
+        titleLine1: "O teu melhor amigo",
+        titleLine2: "está por aqui.",
         subtitle:
           "As fichas são publicadas pelas equipas que cuidam de cada animal. Fazes a candidatura aqui, trocas mensagens com o canil e combinam a visita antes de decidir.",
         searchLabel: "Procurar um animal",
@@ -241,12 +248,19 @@ const dictionaries: Record<Locale, Dictionary> = {
         quickMeetLabel: "Ver só",
         heroImageAlt: "Retrato ilustrativo de um cão ao ar livre",
         illustrativeBadge: "Imagem ilustrativa",
+        cardTitle: "Uma casa muda tudo.",
+        cardSubtitle: "A próxima história pode ser a tua.",
         species: {
           dog: "Cães",
           cat: "Gatos",
           other: "Outros animais",
         },
       },
+      trustBar: [
+        "Adoção com responsabilidade",
+        "Contacto direto com os abrigos",
+        "Acompanhamento em cada passo",
+      ],
       featured: {
         eyebrow: "Publicados recentemente",
         title: "Alguns dos animais disponíveis",
@@ -256,6 +270,7 @@ const dictionaries: Record<Locale, Dictionary> = {
         exploreCatalog: "Abrir o catálogo",
       },
       journey: {
+        eyebrow: "Mais perto de casa",
         title: "Como funciona a adoção",
         helpChoose: "Não sabes por onde começar? Responde a três perguntas",
         steps: [
@@ -288,17 +303,20 @@ const dictionaries: Record<Locale, Dictionary> = {
       joinDescription:
         "Publica os animais, recebe candidaturas e acompanha cada adoção com a tua equipa.",
       registerShelter: "Registar o canil",
+      closingLine: "Mais encontros. Mais finais felizes.",
     },
     aboutFamily: {
       imageAlt:
         "Retrato ilustrado da família FYA: o casal e o filho junto ao rio",
       caption: "Ilustração da família que criou a FYA.",
+      quote: "Uma família. Uma paixão em comum.",
       eyebrow: "Quem somos",
       title: "Uma família que gosta de animais",
       paragraph1:
         "A FYA foi criada por uma família, um casal e o nosso filho, que partilha o gosto pelos animais. Quisemos transformar esse gosto em ajuda concreta.",
       paragraph2:
         "Queremos que os animais dos canis e associações sejam mais vistos e que encontrem família mais depressa. Para isso, juntamos num só sítio quem cuida deles e quem está a pensar adotar, com a informação que cada um precisa para decidir com calma.",
+      closingQuote: "Porque todos merecem um lugar onde pertencer.",
       cta: "Ver os animais para adoção",
     },
     auth: {
@@ -462,8 +480,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     home: {
       hero: {
         eyebrow: "Adopt from shelters and rescue groups",
-        titleLine1: "Animals for adoption,",
-        titleLine2: "straight from shelters.",
+        titleLine1: "Your best friend",
+        titleLine2: "is waiting here.",
         subtitle:
           "Profiles are published by the teams caring for each animal. You apply here, message the shelter and arrange a visit before you decide.",
         searchLabel: "Find an animal",
@@ -472,12 +490,19 @@ const dictionaries: Record<Locale, Dictionary> = {
         quickMeetLabel: "Show only",
         heroImageAlt: "Illustrative portrait of a dog outdoors",
         illustrativeBadge: "Illustrative image",
+        cardTitle: "A home changes everything.",
+        cardSubtitle: "The next story could be yours.",
         species: {
           dog: "Dogs",
           cat: "Cats",
           other: "Other animals",
         },
       },
+      trustBar: [
+        "Responsible adoption",
+        "Direct contact with shelters",
+        "Support at every step",
+      ],
       featured: {
         eyebrow: "Recently published",
         title: "Some of the animals available",
@@ -487,6 +512,7 @@ const dictionaries: Record<Locale, Dictionary> = {
         exploreCatalog: "Open the catalog",
       },
       journey: {
+        eyebrow: "Closer to home",
         title: "How adoption works",
         helpChoose: "Not sure where to start? Answer three questions",
         steps: [
@@ -519,17 +545,20 @@ const dictionaries: Record<Locale, Dictionary> = {
       joinDescription:
         "Publish your animals, receive applications and follow each adoption with your team.",
       registerShelter: "Register your shelter",
+      closingLine: "More connections. More happy endings.",
     },
     aboutFamily: {
       imageAlt:
         "Illustrated portrait of the FYA family: the couple and their son by the river",
       caption: "Illustration of the family behind FYA.",
+      quote: "One family. One shared passion.",
       eyebrow: "About us",
       title: "A family that loves animals",
       paragraph1:
         "FYA was started by a family, a couple and our son, who share a love of animals. We wanted to turn that into practical help.",
       paragraph2:
         "We want animals in shelters and rescue groups to be seen by more people and find a family sooner. So we bring together the people caring for them and the people thinking about adopting, with the information each side needs to decide calmly.",
+      closingQuote: "Because everyone deserves a place to belong.",
       cta: "See animals for adoption",
     },
     auth: {
