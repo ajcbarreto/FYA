@@ -9,7 +9,7 @@ export type PlatformSettings = {
 };
 
 const defaults: PlatformSettings = {
-  platformName: "FYA (Found Your Animal)",
+  platformName: "FYA (Find Your Animal)",
   contactEmail: "contacto@fya.local",
   supportEmail: "apoio@fya.local",
   defaultAdoptionFee: "",

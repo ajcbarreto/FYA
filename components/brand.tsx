@@ -1,13 +1,15 @@
-import { PawPrint } from "lucide-react";
+import Image from "next/image";
+
+// Source files for every logo variant live in public/brand/.
 export function Brand() {
   return (
-    <span className="inline-flex items-center gap-2.5">
-      <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-        <PawPrint className="size-5" />
-      </span>
-      <span className="text-2xl font-extrabold tracking-tighter">
-        fya<span className="text-accent">.</span>
-      </span>
-    </span>
+    <Image
+      src="/brand/fya-logo-compacto.svg"
+      alt="FYA"
+      width={94}
+      height={40}
+      className="h-10 w-auto"
+      priority
+    />
   );
 }

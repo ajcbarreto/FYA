@@ -42,7 +42,7 @@ export default async function CanilDashboardPage({
       ? {
           title: "Dashboard do Canil",
           subtitle:
-            "Visao geral operacional do teu canil na FYA (Found Your Animal).",
+            "Visao geral operacional do teu canil na FYA (Find Your Animal).",
           welcomePrefix: "Bem-vindo de volta,",
           cards: {
             totalPets: "Total de animais",
@@ -69,7 +69,7 @@ export default async function CanilDashboardPage({
       : {
           title: "Shelter Dashboard",
           subtitle:
-            "Operational overview of your shelter inside FYA (Found Your Animal).",
+            "Operational overview of your shelter inside FYA (Find Your Animal).",
           welcomePrefix: "Welcome back,",
           cards: {
             totalPets: "Total pets",

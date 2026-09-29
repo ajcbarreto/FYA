@@ -354,7 +354,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       registrationCertificateLabel: "Documento de registo da entidade",
       registrationCertificateHint: "PDF, JPG ou PNG, até 5 MB",
       shelterDeclaration:
-        "Confirmo que as informações fornecidas são verdadeiras e que tenho autoridade para representar este abrigo na plataforma FYA (Found Your Animal).",
+        "Confirmo que as informações fornecidas são verdadeiras e que tenho autoridade para representar este abrigo na plataforma FYA (Find Your Animal).",
       saveDraft: "Guardar rascunho",
       finalizeRegistration: "Criar conta do canil",
       shelterRegistrationLink: "Registar um canil ou associação",
@@ -596,7 +596,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       registrationCertificateLabel: "Organisation registration document",
       registrationCertificateHint: "PDF, JPG or PNG, up to 5 MB",
       shelterDeclaration:
-        "I confirm that the provided information is accurate and that I am authorized to represent this shelter on FYA (Found Your Animal).",
+        "I confirm that the provided information is accurate and that I am authorized to represent this shelter on FYA (Find Your Animal).",
       saveDraft: "Save draft",
       finalizeRegistration: "Create shelter account",
       shelterRegistrationLink: "Register a shelter or rescue group",
@@ -668,7 +668,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     canilProfile: {
       title: "Shelter Profile",
       subtitle:
-        "Manage your shelter public identity on FYA (Found Your Animal).",
+        "Manage your shelter public identity on FYA (Find Your Animal).",
       shelterRole: "Shelter",
       verifiedLabel: "Verification",
       verifiedValue: "Verified",

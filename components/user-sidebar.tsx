@@ -118,7 +118,7 @@ export function UserSidebar({ locale }: UserSidebarProps) {
     <aside className="min-w-0 w-full shrink-0 rounded-2xl border border-border/25 bg-card p-3 lg:sticky lg:top-24 lg:h-fit lg:w-72 lg:p-4">
       <div className="mb-1 hidden px-3 py-2 lg:mb-4 lg:block">
         <h2 className="text-lg font-bold text-primary">
-          FYA (Found Your Animal)
+          FYA (Find Your Animal)
         </h2>
         <p className="text-xs text-muted-foreground">{copy.subtitle}</p>
       </div>
