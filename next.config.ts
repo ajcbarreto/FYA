@@ -6,7 +6,14 @@ const localStorage = [
 ].includes(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "");
 
 const nextConfig: NextConfig = {
-  experimental: { serverActions: { bodySizeLimit: "12mb" } },
+  experimental: {
+    serverActions: { bodySizeLimit: "12mb" },
+    // Every page is dynamic (the root layout reads headers), so by default the
+    // client router refetches a page on every visit. Reusing it for 30s makes
+    // back-and-forth navigation instant; server actions that revalidate still
+    // clear this cache immediately.
+    staleTimes: { dynamic: 30 },
+  },
   distDir: process.env.NEXT_DIST_DIR || ".next",
   images: {
     formats: ["image/avif", "image/webp"],

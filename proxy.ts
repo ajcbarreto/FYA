@@ -88,9 +88,11 @@ export async function proxy(request: NextRequest) {
   }
   if (!required) return next;
   const client = createProxySupabaseClient(request);
-  const {
-    data: { user },
-  } = await client.supabase.auth.getUser();
+  // getClaims verifies the JWT locally (asymmetric signing keys), saving a
+  // round trip to the Auth server on every protected navigation. Layouts and
+  // pages still call getUser, which remains the authoritative check.
+  const { data: claimsData } = await client.supabase.auth.getClaims();
+  const user = claimsData?.claims.sub ? { id: claimsData.claims.sub } : null;
   const redirectTo = (path: string) => {
     const response = NextResponse.redirect(new URL(path, request.url));
     client.response.cookies
