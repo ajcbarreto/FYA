@@ -18,7 +18,7 @@ export const getAccountProfile = cache(
 
 export async function resolveUserRole(
   supabase: SupabaseClient,
-  user: User | null | undefined,
+  user: Pick<User, "id"> | null | undefined,
 ): Promise<UserRole | null> {
   if (!user) return null;
   const data = await getAccountProfile(supabase, user.id);
