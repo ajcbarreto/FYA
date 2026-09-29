@@ -5,7 +5,7 @@ alwaysApply: true
 
 # FYA Core Standards
 
-- Keep the app name and messaging as `FYA (Found Your Animal)`.
+- Keep the app name and messaging as `FYA (Find Your Animal)`.
 - Stack baseline is fixed: Next.js App Router + TypeScript + Tailwind + shadcn.
 - Auth must use `@supabase/ssr` utilities from `lib/supabase/*` (no legacy auth-helpers).
 - Roles are `admin`, `user`, `canil` and authorization must depend on `profiles.role`.

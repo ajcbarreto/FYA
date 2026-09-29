@@ -69,6 +69,6 @@ export function emailLayout(
     <h1 style="font-size:18px;margin:0 0 12px;">${escapeHtml(title)}</h1>
     <div style="font-size:14px;line-height:1.6;color:#5b5b54;">${body}</div>
     ${cta}
-    <p style="font-size:12px;color:#9a9a92;margin-top:32px;">FYA — Found Your Animal</p>
+    <p style="font-size:12px;color:#9a9a92;margin-top:32px;">FYA — Find Your Animal</p>
   </div>`;
 }

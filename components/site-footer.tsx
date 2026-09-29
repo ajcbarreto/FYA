@@ -61,7 +61,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
         </div>
       </div>
       <div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-3 border-t border-border/50 px-8 py-5 text-xs text-muted-foreground">
-        <p>© {new Date().getFullYear()} FYA · Found Your Animal</p>
+        <p>© {new Date().getFullYear()} FYA · Find Your Animal</p>
         <p className="flex items-center gap-2">
           <Heart aria-hidden="true" className="size-3 text-accent" />
           {footer.closingLine}

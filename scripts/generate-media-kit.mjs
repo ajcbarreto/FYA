@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 const directory = new URL("../public/media-kit/", import.meta.url);
 mkdirSync(directory, { recursive: true });
 const escape = (s) =>
@@ -11,15 +11,43 @@ function save(name, w, h, body, title) {
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-labelledby="title"><title id="title">${escape(title)}</title><rect width="${w}" height="${h}" fill="#214e43"/>${body}</svg>\n`,
   );
 }
+// Logo artwork comes from public/brand/; paths are [person, person, letters].
+const logo = (name) => {
+  const svg = readFileSync(new URL(`../brand/${name}`, directory), "utf8");
+  const [x, y, w, h] = svg
+    .match(/viewBox="([^"]+)"/)[1]
+    .split(" ")
+    .map(Number);
+  return { x, y, w, h, paths: svg.match(/<path[^>]*\/>/g) };
+};
+const recolor = (path, fill) => path.replace(/fill="[^"]+"/, `fill="${fill}"`);
+const place = ({ x, y, h }, left, top, height, body) =>
+  `<g transform="translate(${left} ${top}) scale(${height / h}) translate(${-x} ${-y})">${body}</g>`;
+const compact = logo("fya-logo-compacto.svg");
+const symbol = logo("fya-simbolo.svg");
+// Sits where the old "fya." text did: baseline y, font size `size`.
 const wordmark = (x, y, size) =>
-  text(x, y, size, "fya") + text(x + size * 1.5, y, size, ".", "#db7046");
+  place(
+    compact,
+    x,
+    y - size * 0.95,
+    size * 1.25,
+    recolor(compact.paths[0], "#fff") +
+      compact.paths[1] +
+      recolor(compact.paths[2], "#fff"),
+  );
 save(
   "perfil.svg",
   1080,
   1080,
   `<circle cx="540" cy="540" r="400" fill="#edf1e8"/>` +
-    text(250, 650, 300, "fya", "#214e43") +
-    text(700, 650, 300, ".", "#db7046"),
+    place(
+      symbol,
+      540 - (520 * symbol.w) / symbol.h / 2,
+      280,
+      520,
+      symbol.paths.join(""),
+    ),
   "FYA — imagem de perfil",
 );
 save(
@@ -29,17 +57,17 @@ save(
   wordmark(120, 195, 115) +
     text(120, 345, 62, "Mais tempo para os animais.") +
     text(120, 425, 38, "Registos, adoções e equipa num só lugar.") +
-    text(120, 530, 26, "Found Your Animal · Piloto em preparação", "#d9e5da"),
+    text(120, 530, 26, "Find Your Animal · Piloto em preparação", "#d9e5da"),
   "FYA — capa Facebook",
 );
 save(
   "capa-youtube.svg",
   2560,
   1440,
-  wordmark(530, 675, 115) +
+  wordmark(530, 660, 100) +
     text(890, 635, 62, "Aprender a usar a FYA") +
     text(890, 720, 34, "Guias para canis e associações") +
-    text(890, 780, 26, "Found Your Animal", "#d9e5da"),
+    text(890, 780, 26, "Find Your Animal", "#d9e5da"),
   "FYA — capa YouTube, texto na área central",
 );
 // Default Open Graph / Twitter images (lib/seo/metadata.ts), one per locale.

@@ -24,7 +24,7 @@ export function organizationJsonLd(locale: Locale): JsonLdObject {
     "@type": "Organization",
     "@id": `${siteOrigin()}/#organization`,
     name: siteName,
-    alternateName: "Found Your Animal",
+    alternateName: "Find Your Animal",
     url: absolute(`/${locale}`),
     logo: absolute("/media-kit/perfil.png"),
     description:

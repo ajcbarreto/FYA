@@ -1,4 +1,4 @@
-# FYA · Found Your Animal
+# FYA · Find Your Animal
 
 Plataforma de adoção com catálogo PT/EN, candidaturas, mensagens, visitas e áreas de adotante, abrigo e administração. Next.js 16 / React 19 / TypeScript / Tailwind 4 / Supabase.
 

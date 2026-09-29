@@ -20,12 +20,12 @@ export async function generateMetadata({
   const { locale } = await params;
   return locale === "en"
     ? {
-        title: "FYA (Found Your Animal)",
-        description: "FYA - Found Your Animal, animal adoption platform",
+        title: "FYA (Find Your Animal)",
+        description: "FYA - Find Your Animal, animal adoption platform",
       }
     : {
-        title: "FYA (Found Your Animal)",
-        description: "FYA - Found Your Animal, plataforma de adoção de animais",
+        title: "FYA (Find Your Animal)",
+        description: "FYA - Find Your Animal, plataforma de adoção de animais",
       };
 }
 

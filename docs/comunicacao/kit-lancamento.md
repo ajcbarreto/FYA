@@ -4,7 +4,7 @@ Estado: materiais de preparação, não publicados em redes sociais. As contas a
 
 ## Identidade e perfis
 
-Nome de apresentação: **FYA · Found Your Animal**.
+Nome de apresentação: **FYA · Find Your Animal**.
 
 Proposta: **Mais tempo para os animais. Informação num só lugar.**
 
@@ -18,7 +18,7 @@ Bio curta Instagram:
 
 Descrição Facebook:
 
-> A FYA — Found Your Animal ajuda canis e associações a reunir informação dos animais, gerir candidaturas, organizar documentos e acompanhar as famílias depois da adoção. Estamos a preparar um piloto com organizações para aprender com o trabalho de quem cuida todos os dias. Conhece o projeto e deixa um pedido de contacto na página FYA para canis.
+> A FYA — Find Your Animal ajuda canis e associações a reunir informação dos animais, gerir candidaturas, organizar documentos e acompanhar as famílias depois da adoção. Estamos a preparar um piloto com organizações para aprender com o trabalho de quem cuida todos os dias. Conhece o projeto e deixa um pedido de contacto na página FYA para canis.
 
 Descrição YouTube:
 
