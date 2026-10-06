@@ -22,6 +22,8 @@ export async function listPublicShelters(
       let query = supabase
         .from("canis")
         .select(selection)
+        // Individuals' personal listing rows are not shelters.
+        .eq("tipo", "canil")
         .order("nome", { ascending: true });
       const search = options.search?.trim();
       if (search) {

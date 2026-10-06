@@ -6,6 +6,8 @@ export type PlatformSettings = {
   supportEmail: string;
   defaultAdoptionFee: string;
   requireVerificationToPublish: boolean;
+  /** Send every individual's listing to the admin queue, even when screening finds nothing. */
+  requireIndividualReview: boolean;
 };
 
 const defaults: PlatformSettings = {
@@ -14,6 +16,7 @@ const defaults: PlatformSettings = {
   supportEmail: "apoio@fya.local",
   defaultAdoptionFee: "",
   requireVerificationToPublish: true,
+  requireIndividualReview: false,
 };
 
 const SETTINGS_KEY = "platform_settings";
@@ -46,6 +49,10 @@ export function normalizePlatformSettings(value: unknown): PlatformSettings {
     requireVerificationToPublish: readBoolean(
       candidate.requireVerificationToPublish,
       defaults.requireVerificationToPublish,
+    ),
+    requireIndividualReview: readBoolean(
+      candidate.requireIndividualReview,
+      defaults.requireIndividualReview,
     ),
   };
 }

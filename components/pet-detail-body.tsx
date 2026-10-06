@@ -45,7 +45,7 @@ export async function PetDetailBody({
 
   const shelter = await supabase
     .from("canis")
-    .select("verificado")
+    .select("verificado,tipo")
     .eq("id", pet.shelterId)
     .single();
 
@@ -186,24 +186,39 @@ export async function PetDetailBody({
               )}
             />
           </section>
-          <Link
-            href={`/${locale}/canis/${pet.shelterId}`}
-            className="flex items-center justify-between gap-4 rounded-2xl bg-primary p-6 text-white"
-          >
-            <div>
+          {shelter.data?.tipo === "particular" ? (
+            <section className="rounded-2xl bg-primary p-6 text-white">
               <p className="text-xs text-white/65">
-                {pt ? "Abrigo responsável" : "Shelter in charge"}
+                {pt ? "Anunciado por um particular" : "Listed by an individual"}
               </p>
               <h2 className="mt-1 font-semibold">{pet.shelterName}</h2>
-              {shelter.data?.verificado && (
-                <p className="mt-2 flex items-center gap-1 text-xs text-white/75">
-                  <ShieldCheck className="size-3" />
-                  {pt ? "Abrigo verificado" : "Verified shelter"}
+              <p className="mt-3 flex items-start gap-2 text-xs text-white/80">
+                <ShieldCheck className="mt-0.5 size-3 shrink-0" />
+                {pt
+                  ? "A adoção na FYA é gratuita. Nunca faças pagamentos antecipados nem envies dinheiro para transporte, e fala sempre pelas mensagens da FYA."
+                  : "Adoption on FYA is free. Never pay in advance or send money for transport, and always talk through FYA messages."}
+              </p>
+            </section>
+          ) : (
+            <Link
+              href={`/${locale}/canis/${pet.shelterId}`}
+              className="flex items-center justify-between gap-4 rounded-2xl bg-primary p-6 text-white"
+            >
+              <div>
+                <p className="text-xs text-white/65">
+                  {pt ? "Abrigo responsável" : "Shelter in charge"}
                 </p>
-              )}
-            </div>
-            <ArrowUpRight className="size-5" />
-          </Link>
+                <h2 className="mt-1 font-semibold">{pet.shelterName}</h2>
+                {shelter.data?.verificado && (
+                  <p className="mt-2 flex items-center gap-1 text-xs text-white/75">
+                    <ShieldCheck className="size-3" />
+                    {pt ? "Abrigo verificado" : "Verified shelter"}
+                  </p>
+                )}
+              </div>
+              <ArrowUpRight className="size-5" />
+            </Link>
+          )}
         </div>
       </div>
       {related.length > 0 && (

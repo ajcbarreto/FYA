@@ -18,6 +18,8 @@ import type { Locale } from "@/lib/i18n/config";
 
 type CanilSidebarProps = {
   locale: Locale;
+  /** Private individuals only manage their own listings, requests and messages. */
+  individual?: boolean;
 };
 
 type NavItem = {
@@ -26,7 +28,10 @@ type NavItem = {
   icon: ComponentType<{ className?: string }>;
 };
 
-export function CanilSidebar({ locale }: CanilSidebarProps) {
+export function CanilSidebar({
+  locale,
+  individual = false,
+}: CanilSidebarProps) {
   const pathname = usePathname();
   const copy =
     locale === "pt"
@@ -57,7 +62,7 @@ export function CanilSidebar({ locale }: CanilSidebarProps) {
           },
         };
 
-  const items: NavItem[] = [
+  const allItems: NavItem[] = [
     {
       href: `/${locale}/canil/apoios`,
       label: locale === "pt" ? "Apoios e donativos" : "Support and donations",
@@ -125,6 +130,19 @@ export function CanilSidebar({ locale }: CanilSidebarProps) {
       icon: Settings,
     },
   ];
+  const individualPaths = ["animais", "pedidos", "mensagens"].map(
+    (path) => `/${locale}/canil/${path}`,
+  );
+  const items: NavItem[] = individual
+    ? [
+        ...allItems.filter((item) => individualPaths.includes(item.href)),
+        {
+          href: `/${locale}/user`,
+          label: locale === "pt" ? "Área de adotante" : "Adopter area",
+          icon: Home,
+        },
+      ]
+    : allItems;
 
   return (
     <aside className="min-w-0 w-full shrink-0 rounded-2xl border border-border/25 bg-card p-3 lg:sticky lg:top-24 lg:h-fit lg:w-72 lg:p-4">
@@ -132,7 +150,13 @@ export function CanilSidebar({ locale }: CanilSidebarProps) {
         <h2 className="text-lg font-bold text-primary">
           FYA (Find Your Animal)
         </h2>
-        <p className="text-xs text-muted-foreground">{copy.shelterAdmin}</p>
+        <p className="text-xs text-muted-foreground">
+          {individual
+            ? locale === "pt"
+              ? "Os teus anúncios"
+              : "Your listings"
+            : copy.shelterAdmin}
+        </p>
       </div>
       <p className="mb-2 hidden px-3 text-[10px] font-bold uppercase tracking-[.16em] text-muted-foreground lg:block">
         {copy.navLabel}

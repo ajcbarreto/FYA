@@ -6,6 +6,7 @@ import { getAuthUser } from "@/lib/supabase/get-user";
 import { getOwnedShelter } from "@/lib/canil/shelter-data";
 import { AnimalForm } from "@/components/animal-form";
 import { ToastFeedback } from "@/components/toast-feedback";
+import { listingErrorMessages } from "@/lib/listings/moderation";
 import { createAnimal } from "@/app/[locale]/(dashboard)/canil/animais/actions";
 
 type NewAnimalPageProps = {
@@ -40,25 +41,33 @@ export default async function NewAnimalPage({
       ? {
           back: "Voltar aos animais",
           title: "Novo animal",
-          subtitle: "Adiciona um animal ao inventario do teu canil.",
+          subtitle:
+            shelter.tipo === "particular"
+              ? "Descreve o animal com honestidade. A adoção é gratuita e o contacto faz-se pelas mensagens da FYA."
+              : "Adiciona um animal ao inventario do teu canil.",
           submit: "Criar animal",
           errors: {
             invalid_data: "Preenche pelo menos nome, espécie e estado.",
             save_failed: "Não foi possível criar o animal.",
             needs_verification:
               "O teu canil precisa de ser verificado pelo admin antes de publicar animais.",
+            ...listingErrorMessages("pt"),
           },
         }
       : {
           back: "Back to pets",
           title: "New pet",
-          subtitle: "Add a pet to your shelter inventory.",
+          subtitle:
+            shelter.tipo === "particular"
+              ? "Describe the animal honestly. Adoption is free and contact happens through FYA messages."
+              : "Add a pet to your shelter inventory.",
           submit: "Create pet",
           errors: {
             invalid_data: "Provide at least name, species and status.",
             save_failed: "Could not create the pet.",
             needs_verification:
               "Your shelter must be verified by an admin before publishing animals.",
+            ...listingErrorMessages("en"),
           },
         };
 

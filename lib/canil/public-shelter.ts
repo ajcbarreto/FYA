@@ -53,6 +53,11 @@ export async function getPublicShelterById(
   shelterId: string,
 ) {
   return readPublicShelterQuery<PublicShelter>((selection) =>
-    supabase.from("canis").select(selection).eq("id", shelterId).maybeSingle(),
+    supabase
+      .from("canis")
+      .select(selection)
+      .eq("id", shelterId)
+      .eq("tipo", "canil")
+      .maybeSingle(),
   );
 }

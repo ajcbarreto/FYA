@@ -9,6 +9,11 @@ import { getOwnedShelter } from "@/lib/canil/shelter-data";
 import { listAnimalPhotos } from "@/lib/canil/animal-photos";
 import { AnimalForm } from "@/components/animal-form";
 import { ToastFeedback } from "@/components/toast-feedback";
+import { ListingModerationNotice } from "@/components/listing-moderation-notice";
+import {
+  listingErrorMessages,
+  type ModerationState,
+} from "@/lib/listings/moderation";
 import {
   deleteAnimal,
   deleteAnimalPhoto,
@@ -47,7 +52,7 @@ export default async function AnimalEditPage({
   const { data: animal } = await supabase
     .from("animais")
     .select(
-      "id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,compatibilidades",
+      "id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,compatibilidades,moderacao,moderacao_motivos,moderacao_nota",
     )
     .eq("id", animalId)
     .maybeSingle<{
@@ -62,6 +67,9 @@ export default async function AnimalEditPage({
       status: string;
       descricao: string | null;
       compatibilidades: string[];
+      moderacao: ModerationState;
+      moderacao_motivos: string[];
+      moderacao_nota: string | null;
     }>();
 
   if (!animal || animal.canil_id !== shelter.id) {
@@ -102,6 +110,7 @@ export default async function AnimalEditPage({
             update_failed: "Não foi possível atualizar.",
             save_failed: "Não foi possível guardar.",
             photo_not_found: "Foto não encontrada.",
+            ...listingErrorMessages("pt"),
           },
         }
       : {
@@ -135,6 +144,7 @@ export default async function AnimalEditPage({
             update_failed: "Could not update.",
             save_failed: "Could not save.",
             photo_not_found: "Photo not found.",
+            ...listingErrorMessages("en"),
           },
         };
 
@@ -164,6 +174,16 @@ export default async function AnimalEditPage({
         message={feedback}
         variant={success ? "success" : "error"}
       />
+
+      {shelter.tipo === "particular" && (
+        <ListingModerationNotice
+          locale={locale}
+          state={animal.moderacao}
+          reasons={animal.moderacao_motivos}
+          note={animal.moderacao_nota}
+          hasPhoto={photos.length > 0}
+        />
+      )}
 
       <section className="rounded-3xl border border-border/20 bg-card p-6">
         <h2 className="mb-4 text-lg font-bold">{copy.detailsTitle}</h2>
