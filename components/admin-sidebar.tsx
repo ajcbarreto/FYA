@@ -11,6 +11,7 @@ import {
   Users,
   Settings,
   FileText,
+  PawPrint,
 } from "lucide-react";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -77,6 +78,12 @@ export function AdminSidebar({ locale }: AdminSidebarProps) {
       href: `/${locale}/admin/canis`,
       label: copy.links.shelters,
       icon: Building2,
+    },
+    {
+      href: `/${locale}/admin/anuncios`,
+      label:
+        locale === "pt" ? "Anúncios de particulares" : "Individual listings",
+      icon: PawPrint,
     },
     {
       href: `/${locale}/admin/utilizadores`,

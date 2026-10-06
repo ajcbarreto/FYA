@@ -34,6 +34,7 @@ export default async function AdminSheltersPage({
   const { data } = await supabase
     .from("canis")
     .select("id,nome,localizacao,verificado,created_at")
+    .eq("tipo", "canil")
     .order("verificado", { ascending: true })
     .order("nome", { ascending: true });
 

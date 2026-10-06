@@ -72,7 +72,7 @@ export async function PetDetailBody({
 
   if (!pet) notFound();
 
-  const [shelter, details, available, ratings] = await Promise.all([
+  const [shelter, details, available, ratings, kind] = await Promise.all([
     readPublicShelterQuery<PublicShelter>((columns) =>
       supabase.from("canis").select(columns).eq("id", pet.shelterId).single(),
     ),
@@ -88,7 +88,9 @@ export async function PetDetailBody({
       .eq("canil_id", pet.shelterId)
       .eq("status", "disponivel"),
     getShelterRatingSummaries(supabase, [pet.shelterId]),
+    supabase.from("canis").select("tipo").eq("id", pet.shelterId).single(),
   ]);
+  const isIndividual = kind.data?.tipo === "particular";
 
   if (!shelter || animal.error) {
     throw new Error("Unable to verify animal availability");
@@ -283,92 +285,111 @@ export async function PetDetailBody({
               )}
             />
           </section>
-          <aside className="rounded-3xl bg-[#4a504c] p-6 text-white">
-            <div className="flex items-center gap-4">
-              <div className="relative size-14 shrink-0 overflow-hidden rounded-2xl bg-white/10">
-                {shelter.image_url ? (
-                  <Image
-                    src={shelter.image_url}
-                    alt=""
-                    fill
-                    sizes="56px"
-                    className="object-cover"
-                  />
-                ) : (
-                  <PawPrint className="absolute inset-0 m-auto size-6 text-white/60" />
-                )}
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-white/60">
-                  {pt ? "Abrigo responsável" : "Shelter in charge"}
-                </p>
-                <h2 className="truncate font-semibold">{shelter.nome}</h2>
-                <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-white/75">
-                  {shelter.verificado && (
-                    <span className="flex items-center gap-1">
-                      <ShieldCheck className="size-3.5" />
-                      {pt ? "Verificado" : "Verified"}
-                    </span>
-                  )}
-                  {rating && rating.count > 0 && (
-                    <span className="flex items-center gap-1">
-                      <Star className="size-3.5 fill-[#f2c14e] text-[#f2c14e]" />
-                      {rating.average.toFixed(1)} ({rating.count})
-                    </span>
+          {isIndividual ? (
+            <section className="rounded-3xl bg-[#4a504c] p-6 text-white">
+              <p className="text-xs text-white/60">
+                {pt ? "Anunciado por um particular" : "Listed by an individual"}
+              </p>
+              <h2 className="mt-1 font-semibold">{pet.shelterName}</h2>
+              <p className="mt-2 flex items-center gap-2 text-sm text-white/85">
+                <MapPin className="size-4 shrink-0 text-white/50" />
+                {pet.location}
+              </p>
+              <p className="mt-4 flex items-start gap-2 border-t border-white/10 pt-4 text-xs leading-5 text-white/80">
+                <ShieldCheck className="mt-0.5 size-3.5 shrink-0" />
+                {pt
+                  ? "A adoção na FYA é gratuita. Nunca faças pagamentos antecipados nem envies dinheiro para transporte, e fala sempre pelas mensagens da FYA."
+                  : "Adoption on FYA is free. Never pay in advance or send money for transport, and always talk through FYA messages."}
+              </p>
+            </section>
+          ) : (
+            <aside className="rounded-3xl bg-[#4a504c] p-6 text-white">
+              <div className="flex items-center gap-4">
+                <div className="relative size-14 shrink-0 overflow-hidden rounded-2xl bg-white/10">
+                  {shelter.image_url ? (
+                    <Image
+                      src={shelter.image_url}
+                      alt=""
+                      fill
+                      sizes="56px"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <PawPrint className="absolute inset-0 m-auto size-6 text-white/60" />
                   )}
                 </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-white/60">
+                    {pt ? "Abrigo responsável" : "Shelter in charge"}
+                  </p>
+                  <h2 className="truncate font-semibold">{shelter.nome}</h2>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-white/75">
+                    {shelter.verificado && (
+                      <span className="flex items-center gap-1">
+                        <ShieldCheck className="size-3.5" />
+                        {pt ? "Verificado" : "Verified"}
+                      </span>
+                    )}
+                    {rating && rating.count > 0 && (
+                      <span className="flex items-center gap-1">
+                        <Star className="size-3.5 fill-[#f2c14e] text-[#f2c14e]" />
+                        {rating.average.toFixed(1)} ({rating.count})
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-            <ul className="mt-5 space-y-3 border-t border-white/10 pt-5 text-sm text-white/85">
-              <li className="flex gap-3">
-                <MapPin className="mt-0.5 size-4 shrink-0 text-white/50" />
-                {shelter.localizacao}
-              </li>
-              {visitHours && (
+              <ul className="mt-5 space-y-3 border-t border-white/10 pt-5 text-sm text-white/85">
                 <li className="flex gap-3">
-                  <Clock className="mt-0.5 size-4 shrink-0 text-white/50" />
-                  {visitHours}
+                  <MapPin className="mt-0.5 size-4 shrink-0 text-white/50" />
+                  {shelter.localizacao}
                 </li>
-              )}
-              {shelter.telefone && (
-                <li className="flex gap-3">
-                  <Phone className="mt-0.5 size-4 shrink-0 text-white/50" />
-                  <a
-                    href={`tel:${shelter.telefone.replace(/\s/g, "")}`}
-                    className="hover:underline"
-                  >
-                    {shelter.telefone}
-                  </a>
-                </li>
-              )}
-              {shelter.email_contacto && (
-                <li className="flex gap-3">
-                  <Mail className="mt-0.5 size-4 shrink-0 text-white/50" />
-                  <a
-                    href={`mailto:${shelter.email_contacto}`}
-                    className="break-all hover:underline"
-                  >
-                    {shelter.email_contacto}
-                  </a>
-                </li>
-              )}
-              {(available.count ?? 0) > 0 && (
-                <li className="flex gap-3">
-                  <PawPrint className="mt-0.5 size-4 shrink-0 text-white/50" />
-                  {pt
-                    ? `${available.count} ${available.count === 1 ? "animal disponível" : "animais disponíveis"} para adoção`
-                    : `${available.count} ${available.count === 1 ? "animal" : "animals"} available for adoption`}
-                </li>
-              )}
-            </ul>
-            <Link
-              href={`/${locale}/canis/${pet.shelterId}`}
-              className="mt-6 flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#4a504c] transition-colors hover:bg-white/90"
-            >
-              {pt ? "Conhecer o abrigo" : "Visit the shelter page"}
-              <ArrowUpRight className="size-4" />
-            </Link>
-          </aside>
+                {visitHours && (
+                  <li className="flex gap-3">
+                    <Clock className="mt-0.5 size-4 shrink-0 text-white/50" />
+                    {visitHours}
+                  </li>
+                )}
+                {shelter.telefone && (
+                  <li className="flex gap-3">
+                    <Phone className="mt-0.5 size-4 shrink-0 text-white/50" />
+                    <a
+                      href={`tel:${shelter.telefone.replace(/\s/g, "")}`}
+                      className="hover:underline"
+                    >
+                      {shelter.telefone}
+                    </a>
+                  </li>
+                )}
+                {shelter.email_contacto && (
+                  <li className="flex gap-3">
+                    <Mail className="mt-0.5 size-4 shrink-0 text-white/50" />
+                    <a
+                      href={`mailto:${shelter.email_contacto}`}
+                      className="break-all hover:underline"
+                    >
+                      {shelter.email_contacto}
+                    </a>
+                  </li>
+                )}
+                {(available.count ?? 0) > 0 && (
+                  <li className="flex gap-3">
+                    <PawPrint className="mt-0.5 size-4 shrink-0 text-white/50" />
+                    {pt
+                      ? `${available.count} ${available.count === 1 ? "animal disponível" : "animais disponíveis"} para adoção`
+                      : `${available.count} ${available.count === 1 ? "animal" : "animals"} available for adoption`}
+                  </li>
+                )}
+              </ul>
+              <Link
+                href={`/${locale}/canis/${pet.shelterId}`}
+                className="mt-6 flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#4a504c] transition-colors hover:bg-white/90"
+              >
+                {pt ? "Conhecer o abrigo" : "Visit the shelter page"}
+                <ArrowUpRight className="size-4" />
+              </Link>
+            </aside>
+          )}
         </div>
       </div>
       {related.length > 0 && (

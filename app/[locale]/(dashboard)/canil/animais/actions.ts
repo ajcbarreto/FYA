@@ -19,6 +19,13 @@ const ALLOWED_SEX = ["macho", "femea"];
 const ALLOWED_SIZE = ["pequeno", "medio", "grande"];
 const ALLOWED_STATUS = ["disponivel", "reservado", "em_tratamento", "adotado"];
 
+// The database screens individuals' listings and refuses these outright.
+function listingErrorCode(message: string | undefined) {
+  if (message?.includes("FYA_PAYMENT_TERMS")) return "payment_terms";
+  if (message?.includes("FYA_LISTING_LIMIT")) return "listing_limit";
+  return "save_failed";
+}
+
 function getLocaleFromForm(formData: FormData) {
   const localeValue = String(formData.get("locale") ?? defaultLocale);
   return (isLocale(localeValue) ? localeValue : defaultLocale) as Locale;
@@ -123,7 +130,8 @@ export async function createAnimal(formData: FormData) {
   }
 
   const platform = await getPlatformSettings(supabase);
-  const published = shelter.verificado;
+  // Individuals' listings become public once screening or an administrator approves them.
+  const published = shelter.verificado || shelter.tipo === "particular";
   void platform;
 
   const { data: created, error } = await supabase
@@ -134,7 +142,9 @@ export async function createAnimal(formData: FormData) {
 
   if (error || !created) {
     console.error("[createAnimal] error:", error?.message);
-    redirect(`/${locale}/canil/animais/novo?error=save_failed`);
+    redirect(
+      `/${locale}/canil/animais/novo?error=${listingErrorCode(error?.message)}`,
+    );
   }
 
   revalidatePublicCatalog();
@@ -169,7 +179,7 @@ export async function updateAnimal(formData: FormData) {
   const { error } = await supabase.rpc("save_animal_details", { p_animal: animalId, p_data: input });
 
   if (error) {
-    redirect(`${redirectBase}?error=save_failed`);
+    redirect(`${redirectBase}?error=${listingErrorCode(error.message)}`);
   }
 
   revalidatePublicCatalog();

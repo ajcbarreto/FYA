@@ -9,9 +9,12 @@ function client(result) {
         select() {
           return this;
         },
-        eq(column, id) {
-          assert.equal(column, "id");
-          assert.equal(id, "shelter-id");
+        eq(column, value) {
+          // Individuals' personal listing rows never open as shelter pages.
+          assert.deepEqual(
+            [column, value],
+            column === "tipo" ? ["tipo", "canil"] : ["id", "shelter-id"],
+          );
           return this;
         },
         async maybeSingle() {

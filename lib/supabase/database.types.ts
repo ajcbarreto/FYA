@@ -25,6 +25,10 @@ export type Database = {
           compatibilidades: string[];
           archived_at: string | null;
           published: boolean;
+          moderacao: string;
+          moderacao_motivos: string[];
+          moderacao_nota: string | null;
+          moderado_em: string | null;
         };
         Insert: {
           id?: string;
@@ -41,6 +45,10 @@ export type Database = {
           compatibilidades?: string[];
           archived_at?: string | null;
           published?: boolean;
+          moderacao?: string;
+          moderacao_motivos?: string[];
+          moderacao_nota?: string | null;
+          moderado_em?: string | null;
         };
         Update: {
           id?: string;
@@ -57,6 +65,10 @@ export type Database = {
           compatibilidades?: string[];
           archived_at?: string | null;
           published?: boolean;
+          moderacao?: string;
+          moderacao_motivos?: string[];
+          moderacao_nota?: string | null;
+          moderado_em?: string | null;
         };
         Relationships: [
           {
@@ -449,6 +461,7 @@ export type Database = {
           donation_url: string | null;
           donation_message: string | null;
           image_url: string | null;
+          tipo: string;
         };
         Insert: {
           id?: string;
@@ -463,6 +476,7 @@ export type Database = {
           donation_url?: string | null;
           donation_message?: string | null;
           image_url?: string | null;
+          tipo?: string;
         };
         Update: {
           id?: string;
@@ -477,6 +491,7 @@ export type Database = {
           donation_url?: string | null;
           donation_message?: string | null;
           image_url?: string | null;
+          tipo?: string;
         };
         Relationships: [
           {
@@ -830,6 +845,32 @@ export type Database = {
             columns: ["animal_id"];
             isOneToOne: false;
             referencedRelation: "animais";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      individual_contacts: {
+        Row: {
+          canil_id: string;
+          telefone: string;
+          updated_at: string;
+        };
+        Insert: {
+          canil_id: string;
+          telefone: string;
+          updated_at?: string;
+        };
+        Update: {
+          canil_id?: string;
+          telefone?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "individual_contacts_canil_id_fkey";
+            columns: ["canil_id"];
+            isOneToOne: false;
+            referencedRelation: "canis";
             referencedColumns: ["id"];
           },
         ];
@@ -1935,6 +1976,10 @@ export type Database = {
         Args: { p_animal: string; p_operation: string };
         Returns: undefined;
       };
+      moderate_animal: {
+        Args: { p_animal: string; p_decision: string; p_note?: string };
+        Returns: undefined;
+      };
       moderate_shelter_review: {
         Args: { p_review: string; p_decision: string; p_reason: string };
         Returns: undefined;
@@ -2012,6 +2057,10 @@ export type Database = {
         Returns: number;
       };
       shelter_metrics: { Args: { p_shelter: string }; Returns: Json };
+      start_individual_listing: {
+        Args: { p_location: string; p_phone: string };
+        Returns: string;
+      };
       submit_adoption: {
         Args: { p_animal: string; p_answers: Json; p_message: string };
         Returns: string;
