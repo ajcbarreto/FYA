@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import QRCode from "qrcode";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { getPetById } from "@/lib/pet-catalog/db-pets";
@@ -9,6 +9,9 @@ import { createPublicSupabaseClient } from "@/lib/supabase/public-client";
 import { supabaseUrl, supabasePublishableKey } from "@/lib/supabase/config";
 import { publicAnimalUrl } from "@/lib/help/public-url";
 import { PrintButton } from "@/components/print-button";
+import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { getAuthUser } from "@/lib/supabase/get-user";
+import { canManageShelter } from "@/lib/canil/owned-shelter";
 export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
@@ -42,6 +45,13 @@ export default async function PrintAnimal({
     locale,
   );
   if (!pet) notFound();
+  // Only the animal's shelter team can print its sheet; everyone else sees the profile.
+  const { user } = await getAuthUser();
+  if (
+    !user ||
+    !(await canManageShelter(await createServerSupabaseClient(), pet.shelterId))
+  )
+    redirect(`/${locale}/pets/${petId}`);
   const pt = locale === "pt",
     url = publicAnimalUrl(
       process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",

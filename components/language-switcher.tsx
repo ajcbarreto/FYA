@@ -33,7 +33,7 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
           prefetch={false}
           aria-current={locale === code ? "true" : undefined}
           aria-label={localeMetadata[code].name}
-          className={`rounded-md px-3 py-1.5 transition-colors ${
+          className={`rounded-md px-2 py-1.5 sm:px-3 transition-colors ${
             locale === code
               ? "bg-background text-primary shadow-sm"
               : "text-muted-foreground hover:text-primary"

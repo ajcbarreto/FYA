@@ -317,6 +317,92 @@
   }
 }
 
+/* Shelter directory map pin (Leaflet divIcon). */
+.shelter-pin {
+  display: flex;
+  height: 36px;
+  width: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--primary);
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 25%);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+.shelter-pin > span {
+  transform: rotate(45deg);
+}
+.leaflet-popup-content a {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Page loader: the FYA figures lean into a hug while the dog wags. */
+.logo-loader {
+  animation: logo-loader-in 300ms ease-out 400ms both;
+}
+
+.logo-loader-left,
+.logo-loader-right,
+.logo-loader-dog {
+  transform-box: fill-box;
+}
+
+.logo-loader-left {
+  transform-origin: 85% 100%;
+  animation: logo-loader-hug-left 1.6s ease-in-out infinite;
+}
+
+.logo-loader-right {
+  transform-origin: 15% 100%;
+  animation: logo-loader-hug-right 1.6s ease-in-out infinite;
+}
+
+.logo-loader-dog {
+  transform-origin: 50% 95%;
+  animation: logo-loader-wag 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes logo-loader-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+@keyframes logo-loader-hug-left {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes logo-loader-hug-right {
+  0%,
+  100% {
+    transform: rotate(3deg);
+  }
+  50% {
+    transform: rotate(-4deg);
+  }
+}
+
+@keyframes logo-loader-wag {
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(5deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

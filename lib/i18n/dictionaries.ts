@@ -30,7 +30,6 @@ type Dictionary = {
       searchAriaLabel: string;
       quickMeetLabel: string;
       heroImageAlt: string;
-      illustrativeBadge: string;
       cardTitle: string;
       cardSubtitle: string;
       species: {
@@ -247,7 +246,6 @@ const dictionaries: Record<Locale, Dictionary> = {
         searchAriaLabel: "Pesquisar",
         quickMeetLabel: "Ver só",
         heroImageAlt: "Retrato ilustrativo de um cão ao ar livre",
-        illustrativeBadge: "Imagem ilustrativa",
         cardTitle: "Uma casa muda tudo.",
         cardSubtitle: "A próxima história pode ser a tua.",
         species: {
@@ -489,7 +487,6 @@ const dictionaries: Record<Locale, Dictionary> = {
         searchAriaLabel: "Search",
         quickMeetLabel: "Show only",
         heroImageAlt: "Illustrative portrait of a dog outdoors",
-        illustrativeBadge: "Illustrative image",
         cardTitle: "A home changes everything.",
         cardSubtitle: "The next story could be yours.",
         species: {

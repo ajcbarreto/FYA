@@ -11,6 +11,7 @@ export type ShelterReviewRow = {
   comentario: string | null;
   estado: ReviewEstado;
   created_at: string;
+  verified_adoption?: boolean;
 };
 
 export type ShelterRatingSummary = {
@@ -54,15 +55,19 @@ export async function getShelterRatingSummaries(
 export async function getShelterReviews(
   supabase: SupabaseClient,
   shelterId: string,
+  enhanced = false,
 ) {
   const { data, error } = await supabase
     .from("avaliacoes_canil")
     .select(
-      "id,canil_id,author_profile_id,author_name,rating,comentario,estado,created_at",
+      enhanced
+        ? "id,canil_id,author_profile_id,author_name,rating,comentario,estado,created_at,verified_adoption"
+        : "id,canil_id,author_profile_id,author_name,rating,comentario,estado,created_at",
     )
     .eq("canil_id", shelterId)
     .eq("estado", "aprovada")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(100);
 
   if (error) throw new Error("Unable to load data", { cause: error });
 
@@ -70,21 +75,25 @@ export async function getShelterReviews(
     return [];
   }
 
-  return data as ShelterReviewRow[];
+  return data as unknown as ShelterReviewRow[];
 }
 
-// Todas as avaliacoes de um canil (qualquer estado) — para o dono moderar.
+// Reviews for the shelter team: reply and report; moderation belongs to the platform.
 export async function getReviewsForModeration(
   supabase: SupabaseClient,
   shelterId: string,
+  enhanced = false,
 ) {
   const { data, error } = await supabase
     .from("avaliacoes_canil")
     .select(
-      "id,canil_id,author_profile_id,author_name,rating,comentario,estado,created_at",
+      enhanced
+        ? "id,canil_id,author_profile_id,author_name,rating,comentario,estado,created_at,verified_adoption"
+        : "id,canil_id,author_profile_id,author_name,rating,comentario,estado,created_at",
     )
     .eq("canil_id", shelterId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(100);
 
   if (error) throw new Error("Unable to load data", { cause: error });
 
@@ -92,7 +101,7 @@ export async function getReviewsForModeration(
     return [];
   }
 
-  return data as ShelterReviewRow[];
+  return data as unknown as ShelterReviewRow[];
 }
 
 export function reviewAuthorName(review: ShelterReviewRow, locale: string) {
@@ -105,16 +114,30 @@ export async function getReviewEligibility(
   supabase: SupabaseClient,
   shelterId: string,
   userId: string,
+  enabled = false,
 ) {
-  const { data: existing } = await supabase
+  if (!enabled) return { canReview: false, existingReview: null };
+  const { data: completed, error: completedError } = await supabase
+    .from("pedidos_adocao")
+    .select("id")
+    .eq("canil_id", shelterId)
+    .eq("applicant_profile_id", userId)
+    .eq("status", "concluido")
+    .limit(1);
+  if (completedError)
+    throw new Error("Unable to check review eligibility", {
+      cause: completedError,
+    });
+  const { data: existing, error } = await supabase
     .from("avaliacoes_canil")
     .select("id,rating,comentario,estado")
     .eq("canil_id", shelterId)
     .eq("author_profile_id", userId)
     .maybeSingle();
 
+  if (error) throw new Error("Unable to load own review", { cause: error });
   return {
-    canReview: true,
+    canReview: Boolean(completed?.length),
     existingReview:
       (existing as {
         id: string;
@@ -123,4 +146,23 @@ export async function getReviewEligibility(
         estado: ReviewEstado;
       } | null) ?? null,
   };
+}
+
+export async function getReviewReplies(
+  supabase: SupabaseClient,
+  ids: string[],
+) {
+  if (!ids.length)
+    return new Map<string, { body: string; updated_at: string }>();
+  const { data, error } = await supabase
+    .from("shelter_review_replies")
+    .select("review_id,body,updated_at")
+    .in("review_id", ids);
+  if (error) throw new Error("Unable to load review replies", { cause: error });
+  return new Map<string, { body: string; updated_at: string }>(
+    (data ?? []).map((r) => [
+      r.review_id,
+      { body: r.body, updated_at: r.updated_at },
+    ]),
+  );
 }

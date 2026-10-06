@@ -5,7 +5,13 @@ import { usePathname } from "next/navigation";
 import { isDashboardLinkActive } from "@/lib/dashboard-navigation";
 import { DashboardLinkStatus } from "@/components/dashboard-link-status";
 import type { ComponentType } from "react";
-import { LayoutDashboard, Building2, Users, Settings } from "lucide-react";
+import {
+  LayoutDashboard,
+  Building2,
+  Users,
+  Settings,
+  FileText,
+} from "lucide-react";
 import type { Locale } from "@/lib/i18n/config";
 
 type AdminSidebarProps = {
@@ -42,6 +48,16 @@ export function AdminSidebar({ locale }: AdminSidebarProps) {
         };
 
   const items: NavItem[] = [
+    {
+      href: `/${locale}/admin/contactos`,
+      label: locale === "pt" ? "Parcerias e apoio" : "Partnerships and support",
+      icon: FileText,
+    },
+    {
+      href: `/${locale}/admin/avaliacoes`,
+      label: locale === "pt" ? "Moderação de avaliações" : "Review moderation",
+      icon: Users,
+    },
     {
       href: `/${locale}/admin/pilotos`,
       label: locale === "pt" ? "Pedidos de piloto" : "Pilot requests",

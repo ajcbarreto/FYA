@@ -8,12 +8,15 @@ type ClientGetFormProps = {
   action: string;
   children: ReactNode;
   className?: string;
+  /** Submit as soon as a chip, checkbox or select changes, so filters apply on click. */
+  autoSubmit?: boolean;
 };
 
 export function ClientGetForm({
   action,
   children,
   className,
+  autoSubmit,
 }: ClientGetFormProps) {
   const router = useRouter();
 
@@ -34,7 +37,20 @@ export function ClientGetForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className={className}>
+    <form
+      action={action}
+      method="get"
+      onSubmit={handleSubmit}
+      onChange={(event) => {
+        const target = event.target as EventTarget as HTMLInputElement;
+        if (
+          autoSubmit &&
+          ["radio", "checkbox", "select-one"].includes(target.type)
+        )
+          event.currentTarget.requestSubmit();
+      }}
+      className={className}
+    >
       {children}
     </form>
   );

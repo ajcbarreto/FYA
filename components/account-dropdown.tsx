@@ -52,7 +52,7 @@ export function AccountDropdown({
         <button
           type="button"
           aria-label={menuCopy.openMenu}
-          className="group inline-flex h-10 items-center gap-2 rounded-lg border border-border/60 bg-card pl-1 pr-2.5 transition-colors hover:bg-muted"
+          className="group inline-flex size-11 shrink-0 items-center justify-center gap-2 rounded-lg border border-border/60 bg-card sm:h-10 sm:w-auto sm:pl-1 sm:pr-2.5 transition-colors hover:bg-muted"
         >
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
             {initial}
@@ -60,7 +60,7 @@ export function AccountDropdown({
           <span className="hidden max-w-[120px] truncate text-sm font-semibold sm:inline">
             {displayName}
           </span>
-          <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+          <ChevronDown className="hidden h-4 w-4 text-muted-foreground transition-transform sm:block duration-200 group-data-[state=open]:rotate-180" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
