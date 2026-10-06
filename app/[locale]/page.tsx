@@ -119,9 +119,6 @@ export default async function Home({
               sizes="(max-width: 1024px) 90vw, 45vw"
               className="object-cover"
             />
-            <span className="absolute bottom-5 right-5 rounded-full bg-black/25 px-3 py-1 text-[10px] text-white">
-              {hero.illustrativeBadge}
-            </span>
           </div>
           <span
             aria-hidden="true"

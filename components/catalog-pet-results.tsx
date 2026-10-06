@@ -101,14 +101,22 @@ export async function CatalogPetResults({
               <Link
                 key={key}
                 href={`/${locale}/pets?${params}`}
-                className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-2 text-xs"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#e9edb9] px-3 py-1 text-sm font-bold text-primary hover:bg-[#dfe5a6]"
                 aria-label={`${pt ? "Remover" : "Remove"} ${label}`}
               >
                 {label}
-                <X className="size-3" />
+                <X className="size-3.5" />
               </Link>
             );
           })}
+          {active.length > 0 && (
+            <Link
+              href={`/${locale}/pets`}
+              className="self-center text-sm font-bold text-accent hover:underline"
+            >
+              {pt ? "Limpar tudo" : "Clear all"}
+            </Link>
+          )}
         </div>
       </div>
 

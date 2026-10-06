@@ -17,7 +17,7 @@ export function Navbar({ locale }: NavbarProps) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
-      <nav className="mx-auto w-full max-w-7xl px-5 py-4 lg:px-8">
+      <nav className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-5 lg:px-8">
         <div className="flex items-center justify-between">
           <Link
             href={`/${locale}`}
@@ -56,7 +56,7 @@ export function Navbar({ locale }: NavbarProps) {
             </Suspense>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <LanguageSwitcher locale={locale} />
             <Suspense fallback={<NavbarActionsSkeleton />}>
               <NavbarActions locale={locale} />

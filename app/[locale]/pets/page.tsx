@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Suspense } from "react";
-import { Search, ArrowUpRight, SlidersHorizontal } from "lucide-react";
+import { ArrowUpRight, MapPin, Search, SlidersHorizontal } from "lucide-react";
 import { CatalogPetResults } from "@/components/catalog-pet-results";
 import { ClientGetForm } from "@/components/client-get-form";
 import { CatalogResultsSkeleton } from "@/components/skeletons/catalog-results-skeleton";
@@ -89,6 +89,17 @@ export default async function Catalog({
   if (q) urlParams.set("q", q);
   if (location) urlParams.set("location", location);
   for (const [k, v] of Object.entries(selected)) if (v) urlParams.set(k, v);
+  const speciesSelect = selects.find((s) => s.name === "species")!;
+  const ageSelect = selects.find((s) => s.name === "age")!;
+  const moreSelects = selects.filter(
+    (s) => s.name !== "species" && s.name !== "age",
+  );
+  const moreActive = moreSelects.filter((s) => selected[s.name]).length;
+  const speciesEmoji: Record<string, string> = {
+    "": "🐾",
+    cao: "🐶",
+    gato: "🐱",
+  };
 
   return (
     <main id="main-content" tabIndex={-1} className="page-shell">
@@ -97,21 +108,14 @@ export default async function Catalog({
         items={[{ label: sectionCrumb(locale, "pets").label }]}
         currentPath="/pets"
       />
-      <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p className="eyebrow hidden sm:block">
-            {pt ? "Catálogo" : "Catalog"}
-          </p>
-          <h1 className="display-title text-2xl sm:mt-1 sm:text-3xl lg:text-4xl">
-            {pt ? "Animais para adoção" : "Animals for adoption"}
-          </h1>
-          <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
-            {pt
-              ? "Fichas publicadas pelos canis e associações. Filtra por espécie, idade, porte ou localidade."
-              : "Profiles published by shelters and rescue groups. Filter by species, age, size or location."}
-          </p>
-        </div>
-        <Link href={`/${locale}/match`} className="button-secondary">
+      <header className="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+        <h1 className="display-title text-2xl sm:text-3xl">
+          {pt ? "Animais para adoção" : "Animals for adoption"}
+        </h1>
+        <Link
+          href={`/${locale}/match`}
+          className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+        >
           {pt ? "Ajuda-me a escolher" : "Help me choose"}
           <ArrowUpRight className="size-4" />
         </Link>
@@ -125,71 +129,131 @@ export default async function Catalog({
       )}
       <ClientGetForm
         action={`/${locale}/pets`}
-        className="surface mb-8 space-y-5"
+        autoSubmit
+        className="group/filters mb-6 space-y-3"
       >
-        <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
-          <label className="relative">
-            <span className="sr-only">
-              {pt ? "Nome ou descrição" : "Name or description"}
-            </span>
-            <Search className="absolute left-4 top-4 size-4 text-muted-foreground" />
-            <input
-              name="q"
-              defaultValue={q}
-              placeholder={pt ? "Nome ou raça" : "Name or breed"}
-              className="field pl-11"
-            />
-          </label>
-          <label>
-            <span className="sr-only">{pt ? "Localização" : "Location"}</span>
-            <input
-              name="location"
-              defaultValue={location}
-              placeholder={pt ? "Cidade ou região" : "City or region"}
-              className="field"
-            />
-          </label>
-          <button className="button-primary">
-            {pt ? "Encontrar amigos" : "Find friends"}
-            <Search className="size-4" />
-          </button>
-        </div>
-        <details className="group" open={Object.values(selected).some(Boolean)}>
-          <summary className="flex cursor-pointer list-none items-center gap-2 text-xs font-semibold text-muted-foreground marker:hidden [&::-webkit-details-marker]:hidden">
-            <SlidersHorizontal className="size-4 text-primary" />
-            <span>
-              {pt ? "Mostrar filtros avançados" : "Show advanced filters"}
-            </span>
-            <span className="ml-auto rounded-full bg-muted px-2 py-1 text-[10px] font-bold group-open:hidden">
-              {pt ? "Opcional" : "Optional"}
-            </span>
-            <span className="ml-auto hidden text-primary group-open:inline">
-              {pt ? "Esconder" : "Hide"}
-            </span>
-          </summary>
-          <div className="mt-4 flex flex-wrap items-end gap-3 border-t border-border/40 pt-4">
-            {selects.map((s) => (
-              <label
-                key={s.name}
-                className="min-w-[125px] flex-1 text-xs font-semibold text-muted-foreground"
-              >
-                {s.label}
-                <select
-                  name={s.name}
-                  defaultValue={selected[s.name]}
-                  className="field mt-1"
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <fieldset className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+            <legend className="sr-only">{speciesSelect.label}</legend>
+            {[
+              { value: "", label: pt ? "Todos" : "All" },
+              ...speciesSelect.options.filter((o) => o.value !== "outro"),
+            ].map((option) => {
+              return (
+                <label
+                  key={option.value || "all"}
+                  className="group/species shrink-0"
                 >
-                  <option value="">{pt ? "Todos" : "All"}</option>
-                  {s.options.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
+                  <input
+                    type="radio"
+                    name="species"
+                    value={option.value}
+                    defaultChecked={selected.species === option.value}
+                    className="peer sr-only"
+                  />
+                  <span className="flex cursor-pointer items-center gap-2 rounded-full border-2 border-border bg-card py-1 pl-1 pr-4 text-sm font-bold transition-colors hover:border-primary/50 peer-checked:border-primary peer-checked:bg-muted peer-focus-visible:ring-2 peer-focus-visible:ring-ring">
+                    <span
+                      aria-hidden="true"
+                      className="flex size-7 items-center justify-center rounded-full bg-muted text-base group-has-[:checked]/species:bg-[#e9edb9]"
+                    >
+                      {speciesEmoji[option.value] ?? "🐾"}
+                    </span>
+                    {option.label}
+                  </span>
+                </label>
+              );
+            })}
+          </fieldset>
+          <fieldset className="flex max-w-full gap-0.5 overflow-x-auto rounded-full bg-muted p-1 [scrollbar-width:none]">
+            <legend className="sr-only">{ageSelect.label}</legend>
+            {[
+              { value: "", label: pt ? "Qualquer idade" : "Any age" },
+              ...ageSelect.options,
+            ].map((option) => (
+              <label key={option.value || "any"} className="shrink-0">
+                <input
+                  type="radio"
+                  name="age"
+                  value={option.value}
+                  defaultChecked={selected.age === option.value}
+                  className="peer sr-only"
+                />
+                <span className="block cursor-pointer rounded-full px-3.5 py-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground peer-checked:bg-card peer-checked:text-foreground peer-checked:shadow-sm peer-focus-visible:ring-2 peer-focus-visible:ring-ring">
+                  {option.label}
+                </span>
               </label>
             ))}
+          </fieldset>
+        </div>
+        <div className="space-y-3 rounded-2xl border border-border bg-card p-2 shadow-sm">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-[1fr_1fr_auto_auto]">
+            <label className="relative col-span-2 sm:col-span-1">
+              <span className="sr-only">
+                {pt ? "Nome ou descrição" : "Name or description"}
+              </span>
+              <Search className="absolute left-4 top-4 size-4 text-muted-foreground" />
+              <input
+                name="q"
+                defaultValue={q}
+                placeholder={pt ? "Nome ou raça" : "Name or breed"}
+                className="field pl-11"
+              />
+            </label>
+            <label className="relative col-span-2 sm:col-span-1">
+              <span className="sr-only">{pt ? "Localização" : "Location"}</span>
+              <MapPin className="absolute left-4 top-4 size-4 text-muted-foreground" />
+              <input
+                name="location"
+                defaultValue={location}
+                placeholder={pt ? "Cidade ou região" : "City or region"}
+                className="field pl-11"
+              />
+            </label>
+            <details className="group/more">
+              <summary className="button-secondary h-full w-full cursor-pointer list-none marker:hidden group-open/more:border-primary group-open/more:bg-primary group-open/more:text-primary-foreground [&::-webkit-details-marker]:hidden">
+                <SlidersHorizontal className="size-4" />
+                {pt ? "Mais filtros" : "More filters"}
+                {moreActive > 0 && (
+                  <span className="inline-flex size-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground group-open/more:bg-card group-open/more:text-primary">
+                    {moreActive}
+                  </span>
+                )}
+              </summary>
+            </details>
+            <button className="button-primary">
+              {pt ? "Procurar" : "Search"}
+              <Search className="size-4" />
+            </button>
           </div>
-        </details>
+          <div className="hidden gap-5 border-t border-border/50 px-2 pb-2 pt-4 group-has-[details[open]]/filters:grid sm:grid-cols-3">
+            {moreSelects.map((group) => (
+              <fieldset key={group.name}>
+                <legend className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  {group.label}
+                </legend>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { value: "", label: pt ? "Todos" : "All" },
+                    ...group.options,
+                  ].map((option) => (
+                    <label key={option.value || "all"}>
+                      <input
+                        type="radio"
+                        name={group.name}
+                        value={option.value}
+                        defaultChecked={selected[group.name] === option.value}
+                        className="peer sr-only"
+                      />
+                      <span className="inline-flex h-9 cursor-pointer items-center rounded-full border border-border bg-card px-3.5 text-sm font-semibold transition-colors hover:border-primary peer-checked:border-primary peer-checked:bg-primary peer-checked:text-primary-foreground peer-focus-visible:ring-2 peer-focus-visible:ring-ring">
+                        {option.label}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ))}
+          </div>
+        </div>
       </ClientGetForm>
       {!hasSupabaseEnv && (
         <p

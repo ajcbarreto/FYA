@@ -1,6 +1,6 @@
 import { DashboardPageSkeleton } from "@/components/skeletons/dashboard-page-skeleton";
-import { GenericPageSkeleton } from "@/components/skeletons/generic-page-skeleton";
 import { HomePageSkeleton } from "@/components/skeletons/home-page-skeleton";
+import { LogoLoader } from "@/components/logo-loader";
 import { getLocaleFromHeaders } from "@/lib/i18n/locale-from-headers";
 import { getRouteSkeletonKindFromHeaders } from "@/lib/i18n/route-from-headers";
 
@@ -18,5 +18,5 @@ export default async function LocaleLoading() {
     return <DashboardPageSkeleton locale={locale} />;
   }
 
-  return <GenericPageSkeleton locale={locale} />;
+  return <LogoLoader locale={locale} />;
 }

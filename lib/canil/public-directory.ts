@@ -1,9 +1,6 @@
+import type { ShelterAnimal } from "./animal-filters";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import {
-  toCatalogItem,
-  type AnimalRow,
-  type PetCatalogItem,
-} from "@/lib/pet-catalog/db-pets";
+import { toCatalogItem, type AnimalRow } from "@/lib/pet-catalog/db-pets";
 import { listPrimaryPhotosForAnimals } from "@/lib/canil/animal-photos";
 
 import { readPublicShelterQuery, type PublicShelter } from "./public-shelter";
@@ -66,7 +63,7 @@ export async function getAnimalsForPublicShelter(
   supabase: SupabaseClient,
   shelterId: string,
   locale: string,
-): Promise<PetCatalogItem[]> {
+): Promise<ShelterAnimal[]> {
   const { data, error } = await supabase
     .from("animais")
     .select(
@@ -86,7 +83,11 @@ export async function getAnimalsForPublicShelter(
     supabase,
     rows.map((row) => row.id),
   );
-  return rows.map((animal) =>
-    toCatalogItem(animal, locale, photoMap.get(animal.id)),
-  );
+  return rows.map((animal) => ({
+    ...toCatalogItem(animal, locale, photoMap.get(animal.id)),
+    speciesCode: animal.especie,
+    sizeCode: animal.porte ?? "",
+    ageYears: animal.idade_anos,
+    statusCode: animal.status,
+  }));
 }

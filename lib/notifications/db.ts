@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export type NotificationRow = {
   id: string;
   user_profile_id: string;
-  tipo: "pedido_status" | "favorito" | "canil_favorito";
+  tipo: "pedido_status" | "nova_mensagem" | "favorito" | "canil_favorito";
   referencia: string | null;
   link: string | null;
   lida: boolean;
@@ -57,11 +57,20 @@ export function localizeNotification(
   locale: string,
 ) {
   const isPt = locale === "pt";
+  if (notification.tipo === "nova_mensagem")
+    return {
+      title: isPt ? "Nova mensagem" : "New message",
+      body: isPt
+        ? "Recebeste uma mensagem sobre um pedido de adoção."
+        : "You received a message about an adoption request.",
+    };
   if (notification.tipo === "pedido_status") {
     const statusMap: Record<string, { pt: string; en: string }> = {
       pendente: { pt: "pendente", en: "pending" },
       entrevista: { pt: "entrevista", en: "interview" },
       aprovado: { pt: "aprovado", en: "approved" },
+      concluido: { pt: "concluído", en: "completed" },
+      cancelado: { pt: "cancelado", en: "cancelled" },
       rejeitado: { pt: "rejeitado", en: "rejected" },
     };
     const status = notification.referencia

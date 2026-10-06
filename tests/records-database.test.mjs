@@ -963,3 +963,350 @@ test("support publication, updates, deadlines and monetary receipts are scoped t
     await db.close();
   }
 });
+
+test("verified reviews require completed adoption, shelters reply but cannot moderate, reports remain private", async () => {
+  const { db, ids, shelter, animal, as } = await setup();
+  try {
+    await assert.rejects(
+      as("adopter", "select submit_verified_shelter_review($1,2,$2)", [
+        shelter,
+        "Experiência a melhorar.",
+      ]),
+    );
+    await db.query(
+      "insert into pedidos_adocao(animal_id,canil_id,applicant_profile_id,status) values($1,$2,$3,'concluido')",
+      [animal, shelter, ids.adopter],
+    );
+    await as("adopter", "select submit_verified_shelter_review($1,2,$2)", [
+      shelter,
+      "Experiência a melhorar.",
+    ]);
+    let r = (
+      await db.query("select * from avaliacoes_canil where canil_id=$1", [
+        shelter,
+      ])
+    ).rows[0];
+    assert.equal(r.estado, "aprovada");
+    assert.equal(r.verified_adoption, true);
+    await assert.rejects(
+      as(
+        "owner",
+        "update avaliacoes_canil set estado='rejeitada' where id=$1",
+        [r.id],
+      ),
+    );
+    await assert.rejects(
+      as("adopter", "update avaliacoes_canil set rating=5 where id=$1", [r.id]),
+    );
+    await assert.rejects(
+      as(
+        "owner",
+        "select moderate_shelter_review($1,'rejeitada','Não concordo com a opinião')",
+        [r.id],
+      ),
+    );
+    await assert.rejects(
+      as("other", "select reply_shelter_review($1,'Resposta indevida')", [
+        r.id,
+      ]),
+    );
+    await assert.rejects(
+      as("reader", "select reply_shelter_review($1,'Resposta indevida')", [
+        r.id,
+      ]),
+    );
+    await as(
+      "editor",
+      "select reply_shelter_review($1,'Obrigado pelo comentário. Vamos melhorar.')",
+      [r.id],
+    );
+    await as(
+      "reader",
+      "select report_shelter_review($1,'Este texto precisa de análise privada.')",
+      [r.id],
+    );
+    await as(
+      "reader",
+      "select report_shelter_review($1,'Repetição da mesma denúncia.')",
+      [r.id],
+    );
+    assert.equal(
+      (await db.query("select count(*)::int n from shelter_review_reports"))
+        .rows[0].n,
+      1,
+    );
+    assert.equal(
+      (await as("owner", "select * from shelter_review_reports")).rows.length,
+      0,
+    );
+    assert.equal(
+      (
+        await db.query("select estado from avaliacoes_canil where id=$1", [
+          r.id,
+        ])
+      ).rows[0].estado,
+      "aprovada",
+    );
+    await db.exec("set role anon");
+    assert.equal(
+      (await db.query("select * from shelter_review_replies")).rows.length,
+      1,
+    );
+    await assert.rejects(db.query("select * from shelter_review_reports"));
+    await db.exec("reset role");
+    await db.query("update profiles set role='admin' where id=$1", [ids.other]);
+    await as(
+      "other",
+      "select moderate_shelter_review($1,'rejeitada','Conteúdo com informação privada do processo.')",
+      [r.id],
+    );
+    assert.equal(
+      (await db.query("select * from shelter_review_decisions")).rows.length,
+      1,
+    );
+    assert.ok(
+      (await db.query("select resolved_at from shelter_review_reports")).rows[0]
+        .resolved_at,
+    );
+    await db.exec("set role anon");
+    assert.equal(
+      (await db.query("select * from shelter_review_replies")).rows.length,
+      0,
+    );
+    assert.equal(
+      (await db.query("select * from avaliacoes_canil")).rows.length,
+      0,
+    );
+    await db.exec("reset role");
+    await as("adopter", "select submit_verified_shelter_review($1,3,$2)", [
+      shelter,
+      "Texto corrigido para nova análise.",
+    ]);
+    r = (
+      await db.query("select * from avaliacoes_canil where canil_id=$1", [
+        shelter,
+      ])
+    ).rows[0];
+    assert.equal(r.estado, "pendente");
+    await as(
+      "other",
+      "select moderate_shelter_review($1,'aprovada','Texto corrigido e sem informação privada.')",
+      [r.id],
+    );
+    assert.equal(
+      (await db.query("select * from shelter_review_decisions")).rows.length,
+      2,
+    );
+  } finally {
+    await db.close();
+  }
+});
+test("public visit details and news respect shelter verification, drafts and team permissions", async () => {
+  const { db, ids, shelter, as } = await setup();
+  try {
+    await as(
+      "editor",
+      "insert into shelter_public_details(canil_id,visit_hours,visit_instructions) values($1,'10h–17h','Telefonar antes da visita')",
+      [shelter],
+    );
+    assert.equal(
+      (
+        await as(
+          "reader",
+          "update shelter_public_details set visit_hours='Sempre aberto' where canil_id=$1 returning canil_id",
+          [shelter],
+        )
+      ).rows.length,
+      0,
+    );
+    assert.equal(
+      (
+        await db.query(
+          "select visit_hours from shelter_public_details where canil_id=$1",
+          [shelter],
+        )
+      ).rows[0].visit_hours,
+      "10h–17h",
+    );
+    assert.equal(
+      (await as("other", "select * from shelter_public_details")).rows.length,
+      1,
+    ); // Verified public information.
+    const news = (
+      await as(
+        "owner",
+        "insert into shelter_news(canil_id,title,body,published) values($1,'Dia de adoção','Uma novidade pública do canil.',false) returning id",
+        [shelter],
+      )
+    ).rows[0].id;
+    await db.exec("set role anon");
+    assert.equal((await db.query("select * from shelter_news")).rows.length, 0);
+    await db.exec("reset role");
+    await as("editor", "update shelter_news set published=true where id=$1", [
+      news,
+    ]);
+    await db.exec("set role anon");
+    assert.equal((await db.query("select * from shelter_news")).rows.length, 1);
+    await db.exec("reset role");
+    await db.query("update canis set verificado=false where id=$1", [shelter]);
+    await db.exec("set role anon");
+    assert.equal((await db.query("select * from shelter_news")).rows.length, 0);
+    assert.equal(
+      (await db.query("select * from shelter_public_details")).rows.length,
+      0,
+    );
+    await db.exec("reset role");
+    await assert.rejects(
+      as(
+        "owner",
+        "insert into shelter_news(canil_id,title,body,published) values($1,'Nova publicação','Não pode ser pública ainda.',true)",
+        [shelter],
+      ),
+    );
+    assert.ok(ids.owner);
+  } finally {
+    await db.close();
+  }
+});
+
+test("contact requests isolate brands, shelter teams and internal administrative notes", async () => {
+  const { db, ids, shelter, as } = await setup();
+  try {
+    await db.query("update profiles set role='admin' where id=$1", [ids.other]);
+    const params = [
+      "Marca Amiga",
+      "Maria",
+      "brand@example.org",
+      "https://example.org",
+      "goods",
+      "Oferta de ração",
+      "Gostaríamos de oferecer ração aos canis.",
+      true,
+    ];
+    const sql = "select submit_partnership($1,$2,$3,$4,$5,$6,$7,$8) id";
+    await assert.rejects(as("adopter", sql, params));
+    await db.exec("set role service_role");
+    const brand = (await db.query(sql, params)).rows[0].id;
+    await db.exec("reset role");
+    assert.equal(
+      (await as("owner", "select * from contact_requests")).rows.length,
+      0,
+    );
+    const help = (
+      await as(
+        "owner",
+        "select submit_shelter_help($1,'technical','Não consigo editar','Preciso de ajuda para editar um animal.','high') id",
+        [shelter],
+      )
+    ).rows[0].id;
+    await assert.rejects(
+      as(
+        "reader",
+        "select submit_shelter_help($1,'technical','Falha','Descrição do problema de acesso','normal')",
+        [shelter],
+      ),
+    );
+    await assert.rejects(
+      as(
+        "adopter",
+        "select submit_shelter_help($1,'technical','Falha','Descrição do problema de acesso','normal')",
+        [shelter],
+      ),
+    );
+    assert.equal(
+      (await as("adopter", "select * from contact_requests")).rows.length,
+      0,
+    );
+    assert.equal(
+      (await as("reader", "select * from contact_requests")).rows.length,
+      1,
+    );
+    await assert.rejects(
+      as("owner", "update contact_requests set status='resolved' where id=$1", [
+        help,
+      ]),
+    );
+    await assert.rejects(
+      as(
+        "owner",
+        "select update_contact_request($1,'resolved','high','Resolvido',false)",
+        [help],
+      ),
+    );
+    await as(
+      "other",
+      "select update_contact_request($1,'in_progress','high','Detalhes privados da administração',true)",
+      [help],
+    );
+    assert.equal(
+      (await as("owner", "select * from contact_request_events")).rows.length,
+      0,
+    );
+    await as(
+      "other",
+      "select update_contact_request($1,'waiting','high','Já analisámos. Podes tentar novamente?',false)",
+      [help],
+    );
+    await as(
+      "editor",
+      "select update_contact_request($1,'waiting','high','Já consigo editar. Obrigado!',false)",
+      [help],
+    );
+    assert.equal(
+      (await as("owner", "select * from contact_request_events")).rows.length,
+      2,
+    );
+    await assert.rejects(
+      as(
+        "reader",
+        "select update_contact_request($1,'waiting','high','Mensagem não autorizada',false)",
+        [help],
+      ),
+    );
+    await assert.rejects(
+      as(
+        "owner",
+        "select update_contact_request($1,'waiting','high','Nota privada não autorizada',true)",
+        [help],
+      ),
+    );
+    await as(
+      "other",
+      "select update_contact_request($1,'resolved','normal','Pedido resolvido.',false)",
+      [help],
+    );
+    await assert.rejects(
+      as(
+        "owner",
+        "select update_contact_request($1,'resolved','normal','Outra resposta',false)",
+        [help],
+      ),
+    );
+    await as(
+      "other",
+      "select update_contact_request($1,'negotiating','normal','Reunião agendada com a marca.',true)",
+      [brand],
+    );
+    assert.equal(
+      (await as("other", "select * from contact_request_events")).rows.length,
+      5,
+    );
+    await assert.rejects(
+      as(
+        "other",
+        "select update_contact_request($1,'resolved','normal','Estado inválido para marca',true)",
+        [brand],
+      ),
+    );
+    await db.exec("set role anon");
+    await assert.rejects(db.query("select * from contact_requests"));
+    await assert.rejects(db.query("select * from contact_request_events"));
+    await db.exec("reset role; set role service_role");
+    await db.query(sql, params);
+    await db.query(sql, params);
+    await assert.rejects(db.query(sql, params));
+    await db.exec("reset role");
+  } finally {
+    await db.close();
+  }
+});

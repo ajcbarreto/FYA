@@ -64,6 +64,19 @@ export function CanilSidebar({
 
   const allItems: NavItem[] = [
     {
+      href: `/${locale}/canil/ajuda-fya`,
+      label: locale === "pt" ? "Pedir ajuda à FYA" : "Ask FYA for help",
+      icon: MessageCircle,
+    },
+    {
+      href: `/${locale}/canil/pagina-publica`,
+      label:
+        locale === "pt"
+          ? "Informação pública e novidades"
+          : "Public information and news",
+      icon: Building2,
+    },
+    {
       href: `/${locale}/canil/apoios`,
       label: locale === "pt" ? "Apoios e donativos" : "Support and donations",
       icon: PawPrint,

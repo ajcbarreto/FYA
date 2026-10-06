@@ -376,6 +376,7 @@ export type Database = {
           created_at: string;
           estado: string;
           author_name: string | null;
+          verified_adoption: boolean;
         };
         Insert: {
           id?: string;
@@ -386,6 +387,7 @@ export type Database = {
           created_at?: string;
           estado?: string;
           author_name?: string | null;
+          verified_adoption?: boolean;
         };
         Update: {
           id?: string;
@@ -396,6 +398,7 @@ export type Database = {
           created_at?: string;
           estado?: string;
           author_name?: string | null;
+          verified_adoption?: boolean;
         };
         Relationships: [
           {
@@ -494,6 +497,126 @@ export type Database = {
           {
             foreignKeyName: "canis_owner_profile_id_fkey";
             columns: ["owner_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      contact_request_events: {
+        Row: {
+          id: string;
+          request_id: string;
+          actor_id: string | null;
+          body: string;
+          internal: boolean;
+          status: string | null;
+          priority: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          request_id: string;
+          actor_id?: string | null;
+          body: string;
+          internal?: boolean;
+          status?: string | null;
+          priority?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          request_id?: string;
+          actor_id?: string | null;
+          body?: string;
+          internal?: boolean;
+          status?: string | null;
+          priority?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "contact_request_events_request_id_fkey";
+            columns: ["request_id"];
+            isOneToOne: false;
+            referencedRelation: "contact_requests";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "contact_request_events_actor_id_fkey";
+            columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      contact_requests: {
+        Row: {
+          id: string;
+          kind: string;
+          canil_id: string | null;
+          created_by: string | null;
+          organization: string;
+          contact_name: string;
+          email: string;
+          website: string;
+          category: string;
+          subject: string;
+          message: string;
+          status: string;
+          priority: string;
+          consent_at: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          kind: string;
+          canil_id?: string | null;
+          created_by?: string | null;
+          organization: string;
+          contact_name: string;
+          email: string;
+          website?: string;
+          category: string;
+          subject: string;
+          message: string;
+          status?: string;
+          priority?: string;
+          consent_at?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          kind?: string;
+          canil_id?: string | null;
+          created_by?: string | null;
+          organization?: string;
+          contact_name?: string;
+          email?: string;
+          website?: string;
+          category?: string;
+          subject?: string;
+          message?: string;
+          status?: string;
+          priority?: string;
+          consent_at?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "contact_requests_canil_id_fkey";
+            columns: ["canil_id"];
+            isOneToOne: false;
+            referencedRelation: "canis";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "contact_requests_created_by_fkey";
+            columns: ["created_by"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
@@ -1144,6 +1267,41 @@ export type Database = {
           },
         ];
       };
+      shelter_news: {
+        Row: {
+          id: string;
+          canil_id: string;
+          title: string;
+          body: string;
+          published: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          canil_id: string;
+          title: string;
+          body: string;
+          published?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          canil_id?: string;
+          title?: string;
+          body?: string;
+          published?: boolean;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "shelter_news_canil_id_fkey";
+            columns: ["canil_id"];
+            isOneToOne: false;
+            referencedRelation: "canis";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       shelter_preferences: {
         Row: {
           profile_id: string;
@@ -1167,6 +1325,32 @@ export type Database = {
           },
           {
             foreignKeyName: "shelter_preferences_canil_id_fkey";
+            columns: ["canil_id"];
+            isOneToOne: false;
+            referencedRelation: "canis";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      shelter_public_details: {
+        Row: {
+          canil_id: string;
+          visit_hours: string;
+          visit_instructions: string;
+        };
+        Insert: {
+          canil_id: string;
+          visit_hours?: string;
+          visit_instructions?: string;
+        };
+        Update: {
+          canil_id?: string;
+          visit_hours?: string;
+          visit_instructions?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "shelter_public_details_canil_id_fkey";
             columns: ["canil_id"];
             isOneToOne: false;
             referencedRelation: "canis";
@@ -1202,6 +1386,116 @@ export type Database = {
             columns: ["canil_id"];
             isOneToOne: false;
             referencedRelation: "canis";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      shelter_review_decisions: {
+        Row: {
+          id: string;
+          review_id: string;
+          moderator_id: string;
+          decision: string;
+          reason: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          review_id: string;
+          moderator_id: string;
+          decision: string;
+          reason: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          review_id?: string;
+          moderator_id?: string;
+          decision?: string;
+          reason?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "shelter_review_decisions_review_id_fkey";
+            columns: ["review_id"];
+            isOneToOne: false;
+            referencedRelation: "avaliacoes_canil";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "shelter_review_decisions_moderator_id_fkey";
+            columns: ["moderator_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      shelter_review_replies: {
+        Row: {
+          review_id: string;
+          body: string;
+          updated_at: string;
+        };
+        Insert: {
+          review_id: string;
+          body: string;
+          updated_at?: string;
+        };
+        Update: {
+          review_id?: string;
+          body?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "shelter_review_replies_review_id_fkey";
+            columns: ["review_id"];
+            isOneToOne: false;
+            referencedRelation: "avaliacoes_canil";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      shelter_review_reports: {
+        Row: {
+          id: string;
+          review_id: string;
+          reporter_id: string;
+          reason: string;
+          created_at: string;
+          resolved_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          review_id: string;
+          reporter_id: string;
+          reason: string;
+          created_at?: string;
+          resolved_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          review_id?: string;
+          reporter_id?: string;
+          reason?: string;
+          created_at?: string;
+          resolved_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "shelter_review_reports_review_id_fkey";
+            columns: ["review_id"];
+            isOneToOne: false;
+            referencedRelation: "avaliacoes_canil";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "shelter_review_reports_reporter_id_fkey";
+            columns: ["reporter_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
         ];
@@ -1670,6 +1964,10 @@ export type Database = {
         Args: Record<string, never>;
         Returns: Database["public"]["Tables"]["email_outbox"]["Row"][];
       };
+      contact_requests_version: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
       import_animals: {
         Args: { p_shelter: string; p_rows: Json };
         Returns: number;
@@ -1680,6 +1978,10 @@ export type Database = {
       };
       moderate_animal: {
         Args: { p_animal: string; p_decision: string; p_note?: string };
+        Returns: undefined;
+      };
+      moderate_shelter_review: {
+        Args: { p_review: string; p_decision: string; p_reason: string };
         Returns: undefined;
       };
       my_shelters: {
@@ -1705,8 +2007,16 @@ export type Database = {
         };
         Returns: undefined;
       };
+      reply_shelter_review: {
+        Args: { p_review: string; p_body: string };
+        Returns: undefined;
+      };
       reply_to_application: {
         Args: { p_request: string; p_message_id: string; p_body: string };
+        Returns: undefined;
+      };
+      report_shelter_review: {
+        Args: { p_review: string; p_reason: string };
         Returns: undefined;
       };
       reschedule_visit: {
@@ -1742,6 +2052,10 @@ export type Database = {
         Returns: string;
       };
       shelter_delivery_status: { Args: { p_shelter: string }; Returns: Json };
+      shelter_experience_version: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
       shelter_metrics: { Args: { p_shelter: string }; Returns: Json };
       start_individual_listing: {
         Args: { p_location: string; p_phone: string };
@@ -1749,6 +2063,19 @@ export type Database = {
       };
       submit_adoption: {
         Args: { p_animal: string; p_answers: Json; p_message: string };
+        Returns: string;
+      };
+      submit_partnership: {
+        Args: {
+          p_organization: string;
+          p_contact: string;
+          p_email: string;
+          p_website: string;
+          p_category: string;
+          p_subject: string;
+          p_message: string;
+          p_consent: boolean;
+        };
         Returns: string;
       };
       submit_pilot_request: {
@@ -1760,6 +2087,20 @@ export type Database = {
           p_message: string;
           p_consent: boolean;
         };
+        Returns: undefined;
+      };
+      submit_shelter_help: {
+        Args: {
+          p_shelter: string;
+          p_category: string;
+          p_subject: string;
+          p_message: string;
+          p_priority: string;
+        };
+        Returns: string;
+      };
+      submit_verified_shelter_review: {
+        Args: { p_shelter: string; p_rating: number; p_comment: string };
         Returns: undefined;
       };
       transition_adoption: {
@@ -1785,6 +2126,16 @@ export type Database = {
           p_delay: number;
         };
         Returns: boolean;
+      };
+      update_contact_request: {
+        Args: {
+          p_id: string;
+          p_status: string;
+          p_priority: string;
+          p_body: string;
+          p_internal: boolean;
+        };
+        Returns: undefined;
       };
       void_support_receipt: {
         Args: { p_id: string; p_reason: string };

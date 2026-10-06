@@ -10,6 +10,7 @@ import {
   Building2,
   Users,
   Settings,
+  FileText,
   PawPrint,
 } from "lucide-react";
 import type { Locale } from "@/lib/i18n/config";
@@ -48,6 +49,16 @@ export function AdminSidebar({ locale }: AdminSidebarProps) {
         };
 
   const items: NavItem[] = [
+    {
+      href: `/${locale}/admin/contactos`,
+      label: locale === "pt" ? "Parcerias e apoio" : "Partnerships and support",
+      icon: FileText,
+    },
+    {
+      href: `/${locale}/admin/avaliacoes`,
+      label: locale === "pt" ? "Moderação de avaliações" : "Review moderation",
+      icon: Users,
+    },
     {
       href: `/${locale}/admin/pilotos`,
       label: locale === "pt" ? "Pedidos de piloto" : "Pilot requests",

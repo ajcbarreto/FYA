@@ -1,5 +1,14 @@
+import { ShelterAnimals } from "@/components/shelter-animals";
+import {
+  ShelterSupportOverview,
+  ShelterNews,
+} from "@/components/shelter-support-overview";
+import { ReviewReportForm } from "@/components/review-report-form";
+import { getPublicShelterExperience } from "@/lib/canil/public-experience";
+import { createPublicSupabaseClient } from "@/lib/supabase/public-client";
+import { supabaseUrl, supabasePublishableKey } from "@/lib/supabase/config";
 import { setShelterLike } from "@/app/canil/likes-actions";
-import { Heart, ArrowUpRight } from "lucide-react";
+import { Heart } from "lucide-react";
 import { SubmitButton } from "@/components/submit-button";
 import Link from "next/link";
 import Image from "next/image";
@@ -13,7 +22,6 @@ import {
   PawPrint,
   Phone,
 } from "lucide-react";
-import type { PetCatalogItem } from "@/lib/pet-catalog/db-pets";
 import type { Locale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { getCachedPublicShelterById } from "@/lib/canil/cached-shelter";
@@ -21,6 +29,7 @@ import { getAuthUser } from "@/lib/supabase/get-user";
 import { getAnimalsForPublicShelter } from "@/lib/canil/public-directory";
 import {
   getReviewEligibility,
+  getReviewReplies,
   getShelterRatingSummaries,
   getShelterReviews,
   reviewAuthorName,
@@ -45,9 +54,14 @@ export async function ShelterDetailBody({
   error,
 }: ShelterDetailBodyProps) {
   const supabase = await createServerSupabaseClient();
-  const [shelter, { user }] = await Promise.all([
-    getCachedPublicShelterById(supabase, shelterId),
+  const publicDb = createPublicSupabaseClient(
+    supabaseUrl,
+    supabasePublishableKey,
+  );
+  const [shelter, { user }, experience] = await Promise.all([
+    getCachedPublicShelterById(publicDb, shelterId),
     getAuthUser(),
+    getPublicShelterExperience(publicDb, shelterId),
   ]);
 
   if (!shelter) {
@@ -56,11 +70,16 @@ export async function ShelterDetailBody({
 
   const [animals, reviews, ratingSummaries, eligibility, likedRow] =
     await Promise.all([
-      getAnimalsForPublicShelter(supabase, shelter.id, locale),
-      getShelterReviews(supabase, shelter.id),
-      getShelterRatingSummaries(supabase, [shelter.id]),
+      getAnimalsForPublicShelter(publicDb, shelter.id, locale),
+      getShelterReviews(publicDb, shelter.id, experience.enabled),
+      getShelterRatingSummaries(publicDb, [shelter.id]),
       user
-        ? getReviewEligibility(supabase, shelter.id, user.id)
+        ? getReviewEligibility(
+            supabase,
+            shelter.id,
+            user.id,
+            experience.enabled,
+          )
         : Promise.resolve({ canReview: false, existingReview: null }),
       user
         ? supabase
@@ -73,15 +92,12 @@ export async function ShelterDetailBody({
     ]);
   const liked = Boolean(likedRow.data);
   const rating = ratingSummaries.get(shelter.id);
-  const availableCount = animals.filter(
-    (animal) =>
-      animal.status
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .includes("disponivel") ||
-      animal.status.toLowerCase().includes("available"),
-  ).length;
+  const replies = experience.enabled
+    ? await getReviewReplies(
+        publicDb,
+        reviews.map((r) => r.id),
+      )
+    : new Map<string, { body: string; updated_at: string }>();
   const joined = new Intl.DateTimeFormat(locale, {
     month: "long",
     year: "numeric",
@@ -112,16 +128,19 @@ export async function ShelterDetailBody({
           commentPlaceholder: "Como foi a tua experiência com este canil?",
           submitReview: "Enviar avaliação",
           moderationNote:
-            "A tua avaliação só fica visível depois de o canil a aprovar.",
-          pendingNote:
-            "A tua avaliação foi enviada e aguarda aprovação do canil.",
+            "Só quem concluiu uma adoção pode avaliar. A avaliação é publicada com o nome do teu perfil. O canil pode responder, mas não aprovar ou remover avaliações. Denúncias são analisadas pela FYA.",
+          pendingNote: "A tua avaliação aguarda análise pela equipa FYA.",
           rejectedNote:
             "A tua avaliação anterior não foi aprovada. Podes editar e reenviar.",
           loginToReview: "Inicia sessão para avaliar este canil.",
           messages: {
+            review_saved:
+              "Avaliação guardada. Consulta abaixo o estado da publicação.",
+            report_saved: "Denúncia recebida pela plataforma. Obrigado.",
+            report_failed:
+              "Não foi possível enviar. Verifica o motivo ou tenta mais tarde.",
             like_failed: "Não foi possível guardar o gosto. Tenta novamente.",
-            review_pending:
-              "Avaliação enviada. Vai ser revista pelo canil antes de aparecer.",
+            review_pending: "Avaliação enviada para análise pela equipa FYA.",
             invalid_review: "Escolhe uma classificação válida.",
             review_failed: "Não foi possível guardar a avaliação.",
           } as Record<string, string>,
@@ -148,16 +167,17 @@ export async function ShelterDetailBody({
           commentPlaceholder: "How was your experience with this shelter?",
           submitReview: "Send review",
           moderationNote:
-            "Your review is only visible after the shelter approves it.",
-          pendingNote:
-            "Your review was sent and is awaiting the shelter's approval.",
+            "Only people with a completed adoption can review. Your review is published with your profile name. Shelters can reply but cannot approve or remove reviews. FYA assesses reports.",
+          pendingNote: "Your review is awaiting assessment by the FYA team.",
           rejectedNote:
             "Your previous review was not approved. You can edit and resend it.",
           loginToReview: "Sign in to review this shelter.",
           messages: {
+            review_saved: "Review saved. Check its publication status below.",
+            report_saved: "Report received by the platform. Thank you.",
+            report_failed: "Could not report. Check the reason or try later.",
             like_failed: "Could not save your like. Please try again.",
-            review_pending:
-              "Review sent. The shelter will review it before it appears.",
+            review_pending: "Review sent. The FYA team will assess it.",
             invalid_review: "Pick a valid rating.",
             review_failed: "Could not save the review.",
           } as Record<string, string>,
@@ -190,6 +210,7 @@ export async function ShelterDetailBody({
             <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl">
               <Image
                 src={shelter.image_url}
+                unoptimized
                 alt={shelter.nome}
                 fill
                 className="object-cover"
@@ -217,6 +238,20 @@ export async function ShelterDetailBody({
               <MapPin className="h-3.5 w-3.5" />
               {shelter.localizacao}
             </p>
+            {shelter.verificado && (
+              <details className="mt-2 text-sm">
+                <summary className="inline-flex min-h-11 cursor-pointer items-center underline underline-offset-4">
+                  {locale === "pt"
+                    ? "O que significa verificado?"
+                    : "What does verified mean?"}
+                </summary>
+                <p className="max-w-xl py-2 leading-relaxed">
+                  {locale === "pt"
+                    ? "O registo deste canil foi aprovado pela administração da FYA. O selo não certifica cuidados veterinários nem confirma os valores dos donativos."
+                    : "This shelter’s registration was approved by FYA administration. The badge does not certify veterinary care or verify donation totals."}
+                </p>
+              </details>
+            )}
             {rating && rating.count > 0 && (
               <a
                 href="#comentarios"
@@ -279,6 +314,9 @@ export async function ShelterDetailBody({
         <a href="#sobre">{locale === "pt" ? "Sobre nós" : "About us"}</a>
         <a href="#apoiar">{locale === "pt" ? "Como ajudar" : "How to help"}</a>
         <a href="#contactos">{copy.contactTitle}</a>
+        {(experience.news.length > 0 || experience.updates.length > 0) && (
+          <a href="#novidades">{locale === "pt" ? "Novidades" : "News"}</a>
+        )}
         <a href="#comentarios">
           {locale === "pt" ? "Comentários" : "Comments"}
         </a>
@@ -286,55 +324,15 @@ export async function ShelterDetailBody({
 
       <section className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
         <article className="space-y-6 lg:col-span-8">
-          <div
-            id="animais"
-            className="scroll-mt-24 rounded-3xl border border-border bg-card p-4 sm:p-6"
-          >
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-xl font-bold">{copy.residentsTitle}</h2>
-              <span className="rounded-full bg-muted px-3 py-1.5 text-sm font-semibold">
-                {availableCount}{" "}
-                {locale === "pt"
-                  ? "disponíveis para adoção"
-                  : "available for adoption"}
-              </span>
-            </div>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              {locale === "pt"
-                ? "Conhece cada animal e inicia o pedido de adoção na sua ficha."
-                : "Meet each animal and start an adoption application from their profile."}
-            </p>
-            {animals.length === 0 ? (
-              <p className="mt-4 text-sm text-muted-foreground">
-                {copy.noResidents}
-              </p>
-            ) : (
-              <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                {animals.slice(0, 6).map((pet, index) => (
-                  <ShelterAnimalCard
-                    key={pet.id}
-                    pet={pet}
-                    locale={locale}
-                    eager={index < 3}
-                  />
-                ))}
-              </div>
-            )}
-            {animals.length > 6 && (
-              <details className="mt-5 rounded-2xl border border-border p-4">
-                <summary className="min-h-11 cursor-pointer py-3 text-sm font-semibold text-primary">
-                  {locale === "pt"
-                    ? `Ver mais ${animals.length - 6} animais`
-                    : `Show ${animals.length - 6} more animals`}
-                </summary>
-                <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                  {animals.slice(6).map((pet) => (
-                    <ShelterAnimalCard key={pet.id} pet={pet} locale={locale} />
-                  ))}
-                </div>
-              </details>
-            )}
-          </div>
+          <ShelterAnimals animals={animals} locale={locale} />
+          <ShelterSupportOverview
+            data={experience}
+            locale={locale}
+            shelterId={shelter.id}
+            donationUrl={shelter.verificado ? shelter.donation_url : null}
+            donationMessage={shelter.donation_message}
+          />
+          <ShelterNews data={experience} locale={locale} />
 
           <div
             id="sobre"
@@ -422,15 +420,34 @@ export async function ShelterDetailBody({
               </form>
             ) : (
               <p className="mt-4 rounded-2xl border border-border/30 bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
-                <Link
-                  href={`/${locale}/auth/login?next=${encodeURIComponent(`/${locale}/canis/${shelter.id}#comentarios`)}`}
-                  className="font-semibold underline underline-offset-4"
-                >
-                  {copy.loginToReview}
-                </Link>
+                {!experience.enabled ? (
+                  locale === "pt" ? (
+                    "Consulta as avaliações publicadas. Novas avaliações estarão disponíveis após a atualização do serviço."
+                  ) : (
+                    "Read published reviews. New reviews will be available after the service update."
+                  )
+                ) : user ? (
+                  locale === "pt" ? (
+                    "Podes avaliar depois de concluir uma adoção com este canil. Para dúvidas sobre animais, contacta a equipa."
+                  ) : (
+                    "You can review after completing an adoption with this shelter. Contact the team with animal questions."
+                  )
+                ) : (
+                  <Link
+                    href={`/${locale}/auth/login?next=${encodeURIComponent(`/${locale}/canis/${shelter.id}#comentarios`)}`}
+                    className="font-semibold underline underline-offset-4"
+                  >
+                    {copy.loginToReview}
+                  </Link>
+                )}
               </p>
             )}
 
+            <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+              {locale === "pt"
+                ? "As avaliações com o selo “Adoção confirmada” estão associadas a uma adoção concluída na FYA. Avaliações antigas sem selo podem ter sido publicadas com regras anteriores. Até 100 avaliações mais recentes."
+                : "Reviews marked “Confirmed adoption” are linked to a completed adoption on FYA. Older reviews without a badge may have been published under previous rules. Up to 100 latest reviews."}
+            </p>
             {reviews.length === 0 ? (
               <p className="mt-4 text-sm text-muted-foreground">
                 {copy.noReviews}
@@ -448,11 +465,43 @@ export async function ShelterDetailBody({
                       </p>
                       <StarRating value={review.rating} />
                     </div>
+                    {review.verified_adoption && (
+                      <p className="mt-2 text-xs font-semibold text-primary">
+                        {locale === "pt"
+                          ? "Adoção confirmada"
+                          : "Confirmed adoption"}
+                      </p>
+                    )}
                     {review.comentario && (
-                      <p className="mt-2 text-sm text-muted-foreground">
+                      <p className="mt-2 whitespace-pre-line break-words text-sm text-muted-foreground">
                         {review.comentario}
                       </p>
                     )}
+                    {replies.get(review.id) && (
+                      <div className="mt-3 rounded-xl bg-muted p-4">
+                        <p className="text-sm font-bold">
+                          {locale === "pt"
+                            ? "Resposta do canil"
+                            : "Shelter reply"}
+                        </p>
+                        <p className="mt-2 whitespace-pre-line break-words text-sm leading-relaxed">
+                          {replies.get(review.id)!.body}
+                        </p>
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          {new Date(
+                            replies.get(review.id)!.updated_at,
+                          ).toLocaleDateString(locale)}
+                        </p>
+                      </div>
+                    )}
+                    {experience.enabled &&
+                      user &&
+                      review.author_profile_id !== user.id && (
+                        <ReviewReportForm
+                          locale={locale}
+                          reviewId={review.id}
+                        />
+                      )}
                     <p className="mt-1 text-xs text-muted-foreground/70">
                       {new Intl.DateTimeFormat(locale, {
                         day: "2-digit",
@@ -467,7 +516,7 @@ export async function ShelterDetailBody({
           </div>
         </article>
 
-        <aside className="space-y-6 lg:col-span-4">
+        <aside className="space-y-6 lg:sticky lg:top-24 lg:col-span-4 lg:self-start">
           <div
             id="contactos"
             className="scroll-mt-24 rounded-3xl border border-border bg-card p-5 sm:p-6"
@@ -478,6 +527,21 @@ export async function ShelterDetailBody({
                 ? "Combina a visita com a equipa antes de te deslocares."
                 : "Arrange your visit with the team before travelling."}
             </p>
+            {experience.details?.visit_hours && (
+              <div className="mt-4 rounded-xl bg-muted p-4">
+                <h3 className="text-sm font-bold">
+                  {locale === "pt" ? "Horário de atendimento" : "Contact hours"}
+                </h3>
+                <p className="mt-2 whitespace-pre-line break-words text-sm">
+                  {experience.details.visit_hours}
+                </p>
+              </div>
+            )}
+            {experience.details?.visit_instructions && (
+              <p className="mt-4 whitespace-pre-line break-words text-sm leading-relaxed">
+                {experience.details.visit_instructions}
+              </p>
+            )}
             <ul className="mt-4 space-y-4 text-sm">
               <li className="flex items-start gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -488,44 +552,52 @@ export async function ShelterDetailBody({
                   <p>{shelter.localizacao}</p>
                 </div>
               </li>
-              <li className="flex items-start gap-3">
-                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <div className="min-w-0">
-                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    {copy.phoneLabel}
-                  </p>
-                  {shelter.telefone ? (
-                    <a
-                      className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
-                      href={`tel:${shelter.telefone.replace(/[^+\d]/g, "")}`}
-                    >
-                      {shelter.telefone}
-                    </a>
-                  ) : (
-                    <p>{copy.notProvided}</p>
-                  )}
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <div className="min-w-0">
-                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    {copy.emailLabel}
-                  </p>
-                  <p className="break-all">
-                    {shelter.email_contacto ? (
-                      <a
-                        className="inline-flex min-h-11 items-center underline underline-offset-4"
-                        href={`mailto:${shelter.email_contacto}`}
-                      >
-                        {shelter.email_contacto}
-                      </a>
-                    ) : (
-                      copy.notProvided
-                    )}
-                  </p>
-                </div>
-              </li>
+              {shelter.telefone && (
+                <>
+                  <li className="flex items-start gap-3">
+                    <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        {copy.phoneLabel}
+                      </p>
+                      {shelter.telefone ? (
+                        <a
+                          className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
+                          href={`tel:${shelter.telefone.replace(/[^+\d]/g, "")}`}
+                        >
+                          {shelter.telefone}
+                        </a>
+                      ) : (
+                        <p>{copy.notProvided}</p>
+                      )}
+                    </div>
+                  </li>
+                </>
+              )}
+              {shelter.email_contacto && (
+                <>
+                  <li className="flex items-start gap-3">
+                    <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        {copy.emailLabel}
+                      </p>
+                      <p className="break-all">
+                        {shelter.email_contacto ? (
+                          <a
+                            className="inline-flex min-h-11 items-center underline underline-offset-4"
+                            href={`mailto:${shelter.email_contacto}`}
+                          >
+                            {shelter.email_contacto}
+                          </a>
+                        ) : (
+                          copy.notProvided
+                        )}
+                      </p>
+                    </div>
+                  </li>
+                </>
+              )}
               <li className="flex items-start gap-3">
                 <PawPrint className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 <div className="min-w-0">
@@ -537,104 +609,8 @@ export async function ShelterDetailBody({
               </li>
             </ul>
           </div>
-          <section
-            id="apoiar"
-            className="scroll-mt-24 rounded-3xl border border-primary/15 bg-secondary/10 p-6 sm:p-8"
-          >
-            <Heart className="mb-5 h-7 w-7 text-primary" />
-            <p className="text-xs font-bold uppercase tracking-widest text-primary">
-              {locale === "pt" ? "Apoiar" : "Support"}
-            </p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-              {locale === "pt"
-                ? "Como ajudar este canil"
-                : "How to help this shelter"}
-            </h2>
-            <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-              {shelter.donation_message ||
-                (locale === "pt"
-                  ? "Contacta o canil para saberes do que precisa neste momento, por exemplo alimentação, mantas, voluntariado ou apoio veterinário."
-                  : "Contact the shelter to find out what it needs right now, such as food, blankets, volunteering or veterinary support.")}
-            </p>
-            {shelter.verificado && (
-              <Link
-                href={`/${locale}/canis/${shelter.id}/apoiar`}
-                className="button-secondary mt-5 w-full text-center"
-              >
-                {locale === "pt"
-                  ? "Ver campanhas e necessidades"
-                  : "View campaigns and needs"}
-              </Link>
-            )}
-            {shelter.verificado &&
-            shelter.donation_url?.startsWith("https://") ? (
-              <>
-                <a
-                  href={shelter.donation_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-6 flex items-center justify-between rounded-full bg-primary px-5 py-3 font-semibold text-primary-foreground"
-                >
-                  {locale === "pt" ? "Fazer um donativo" : "Make a donation"}
-                  <ArrowUpRight className="h-5 w-5" />
-                </a>
-                <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                  {locale === "pt"
-                    ? "Abre a página de donativos indicada pelo canil. O pagamento é realizado fora da FYA."
-                    : "Opens the shelter’s donation page. Payment takes place outside FYA."}
-                </p>
-              </>
-            ) : (
-              <p className="mt-5 rounded-xl bg-background/70 p-4 text-sm">
-                {locale === "pt"
-                  ? "Donativos online ainda não disponíveis. Fala diretamente com o canil para ajudar."
-                  : "Online donations are not available yet. Contact the shelter to help."}
-              </p>
-            )}
-          </section>
         </aside>
       </section>
     </>
-  );
-}
-
-function ShelterAnimalCard({
-  pet,
-  locale,
-  eager,
-}: {
-  pet: PetCatalogItem;
-  locale: Locale;
-  eager?: boolean;
-}) {
-  return (
-    <Link
-      href={`/${locale}/pets/${pet.id}`}
-      className="flex overflow-hidden rounded-2xl border border-border bg-card transition-[transform,box-shadow] hover:-translate-y-1 hover:shadow-md sm:block"
-    >
-      <div className="relative aspect-square w-24 shrink-0 self-start sm:w-full">
-        <Image
-          src={pet.imageUrl}
-          alt={pet.name}
-          fill
-          loading={
-            eager || pet.imageUrl.includes("placeholder") ? "eager" : undefined
-          }
-          sizes="(max-width: 639px) 90vw, (max-width: 1023px) 45vw, (max-width: 1279px) 30vw, 20vw"
-          className="object-cover"
-        />
-      </div>
-      <div className="min-w-0 flex-1 space-y-1 break-words p-3 sm:p-4">
-        <p className="font-bold">{pet.name}</p>
-        <p className="text-sm text-muted-foreground">
-          {pet.age} · {pet.species}
-        </p>
-        <p className="text-sm font-medium">{pet.status}</p>
-        <span className="inline-flex items-center gap-1 pt-2 text-sm font-semibold text-primary">
-          {locale === "pt" ? "Conhecer melhor" : "Meet this animal"}
-          <ArrowUpRight aria-hidden="true" className="size-4" />
-        </span>
-      </div>
-    </Link>
   );
 }

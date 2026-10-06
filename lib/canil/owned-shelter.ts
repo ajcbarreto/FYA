@@ -12,3 +12,13 @@ export async function getOwnedShelter(
   if (!userId) return null;
   return (data?.[0] as ShelterRecord | undefined) ?? null;
 }
+
+/** True when the signed-in person owns or is on the team of this shelter. */
+export async function canManageShelter(
+  supabase: SupabaseClient,
+  shelterId: string,
+) {
+  const { data, error } = await supabase.rpc("my_shelters");
+  if (error) throw new Error("Unable to load shelter", { cause: error });
+  return ((data ?? []) as { id: string }[]).some((s) => s.id === shelterId);
+}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ContactAdminSummary } from "@/components/contact-admin-summary";
 import { notFound } from "next/navigation";
 import {
   Building2,
@@ -55,7 +56,7 @@ export default async function AdminDashboardPage({
             count === 1
               ? "1 pedido de adoção pendente na plataforma."
               : `${count} pedidos de adoção pendentes na plataforma.`,
-          allClear: "Tudo em dia. Sem itens pendentes.",
+          allClear: "Sem canis ou adoções pendentes nesta secção.",
           quickTitle: "Acessos rapidos",
           quick: {
             shelters: "Gerir canis",
@@ -86,7 +87,7 @@ export default async function AdminDashboardPage({
             count === 1
               ? "1 adoption request pending platform-wide."
               : `${count} adoption requests pending platform-wide.`,
-          allClear: "All caught up. No pending items.",
+          allClear: "No pending shelters or adoptions in this section.",
           quickTitle: "Quick links",
           quick: {
             shelters: "Manage shelters",
@@ -180,6 +181,7 @@ export default async function AdminDashboardPage({
 
   return (
     <main id="main-content" tabIndex={-1} className="space-y-6">
+      <ContactAdminSummary locale={locale} />
       <header className="rounded-3xl border border-border/50 bg-card p-6 sm:p-8">
         <h1 className="display-title text-4xl sm:text-5xl">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.subtitle}</p>

@@ -96,6 +96,11 @@ export function LegalInformation({
               ? "Ao registar uma promessa de ajuda, o nome e email da conta e a mensagem indicada são partilhados com a equipa do canil para combinar a entrega. Estes dados e os registos individuais de receção não são públicos. Os totais das campanhas são confirmados manualmente pelos canis; o pagamento é externo à FYA."
               : "When recording a support promise, your account name and email and your message are shared with the shelter team to arrange delivery. These details and individual receipt records are not public. Campaign totals are manually confirmed by shelters; payments happen outside FYA."}
           </p>
+          <p>
+            {pt
+              ? "As propostas de parceria recolhem organização, contacto, email, website opcional e proposta para análise pela administração. Os pedidos de ajuda dos canis e as respetivas mensagens são visíveis à equipa desse canil e à administração; notas internas são exclusivas da administração. São registados estados, datas e autores para acompanhamento. Estes contactos não subscrevem marketing."
+              : "Partnership proposals collect organization, contact name, email, optional website and proposal for administrative review. Shelter help requests and messages are visible to that shelter team and administrators; internal notes are visible only to administrators. Statuses, dates and authors are recorded for follow-up. These contacts do not subscribe you to marketing."}
+          </p>
           <Link className="underline" href={`/${locale}/conta/privacidade`}>
             {pt
               ? "Consultar os meus dados e registar um pedido"
