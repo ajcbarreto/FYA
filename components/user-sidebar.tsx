@@ -13,6 +13,7 @@ import {
   Settings,
   Heart,
   LogOut,
+  PawPrint,
 } from "lucide-react";
 import type { Locale } from "@/lib/i18n/config";
 import { logout } from "@/app/auth/register/actions";
@@ -41,6 +42,7 @@ export function UserSidebar({ locale }: UserSidebarProps) {
             favorites: "Favoritos",
             requests: "Meus Pedidos",
             messages: "Mensagens",
+            listings: "Dar para adoção",
             settings: "Definições",
             logout: "Terminar sessão",
           },
@@ -55,6 +57,7 @@ export function UserSidebar({ locale }: UserSidebarProps) {
             favorites: "Favorites",
             requests: "My Requests",
             messages: "Messages",
+            listings: "Rehome an animal",
             settings: "Settings",
             logout: "Sign out",
           },
@@ -77,6 +80,11 @@ export function UserSidebar({ locale }: UserSidebarProps) {
       href: `/${locale}/user/mensagens`,
       label: copy.links.messages,
       icon: MessageCircle,
+    },
+    {
+      href: `/${locale}/user/animais`,
+      label: copy.links.listings,
+      icon: PawPrint,
     },
   ];
   const accountItems: NavItem[] = [

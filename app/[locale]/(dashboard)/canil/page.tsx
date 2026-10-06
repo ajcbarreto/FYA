@@ -37,6 +37,8 @@ export default async function CanilDashboardPage({
   }
 
   const { shelter, animals } = await getShelterForUser(supabase, user.id);
+  // Individuals have no shelter dashboard; their listings are the starting point.
+  if (shelter?.tipo === "particular") redirect(`/${locale}/canil/animais`);
   const copy =
     locale === "pt"
       ? {

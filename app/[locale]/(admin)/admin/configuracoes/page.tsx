@@ -49,6 +49,10 @@ export default async function AdminSettingsPage({
           requireVerification: "Exigir canil verificado para publicar animais",
           requireVerificationHint:
             "A publicação exige sempre verificação. Os registos internos podem ser criados antes.",
+          requireIndividualReview:
+            "Rever manualmente todos os anúncios de particulares",
+          requireIndividualReviewHint:
+            "Desligado, só os anúncios que a verificação automática assinala vão para a fila de análise.",
           save: "Guardar configurações",
           messages: {
             platform_saved: "Configurações da plataforma guardadas.",
@@ -69,6 +73,9 @@ export default async function AdminSettingsPage({
           requireVerification: "Require verified shelter to publish animals",
           requireVerificationHint:
             "Publishing always requires verification. Internal records can be created beforehand.",
+          requireIndividualReview: "Manually review every individual's listing",
+          requireIndividualReviewHint:
+            "When off, only listings flagged by the automatic checks go to the review queue.",
           save: "Save settings",
           messages: {
             platform_saved: "Platform settings saved.",
@@ -173,6 +180,23 @@ export default async function AdminSettingsPage({
               </span>
               <span className="mt-0.5 block text-xs text-muted-foreground">
                 {copy.requireVerificationHint}
+              </span>
+            </span>
+          </label>
+
+          <label className="flex items-start gap-3 rounded-2xl bg-muted/60 p-4">
+            <input
+              type="checkbox"
+              name="requireIndividualReview"
+              defaultChecked={platform.requireIndividualReview}
+              className="mt-0.5 h-4 w-4 rounded border-border"
+            />
+            <span>
+              <span className="text-sm font-semibold">
+                {copy.requireIndividualReview}
+              </span>
+              <span className="mt-0.5 block text-xs text-muted-foreground">
+                {copy.requireIndividualReviewHint}
               </span>
             </span>
           </label>

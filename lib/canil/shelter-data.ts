@@ -12,6 +12,7 @@ export type ShelterRecord = {
   telefone: string | null;
   email_contacto: string | null;
   verificado: boolean;
+  tipo: "canil" | "particular";
   donation_url: string | null;
   donation_message: string | null;
   image_url: string | null;
@@ -30,6 +31,7 @@ export type ShelterAnimalRecord = {
   status: string;
   descricao: string | null;
   created_at: string;
+  moderacao?: "aprovado" | "pendente" | "rejeitado";
 };
 
 export async function getShelterForUser(
@@ -42,7 +44,7 @@ export async function getShelterForUser(
     ? await supabase
         .from("animais")
         .select(
-          "id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,created_at",
+          "id,canil_id,nome,especie,raca,sexo,idade_anos,porte,status,descricao,created_at,moderacao",
         )
         .eq("canil_id", shelter.id)
         .order("created_at", { ascending: false })

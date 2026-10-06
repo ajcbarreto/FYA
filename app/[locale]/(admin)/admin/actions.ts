@@ -64,6 +64,8 @@ export async function updatePlatformSettings(formData: FormData) {
     formData.get("defaultAdoptionFee") ?? "",
   ).trim();
   const requireVerificationToPublish = true;
+  const requireIndividualReview =
+    formData.get("requireIndividualReview") === "on";
 
   if (!platformName) {
     redirect(`/${locale}/admin/configuracoes?error=invalid_platform`);
@@ -78,6 +80,7 @@ export async function updatePlatformSettings(formData: FormData) {
         supportEmail,
         defaultAdoptionFee,
         requireVerificationToPublish,
+        requireIndividualReview,
       },
       updated_by: user?.id ?? null,
     },
@@ -183,4 +186,30 @@ export async function updatePetCatalogFilters(formData: FormData) {
   redirect(
     `/${locale}/admin/configuracoes?success=${encodeURIComponent(dictionary.admin.success)}`,
   );
+}
+
+export async function moderateListing(formData: FormData) {
+  const locale = getLocale(formData);
+  const animalId = String(formData.get("animalId") ?? "").trim();
+  const decision = String(formData.get("decision") ?? "");
+  const note = String(formData.get("note") ?? "").trim();
+
+  if (!animalId || !["aprovado", "rejeitado"].includes(decision)) {
+    redirect(`/${locale}/admin/anuncios?error=invalid_data`);
+  }
+
+  const supabase = await requireAdmin(locale);
+  const { error } = await supabase.rpc("moderate_animal", {
+    p_animal: animalId,
+    p_decision: decision,
+    p_note: note,
+  });
+
+  if (error) {
+    redirect(`/${locale}/admin/anuncios?error=moderation_failed`);
+  }
+
+  revalidatePublicCatalog();
+  revalidatePath(`/${locale}/admin/anuncios`);
+  redirect(`/${locale}/admin/anuncios?success=${decision}`);
 }

@@ -3,6 +3,7 @@ import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import { CanilSidebar } from "@/components/canil-sidebar";
 import { staticPageMetadata } from "@/lib/seo/metadata";
+import { getOwnedShelter } from "@/lib/canil/owned-shelter";
 
 export function generateMetadata({
   params,
@@ -27,15 +28,20 @@ export default async function CanilLayout({
     notFound();
   }
 
-  const { user } = await getAuthUser();
+  const { supabase, user } = await getAuthUser();
 
-  if (!user) {
+  if (!user || !supabase) {
     redirect(`/${locale}/auth/login?next=/canil`);
   }
 
+  const shelter = await getOwnedShelter(supabase, user.id);
+
   return (
     <div className="dashboard-shell">
-      <CanilSidebar locale={locale as Locale} />
+      <CanilSidebar
+        locale={locale as Locale}
+        individual={shelter?.tipo === "particular"}
+      />
       <div className="min-w-0 flex-1">{children}</div>
     </div>
   );

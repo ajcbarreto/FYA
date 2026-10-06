@@ -196,6 +196,17 @@ export default async function CanilPetsPage({
                     </td>
                     <td className="px-6 py-4 text-sm font-semibold">
                       {localizeAnimalStatus(animal.status, locale)}
+                      {animal.moderacao && animal.moderacao !== "aprovado" && (
+                        <span className="ml-2 rounded-full bg-accent/15 px-2 py-0.5 text-xs">
+                          {animal.moderacao === "pendente"
+                            ? locale === "pt"
+                              ? "Em análise"
+                              : "Under review"
+                            : locale === "pt"
+                              ? "Rejeitado"
+                              : "Rejected"}
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap items-center gap-2">
