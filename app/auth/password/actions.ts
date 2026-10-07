@@ -1,7 +1,7 @@
 "use server";
 
 import { captchaToken } from "@/lib/captcha";
-import { headers } from "next/headers";
+import { siteOrigin } from "@/lib/seo/site";
 import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
@@ -9,18 +9,6 @@ import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 function getLocaleFromForm(formData: FormData): Locale {
   const localeValue = String(formData.get("locale") ?? defaultLocale);
   return isLocale(localeValue) ? localeValue : defaultLocale;
-}
-
-async function getOrigin() {
-  const headerList = await headers();
-  const origin = headerList.get("origin");
-  if (origin) return origin;
-  const host = headerList.get("host");
-  const protocol =
-    host?.startsWith("localhost") || host?.startsWith("127.")
-      ? "http"
-      : "https";
-  return host ? `${protocol}://${host}` : "";
 }
 
 export async function requestPasswordReset(formData: FormData) {
@@ -32,7 +20,7 @@ export async function requestPasswordReset(formData: FormData) {
   }
 
   const supabase = await createServerSupabaseClient();
-  const origin = await getOrigin();
+  const origin = siteOrigin();
   const next = encodeURIComponent(`/${locale}/auth/reset-password`);
   const redirectTo = origin
     ? `${origin}/auth/callback?next=${next}`
